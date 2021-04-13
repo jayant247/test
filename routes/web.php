@@ -14,5 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+        $exitCode = Artisan::call('cache:clear');
+    $exitCode = Artisan::call('optimize');
+    $exitCode = Artisan::call('route:cache');
+    $exitCode = Artisan::call('route:clear');
+    $exitCode = Artisan::call('view:clear');
+    $exitCode = Artisan::call('config:cache');
     return view('welcome');
 });

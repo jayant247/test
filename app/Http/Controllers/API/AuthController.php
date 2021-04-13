@@ -9,9 +9,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Mail;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator;
 use Illuminate\Support\Facades\Hash;
 class AuthController extends BaseController
@@ -235,6 +237,100 @@ class AuthController extends BaseController
         }
     }
 
+    public function verifyEmailOtp(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'email'=>'required|email',
+                'otp'=>'required|numeric',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $user = User::whereEmail($request->email)->first();
+            if(!is_null($user)){
+                if($user->email_otp){
+                    $start_date = new \DateTime();
+                    $since_start = $start_date->diff(new \DateTime($user->email_otp_time));
+                    $minutes = $since_start->days * 24 * 60;
+                    $minutes += $since_start->h * 60;
+                    $minutes += $since_start->i;
+                    if($minutes>10){
+                        return $this->sendError('OTP Timeout. Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                    }else{
+                        if($user->email_otp==$request->otp.''){
+                            $user->email_otp=null;
+                            $user->email_verified_at=Carbon::now();
+                            $user->save();
+                            $response= ['userInfo'=>$user->toArray()];
+
+                            return $this->sendResponse($response, 'Email OTP Verified Successfully');
+                        }else{
+                            return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"]);
+                        }
+                    }
+                }else{
+                    return $this->sendError('Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                }
+            }else{
+                return $this->sendError('User Does Not Exist', [],200);
+            }
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function resendEmailOtp(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'email'=>'required|email',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $user = User::whereEmail($request->email)->first();
+            if(!is_null($user)){
+                if($user->email_otp) {
+                    $start_date = new \DateTime();
+                    $since_start = $start_date->diff(new \DateTime($user->email_otp_time));
+                    $minutes = $since_start->days * 24 * 60;
+                    $minutes += $since_start->h * 60;
+                    $minutes += $since_start->i;
+                    if ($minutes > 10) {
+                        $user->email_otp = rand(100000,999999);
+                        $user->email_otp_time = Carbon::now();
+                        $user->save();
+                        Mail::send('email.mailOTP', ['otp' => $user->email_otp], function ($m) use ($user) {
+                            $m->from(env('MAIL_FROM_ADDRESS','info@bloomapp.in'), 'Bloom App | OTP verify mail');
+
+                            $m->to($user->email, $user->fullname)->subject('Email Verification OTP.');
+                        });
+                        return $this->sendResponse([], 'New OTP Send Successfully');
+                    }else{
+                        Mail::send('email.mailOTP', ['otp' => $user->email_otp], function ($m) use ($user) {
+                            $m->from(env('MAIL_FROM_ADDRESS','info@bloomapp.in'), 'Bloom App | OTP verify mail');
+
+                            $m->to($user->email, $user->fullname)->subject('Email Verification OTP.');
+                        });
+                        return $this->sendResponse([], 'OTP Send Successfully');
+                    }
+                }else{
+                    $user->email_otp = rand(100000,999999);
+                    $user->email_otp_time = Carbon::now();
+                    $user->save();
+                    Mail::send('email.mailOTP', ['otp' => $user->email_otp], function ($m) use ($user) {
+                        $m->from(env('MAIL_FROM_ADDRESS','info@bloomapp.in'), 'Bloom App | OTP verify mail');
+
+                        $m->to($user->email, $user->fullname)->subject('Email Verification OTP.');
+                    });
+                    return $this->sendResponse([], 'OTP Send Successfully');
+                }
+            }else{
+                return $this->sendError('User Does Not Exist', [],200);
+            }
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
 
     public function customerLoginWithOtp(Request $request){
         try{

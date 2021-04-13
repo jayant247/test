@@ -41,6 +41,8 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
     Route::post('customerLoginWithOtp',[AuthController::class,'customerLoginWithOtp']);
     Route::post('verifyMobileOtp',[AuthController::class,'verifyMobileOtp']);
     Route::post('resendOtp',[AuthController::class,'resendOtp']);
+    Route::post('verifyEmailOtp',[AuthController::class,'verifyEmailOtp']);
+    Route::post('resendEmailOtp',[AuthController::class,'resendEmailOtp']);
 
 });
 
