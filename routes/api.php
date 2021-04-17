@@ -35,9 +35,14 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     Route::post('updateCategory/{id}',[CategoryController::class,'updateCategory']);
 
     //product
-
     Route::post('createProduct',[ProductController::class,'createProduct']);
+    Route::post('updateProduct/{id}',[ProductController::class,'updateProduct']);
+    Route::delete('deleteProduct/{id}',[ProductController::class,'deleteProduct']);
 
+    //product Description
+    Route::post('createProductDescription',[ProductController::class,'createProductDescription']);
+    Route::post('updateProductDescription/{id}',[ProductController::class,'updateProductDescription']);
+    Route::delete('deleteProductDescription/{id}',[ProductController::class,'deleteProductDescription']);
 });
 
 Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function () {
@@ -55,4 +60,6 @@ Route::group(['middleware' => [],'prefix' => 'frontend','as' => 'frontend.'], fu
 
     Route::get('getCategory',[CategoryController::class,'getCategory']);
     Route::get('getProducts',[ProductController::class,'getProduct']);
+    Route::get('getProdcutDescription',[ProductController::class,'getProductDescription']);
+
 });
