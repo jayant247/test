@@ -138,9 +138,16 @@ class AuthController extends BaseController
             $role = Role::where('name','Customer')->first();
             $userData = User::query()->whereId($newUser->id)->first();
             if(!is_null($userData)){
+            
+
                 $userData->assignRole($role);
                 $response=['newUser'=>$userData];
-                return $this->sendResponse($response,'OTP Sent Successfully', true);
+                if($this->sendOtp($userData)){
+                    return $this->sendResponse($response, 'OTP Send Successfully');    
+                }else{
+                    return $this->sendResponse([], 'OTP Send Failed',false);    
+                }
+                
             }
             else{
                 return $this->sendError('Something Went Wrong While Registration', [],200);
@@ -218,16 +225,29 @@ class AuthController extends BaseController
                         $user->mobile_otp = rand(100000,999999);
                         $user->mobile_otp_time = Carbon::now();
                         $user->save();
-                        return $this->sendResponse([], 'New OTP Send Successfully');
+                        if($this->sendOtp($user)){
+                            return $this->sendResponse([], 'New OTP Send Successfully');    
+                        }else{
+                            return $this->sendResponse([], 'OTP Send Failed',false);    
+                        }
+                        
                     }else{
 
-                        return $this->sendResponse([], 'OTP Send Successfully');
+                        if($this->sendOtp($user)){
+                            return $this->sendResponse([], 'OTP Send Successfully');    
+                        }else{
+                            return $this->sendResponse([], 'OTP Send Failed',false);    
+                        }
                     }
                 }else{
                     $user->mobile_otp = rand(100000,999999);
                     $user->mobile_otp_time = Carbon::now();
                     $user->save();
-                    return $this->sendResponse([], 'OTP Send Successfully');
+                    if($this->sendOtp($user)){
+                        return $this->sendResponse([], 'New OTP Send Successfully');    
+                    }else{
+                        return $this->sendResponse([], 'OTP Send Failed',false);    
+                    }
                 }
             }else{
                 return $this->sendError('User Does Not Exist', [],200);
@@ -346,7 +366,11 @@ class AuthController extends BaseController
                 $user->mobile_otp = rand(100000,999999);
                 $user->mobile_otp_time = Carbon::now();
                 $user->save();
-                return $this->sendResponse([],'Please verify otp', true);
+                if($this->sendOtp($user)){
+                    return $this->sendResponse([], 'OTP Send Successfully');    
+                }else{
+                    return $this->sendResponse([], 'OTP Send Failed',false);    
+                }
             }
             else{
                 return $this->sendError('No User Found', [],200);
@@ -552,6 +576,34 @@ class AuthController extends BaseController
         }catch (\Exception $exception){
             return $this->sendError('Something Went Wrong', $exception->getMessage(),413);
         }
+    }
+
+    function sendOtp($user){
+        $curl = curl_init();
+            $url = "https://2factor.in/API/V1/".env("MESSAGE_API_KEY")."/SMS/+91".$user->mobile_no."/".$user->mobile_otp;
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => $url,
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => "",
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 30,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => "GET",
+              CURLOPT_POSTFIELDS => "",
+              CURLOPT_HTTPHEADER => array(
+                
+              ),
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+
+            $response = json_decode($response,true);
+            if($response["Status"]=="Success"){
+                return true;
+            }else{
+                return false;
+            }
     }
 
 
