@@ -19,6 +19,8 @@ class CreateCategoriesTable extends Migration
             $table->bigInteger('parent_id')->nullable()->unsigned();
             $table->string('type')->nullable();
             $table->string('category_thumbnail')->nullable();
+            $table->text('big_thumbnail')->nullable();
+            $table->boolean('is_bigthumbnail_show')->default(false);
             $table->timestamps();
         });
     }

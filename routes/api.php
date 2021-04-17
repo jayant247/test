@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,10 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     Route::post('createCategory',[CategoryController::class,'createCategory']);
     Route::post('updateCategory/{id}',[CategoryController::class,'updateCategory']);
 
+    //product
+
+    Route::post('createProduct',[ProductController::class,'createProduct']);
+
 });
 
 Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function () {
@@ -49,5 +54,5 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
 Route::group(['middleware' => [],'prefix' => 'frontend','as' => 'frontend.'], function () {
 
     Route::get('getCategory',[CategoryController::class,'getCategory']);
-
+    Route::get('getProducts',[ProductController::class,'getProduct']);
 });
