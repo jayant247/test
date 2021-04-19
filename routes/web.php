@@ -20,5 +20,6 @@ Route::get('/', function () {
     $exitCode = Artisan::call('route:clear');
     $exitCode = Artisan::call('view:clear');
     $exitCode = Artisan::call('config:cache');
+    $exitCode = Artisan::call('migrate');
     return view('welcome');
 });

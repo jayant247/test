@@ -5,11 +5,13 @@ use App\Models\Category;
 use App\Models\ProductDescription;
 use App\Models\ProductHasCategory;
 use App\Models\ProductImages;
+use App\Models\ProductReview;
 use App\Models\Products;
 use App\Models\ProductVariables;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
+use Auth;
 use Validator;
 
 class ProductController extends BaseController{
@@ -508,7 +510,7 @@ class ProductController extends BaseController{
         }
     }
 
-    //create product variables
+    //create product images
     public function createProductImages(Request $request){
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
@@ -588,8 +590,8 @@ class ProductController extends BaseController{
                 if($newProductVariable->save()){
                     return $this->sendResponse([],'Product Images Updated Successfully.', true);
                 }else{
-                    if(file_exists(public_path().$newProductVariable->image)){
-                        unlink(public_path().$newProductVariable->image);
+                    if(file_exists(public_path().$newProductVariable->imagePath)){
+                        unlink(public_path().$newProductVariable->imagePath);
                     }
                     return $this->sendError('Product Images Updation Failed',[], 200);
                 }
@@ -639,11 +641,191 @@ class ProductController extends BaseController{
 
     }
 
+
+    //product review
+    public function getProductReview(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'numeric',
+                'limit'=>'numeric',
+                'product_id' => 'required|numeric',
+                'user_id'=>'numeric',
+                'review_id'=>'numeric'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $query = ProductReview::query()->whereProductId($request->product_id);
+            if($request->has('user_id')){
+                $query =$query->where('user_id',$request->user_id);
+            }
+            if($request->has('review_id')){
+                $query =$query->where('id',$request->review_id);
+            }
+            $data = $query->get();
+            if(count($data)>0){
+                $response =  $data;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    //create product images
+    public function createProductReview(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'product_id' => 'required|numeric',
+                'image' => 'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'comment'=>'string|required',
+                'rating'=>'numeric|max:5'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $product = Products::find($request->product_id);
+            if(!is_null($product)){
+                $newProductVariable = new ProductReview();
+                $newProductVariable->product_id = $request->product_id;
+                $newProductVariable->comment =$request->comment ;
+                $newProductVariable->rating = $request->rating;
+                $newProductVariable->user_id = Auth::user()->id;
+                if($request->hasFile('image')){
+                    $oldImage = $newProductVariable->imagePath;
+                    $newProductVariable->imagePath = $this->saveReviewImage($request->image);
+                    $newProductVariable->is_pic_available = true;
+
+                }
+                $newProductVariable->save();
+                $avg = ProductReview::whereProductId($request->product_id)->avg('rating');
+                $product->avg_rating = $avg;
+                $product->save();
+
+                if($newProductVariable->save()){
+                    return $this->sendResponse([],'Product Review Uploaded Successfully.', true);
+                }else{
+                    if(file_exists(public_path().$newProductVariable->imagePath)){
+                        unlink(public_path().$newProductVariable->imagePath);
+                    }
+                    return $this->sendError('Product Review Uploading Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut With id '.$request->product_id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
+    public function updateProductReview(Request $request,$id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+                'image' => 'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'comment'=>'string',
+                'rating'=>'numeric|max:5'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $newProductVariable = ProductReview::find($id);
+
+            if(!is_null($newProductVariable)){
+                if($request->hasFile('image')){
+                    $oldImage = $newProductVariable->imagePath;
+                    $newProductVariable->imagePath = $this->saveReviewImage($request->image);
+                    $newProductVariable->is_pic_available = true;
+                    if(file_exists(public_path().$oldImage)){
+                        unlink(public_path().$oldImage);
+                    }
+                }
+
+                $newProductVariable->comment = $request->has('comment')?$request->comment:$newProductVariable->comment;
+                $newProductVariable->rating = $request->has('rating')?$request->rating:$newProductVariable->rating;
+                $newProductVariable->save();
+                $product = Products::find($newProductVariable->product_id);
+                $avg = ProductReview::whereProductId($newProductVariable->product_id)->avg('rating');
+                $product->avg_rating = $avg;
+                $product->save();
+                if($newProductVariable->save()){
+                    return $this->sendResponse([],'Product Review Updated Successfully.', true);
+                }else{
+                    if(file_exists(public_path().$newProductVariable->imagePath)){
+                        unlink(public_path().$newProductVariable->imagePath);
+                    }
+                    return $this->sendError('Product Review Updation Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut Review With id '.$id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
+    public function deleteProductReview(Request $request,$id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $newProductVariable = ProductReview::find($id);
+
+            if(!is_null($newProductVariable)){
+                if($newProductVariable->delete()){
+                    return $this->sendResponse([],'Product Review Deleted Successfully.', true);
+                }else{
+
+                    return $this->sendError('Product Review Deletion Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut Variable With id '.$id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
     function saveImage($image){
         $image_name = 'product'.time().'.'.$image->getClientOriginalExtension();
         $destinationPath = public_path('images/product/');
         $image->move($destinationPath, $image_name);
         $imageURL='/images/product/'.$image_name;
+        return $imageURL;
+    }
+
+    function saveReviewImage($image){
+        $image_name = 'productReview'.time().'.'.$image->getClientOriginalExtension();
+        $destinationPath = public_path('images/productReview/');
+        $image->move($destinationPath, $image_name);
+        $imageURL='/images/productReview/'.$image_name;
         return $imageURL;
     }
 
