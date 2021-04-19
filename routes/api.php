@@ -43,6 +43,16 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     Route::post('createProductDescription',[ProductController::class,'createProductDescription']);
     Route::post('updateProductDescription/{id}',[ProductController::class,'updateProductDescription']);
     Route::delete('deleteProductDescription/{id}',[ProductController::class,'deleteProductDescription']);
+
+    //product variables
+    Route::post('createProductVariable',[ProductController::class,'createProductVariable']);
+    Route::post('updateProductVariable/{id}',[ProductController::class,'updateProductVariable']);
+    Route::delete('deleteProductVariable/{id}',[ProductController::class,'deleteProductVariable']);
+
+    //product Images
+    Route::post('createProductImages',[ProductController::class,'createProductImages']);
+    Route::post('updateProductImages/{id}',[ProductController::class,'updateProductImages']);
+    Route::delete('deleteProductImages/{id}',[ProductController::class,'deleteProductImages']);
 });
 
 Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function () {
@@ -61,5 +71,7 @@ Route::group(['middleware' => [],'prefix' => 'frontend','as' => 'frontend.'], fu
     Route::get('getCategory',[CategoryController::class,'getCategory']);
     Route::get('getProducts',[ProductController::class,'getProduct']);
     Route::get('getProdcutDescription',[ProductController::class,'getProductDescription']);
+    Route::get('getProductVariable',[ProductController::class,'getProductVariable']);
+    Route::get('getProductImages',[ProductController::class,'getProductImages']);
 
 });

@@ -172,7 +172,7 @@ class CategoryController extends BaseController{
                 $skip = $limit*$pageNo;
                 $query= $query->skip($skip)->limit($limit);
             }
-            $data= $query->orderBy('id','DESC')->get();
+            $data= $query->orderBy('id','ASC')->get();
             if(count($data)>0){
                 $response =  $data;
                 return $this->sendResponse($response,'Data Fetched Successfully', true);

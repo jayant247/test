@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API;
 use App\Models\Category;
 use App\Models\ProductDescription;
 use App\Models\ProductHasCategory;
+use App\Models\ProductImages;
 use App\Models\Products;
+use App\Models\ProductVariables;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
@@ -227,7 +229,7 @@ class ProductController extends BaseController{
         }
 
     }
-
+    //delete product
     public function deleteProduct(Request $request,$id){
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
@@ -245,9 +247,7 @@ class ProductController extends BaseController{
                 if($newProduct->delete()){
                     return $this->sendResponse([],'Product Deleted Successfully.', true);
                 }else{
-                    if(file_exists(public_path().$newProduct->primary_image)){
-                        unlink(public_path().$newProduct->primary_image);
-                    }
+
                     return $this->sendError('Product Deletion Failed',[], 422);
                 }
             }else{
@@ -262,6 +262,382 @@ class ProductController extends BaseController{
 
     }
 
+    //product variables
+
+    //get product variables
+
+    public function getProductVariable(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'numeric',
+                'limit'=>'numeric',
+                'product_id' => 'required|numeric',
+                'variable_id' => 'numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $query = ProductVariables::query()->whereProductId($request->product_id);
+            if($request->has('variable_id')){
+                $query =$query->where('id',$request->variable_id);
+            }
+            $data = $query->get();
+            if(count($data)>0){
+                $response =  $data;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    //create product variables
+    public function createProductVariable(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'product_id' => 'required|numeric',
+                'primary_image' => 'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'price'=>'required|numeric',
+                'mrp'=>'required|numeric',
+                'sale_price'=>'numeric',
+                'sale_percentage'=>'numeric|max:100',
+                'is_on_sale' => 'boolean',
+                'color' => 'string',
+                'size' => 'string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $product = Products::find($request->product_id);
+            if(!is_null($product)){
+                $newProductVariable = new ProductVariables();
+                if($request->has('is_on_sale') && $request->is_on_sale=true){
+                    if(!$request->has('sale_percentage') || !$request->has('sale_price')){
+                        return $this->sendError('Validation Error.', [
+                            "sale_price"=>['Sale price is required'],
+                            "sale_percentage"=>['Sale percentage is required']
+                        ]);
+                    }else{
+                        $newProductVariable->sale_price = $request->sale_price;
+                        $newProductVariable->sale_percentage = $request->sale_percentage;
+                        $newProductVariable->is_on_sale = $request->is_on_sale;
+                    }
+                }
+                $newProductVariable->product_id = $request->product_id;
+                $newProductVariable->primary_image =$this->saveImage($request->primary_image) ;
+                $newProductVariable->price = $request->price;
+                $newProductVariable->mrp = $request->mrp;
+                $newProductVariable->color = $request->has('color')?$request->color:null;
+                $newProductVariable->size = $request->has('size')?$request->size:null;
+                $newProductVariable->save();
+                if($newProductVariable->is_on_sale){
+                    $product->sale_price = $request->sale_price;
+                    $product->sale_percentage = $request->sale_percentage;
+                    $product->is_on_sale = $request->is_on_sale;
+                    $product->save();
+                }
+                if($newProductVariable->save()){
+                    return $this->sendResponse([],'Product Variable Created Successfully.', true);
+                }else{
+                    if(file_exists(public_path().$newProductVariable->primary_image)){
+                        unlink(public_path().$newProductVariable->primary_image);
+                    }
+                    return $this->sendError('Product Variable Creation Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut With id '.$request->product_id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
+    public function updateProductVariable(Request $request,$id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'product_id' => 'numeric',
+                'primary_image' => 'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'price'=>'numeric',
+                'mrp'=>'numeric',
+                'sale_price'=>'numeric',
+                'sale_percentage'=>'numeric|max:100',
+                'is_on_sale' => 'boolean',
+                'color' => 'string',
+                'size' => 'string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $newProductVariable = ProductVariables::find($id);
+
+            if(!is_null($newProductVariable)){
+                if($request->has('is_on_sale') && $request->is_on_sale=true){
+                    if(!$request->has('sale_percentage') || !$request->has('sale_price')){
+                        return $this->sendError('Validation Error.', [
+                            "sale_price"=>['Sale price is required'],
+                            "sale_percentage"=>['Sale percentage is required']
+                        ]);
+                    }else{
+                        $newProductVariable->sale_price = $request->sale_price;
+                        $newProductVariable->sale_percentage = $request->sale_percentage;
+                        $newProductVariable->is_on_sale = $request->is_on_sale;
+                    }
+                }
+
+                if($request->has('product_id')){
+                    $product = Products::find($request->product_id);
+                    if(!is_null($product)){
+                        $newProductVariable->product_id = $request->product_id;
+                    }else{
+                        return $this->sendError('No Prodcut Variable With id '.$request->product_id.' available',[], 200);
+                    }
+                }
+                if($request->hasFile('primary_image')){
+                    $oldImage = $newProductVariable->primary_image;
+                    $newProductVariable->primary_image = $this->saveImage($request->primary_image);
+                    unlink(public_path().$oldImage);
+                }
+
+                $newProductVariable->price = $request->has('price')?$request->price:$newProductVariable->price;
+                $newProductVariable->mrp = $request->has('mrp')?$request->mrp:$newProductVariable->mrp;
+                $newProductVariable->color = $request->has('color')?$request->color:null;
+                $newProductVariable->size = $request->has('size')?$request->size:null;
+                $newProductVariable->save();
+                if($newProductVariable->is_on_sale){
+                    $product->sale_price = $request->sale_price;
+                    $product->sale_percentage = $request->sale_percentage;
+                    $product->is_on_sale = $request->is_on_sale;
+                    $product->save();
+                }
+                if($newProductVariable->save()){
+                    return $this->sendResponse([],'Product Variable Updated Successfully.', true);
+                }else{
+                    if(file_exists(public_path().$newProductVariable->primary_image)){
+                        unlink(public_path().$newProductVariable->primary_image);
+                    }
+                    return $this->sendError('Product Variable Updation Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut Variable With id '.$id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
+    public function deleteProductVariable(Request $request,$id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $newProductVariable = ProductVariables::find($id);
+
+            if(!is_null($newProductVariable)){
+                if($newProductVariable->delete()){
+                    return $this->sendResponse([],'Product Variable Deleted Successfully.', true);
+                }else{
+
+                    return $this->sendError('Product Variable Deletion Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut Variable With id '.$id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
+    //product images
+
+    public function getProductImages(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'numeric',
+                'limit'=>'numeric',
+                'product_id' => 'required|numeric',
+                'product_variable_id' => 'numeric',
+                'image_id' => 'numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $query = ProductImages::query()->whereProductId($request->product_id);
+            if($request->has('product_variable_id')){
+                $query =$query->where('product_variable_id',$request->product_variable_id);
+            }
+            if($request->has('image_id')){
+                $query =$query->where('id',$request->image_id);
+            }
+            $data = $query->get();
+            if(count($data)>0){
+                $response =  $data;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    //create product variables
+    public function createProductImages(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'product_id' => 'required|numeric',
+                'image' => 'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'product_variable_id'=>'numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $product = Products::find($request->product_id);
+            if(!is_null($product)){
+                $newProductVariable = new ProductImages();
+
+                $newProductVariable->product_id = $request->product_id;
+                $newProductVariable->imagePath =$this->saveImage($request->image) ;
+                $newProductVariable->product_variable_id = $request->has('product_variable_id')?$request->product_variable_id:null;
+
+
+                if($newProductVariable->save()){
+                    return $this->sendResponse([],'Product Image Uploaded Successfully.', true);
+                }else{
+                    if(file_exists(public_path().$newProductVariable->imagePath)){
+                        unlink(public_path().$newProductVariable->imagePath);
+                    }
+                    return $this->sendError('Product Image Uploading Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut With id '.$request->product_id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
+    public function updateProductImages(Request $request,$id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'product_id' => 'numeric',
+                'image' => 'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'product_variable_id'=>'numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $newProductVariable = ProductImages::find($id);
+
+            if(!is_null($newProductVariable)){
+
+
+                if($request->has('product_id')){
+                    $product = Products::find($request->product_id);
+                    if(!is_null($product)){
+                        $newProductVariable->product_id = $request->product_id;
+                    }else{
+                        return $this->sendError('No Prodcut Variable With id '.$request->product_id.' available',[], 200);
+                    }
+                }
+                if($request->hasFile('image')){
+                    $oldImage = $newProductVariable->imagePath;
+                    $newProductVariable->imagePath = $this->saveImage($request->image);
+                    if(file_exists(public_path().$oldImage)){
+                        unlink(public_path().$oldImage);
+                    }
+                }
+
+                $newProductVariable->product_variable_id = $request->has('product_variable_id')?$request->product_variable_id:$newProductVariable->product_variable_id;
+
+                if($newProductVariable->save()){
+                    return $this->sendResponse([],'Product Images Updated Successfully.', true);
+                }else{
+                    if(file_exists(public_path().$newProductVariable->image)){
+                        unlink(public_path().$newProductVariable->image);
+                    }
+                    return $this->sendError('Product Images Updation Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut Variable With id '.$id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
+
+    public function deleteProductImages(Request $request,$id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            $newProductVariable = ProductImages::find($id);
+
+            if(!is_null($newProductVariable)){
+                if($newProductVariable->delete()){
+                    return $this->sendResponse([],'Product Images Deleted Successfully.', true);
+                }else{
+
+                    return $this->sendError('Product Images Deletion Failed',[], 200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut Variable With id '.$id.' available',[], 200);
+            }
+
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+
+    }
 
     function saveImage($image){
         $image_name = 'product'.time().'.'.$image->getClientOriginalExtension();
