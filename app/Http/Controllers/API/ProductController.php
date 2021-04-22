@@ -943,4 +943,34 @@ class ProductController extends BaseController{
             return $this->sendError('Something Went Wrong', $e,413);
         }
     }
+
+    public function getSingleProductInfo(Request $request,$id)
+    {
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $prodcutDescription = Products::find($id);
+            if(!is_null($prodcutDescription)){
+                $productData = null;
+                $productData = Products::whereId($id)
+                    ->with(['productDescriptions','productVariables','productImages','productVariables.productVariablesImages'])
+                    ->first();
+                if($productData){
+                    return $this->sendResponse($productData,'Product Description Deleted Successfully', true);
+                }else{
+                    return $this->sendError('Product Description Deletion Failed', [],200);
+                }
+            }else{
+                return $this->sendError('No Product Description Found', [],200);
+            }
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
 }

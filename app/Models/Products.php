@@ -22,6 +22,17 @@ class Products extends Model
     }
 
     public function productDescriptions(){
-        return $this->hasMany(ProductDescription::class,'product_id','id');
+        return $this->hasMany(ProductDescription::class,'product_id','id')->select('property_name','property_value','product_id');
     }
+
+    public function productVariables(){
+        return $this->hasMany(ProductVariables::class,'product_id','id');
+    }
+
+    public function productImages(){
+        return $this->hasMany(ProductImages::class,'product_id','id')->select('imagePath','product_id');
+    }
+
+
+
 }

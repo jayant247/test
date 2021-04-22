@@ -82,5 +82,5 @@ Route::group(['middleware' => [],'prefix' => 'frontend','as' => 'frontend.'], fu
     Route::get('getProductVariable',[ProductController::class,'getProductVariable']);
     Route::get('getProductImages',[ProductController::class,'getProductImages']);
     Route::get('getProductReview',[ProductController::class,'getProductReview']);
-
+    Route::get('getSingleProductInfo/{id}',[ProductController::class,'getSingleProductInfo']);
 });
