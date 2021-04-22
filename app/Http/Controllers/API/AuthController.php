@@ -207,8 +207,12 @@ class AuthController extends BaseController
             if($validator->fails()){
                 return $this->sendError('Validation Error.', $validator->errors());
             }
-
-            $newUser = new User;
+            ;
+            if(!is_null(User::where('imei_number',$request->imei_number)->first())){
+                $newUser = User::where('imei_number',$request->imei_number)->first();
+            }else{
+                $newUser = new User;
+            }
             $newUser->name = $request->name;
             $newUser->firebase_token = $request->has('firebase_token')?$request->firebase_token: null ;
             $newUser->mobile_no=$request->mobile_no;
@@ -690,6 +694,57 @@ class AuthController extends BaseController
             }else{
                 return false;
             }
+    }
+
+    public function customerRegistrationWithImei(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'imei_number'=>'string|required',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $response=[];
+            $response['token']=null;
+            if(!is_null(User::where('imei_number',$request->imei_number)->first())){
+                $newUser = User::where('imei_number',$request->imei_number)->first();
+                try {
+                    if (! $token = JWTAuth::fromUser($newUser)) {
+                        return $this->sendError('Error in token generation.', ['error'=>"Error in token generationord."]);
+                    }
+                } catch (JWTException $e) {
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                }
+                $response['token']=$token;
+            }else{
+                $newUser = new User;
+                $newUser->name = $request->imei_number;
+                $newUser->mobile_no=$request->imei_number;
+                $newUser->email=$request->imei_number;
+                $newUser->imei_number = $request->imei_number;
+                $newUser->save();
+
+                try {
+                    if (! $token = JWTAuth::fromUser($newUser)) {
+                        return $this->sendError('Error in token generation.', ['error'=>"Error in token generationord."]);
+                    }
+                } catch (JWTException $e) {
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                }
+                $response['token']=$token;
+            }
+
+
+
+            if(!is_null($response['token'])){
+                return $this->sendResponse($response, 'Guest User Login Successfully');
+            }
+            else{
+                return $this->sendError('Something Went Wrong While Registration', [],200);
+            }
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
     }
 
 

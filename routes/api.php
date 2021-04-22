@@ -71,6 +71,7 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
     Route::post('resendEmailOtp',[AuthController::class,'resendEmailOtp']);
     Route::post('loginWithEmailPassword',[AuthController::class,'loginWithEmailPassword']);
     Route::post('loginWithMobileNoPassword',[AuthController::class,'loginWithMobileNoPassword']);
+    Route::post('customerRegistrationWithImei',[AuthController::class,'customerRegistrationWithImei']);
 
 });
 
