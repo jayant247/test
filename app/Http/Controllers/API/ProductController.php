@@ -44,6 +44,21 @@ class ProductController extends BaseController{
             }
 
             $data = $query->get();
+            $colorArray=[];
+            foreach($data as $key=>$product){
+                $productVariable = ProductVariables::whereProductId($product['id'])->get();
+                $productColorsImageArray = [];
+                foreach ($productVariable as $prodVar){
+                    if(!in_array($prodVar['color'], $colorArray)){
+                        array_push($colorArray,$prodVar['color']);
+                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        array_push($productColorsImageArray,$imageColorArray);
+                    }
+                }
+//                dd($productColorsImageArray);
+                $product['colorsImageArray']=$productColorsImageArray;
+//                $data[$key]
+            }
             if(count($data)>0){
                 $response =  $data;
                 return $this->sendResponse($response,'Data Fetched Successfully', true);
@@ -342,6 +357,20 @@ class ProductController extends BaseController{
                     $product->is_on_sale = $request->is_on_sale;
                     $product->save();
                 }
+                $allProductVariables = ProductVariables::whereProductId($newProductVariable->product_id)->get();
+                $colorsArray = [];
+                $sizeArray = [];
+                foreach($allProductVariables as $key=>$prodVar){
+                    if(!in_array($prodVar['color'], $colorsArray)){
+                        array_push($colorsArray,$prodVar['color']);
+                    }
+                    if(!in_array($prodVar['size'], $sizeArray)){
+                        array_push($sizeArray,$prodVar['size']);
+                    }
+                }
+                $product->available_sizes=implode(" ,",$sizeArray);
+                $product->available_colors=implode(" ,",$colorsArray);
+                $product->save();
                 if($newProductVariable->save()){
                     return $this->sendResponse([],'Product Variable Created Successfully.', true);
                 }else{
@@ -416,12 +445,28 @@ class ProductController extends BaseController{
                 $newProductVariable->color = $request->has('color')?$request->color:null;
                 $newProductVariable->size = $request->has('size')?$request->size:null;
                 $newProductVariable->save();
+                $product = Products::find($newProductVariable->product_id);
                 if($newProductVariable->is_on_sale){
                     $product->sale_price = $request->sale_price;
                     $product->sale_percentage = $request->sale_percentage;
                     $product->is_on_sale = $request->is_on_sale;
                     $product->save();
                 }
+
+                $allProductVariables = ProductVariables::whereProductId($newProductVariable->product_id)->get();
+                $colorsArray = [];
+                $sizeArray = [];
+                foreach($allProductVariables as $key=>$prodVar){
+                    if(!in_array($prodVar['color'], $colorsArray)){
+                        array_push($colorsArray,$prodVar['color']);
+                    }
+                    if(!in_array($prodVar['size'], $sizeArray)){
+                        array_push($sizeArray,$prodVar['size']);
+                    }
+                }
+                $product->available_sizes=implode(" ,",$sizeArray);
+                $product->available_colors=implode(" ,",$colorsArray);
+                $product->save();
                 if($newProductVariable->save()){
                     return $this->sendResponse([],'Product Variable Updated Successfully.', true);
                 }else{
