@@ -21,6 +21,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'metadata.'], function () {
+    //Create Password
+    Route::post('createPassword',[AuthController::class,'createPassword']);
 
     //Roles & Permissions
     Route::post('createRole',[AuthController::class,'createRole']);
@@ -67,6 +69,8 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
     Route::post('resendOtp',[AuthController::class,'resendOtp']);
     Route::post('verifyEmailOtp',[AuthController::class,'verifyEmailOtp']);
     Route::post('resendEmailOtp',[AuthController::class,'resendEmailOtp']);
+    Route::post('loginWithEmailPassword',[AuthController::class,'loginWithEmailPassword']);
+    Route::post('loginWithMobileNoPassword',[AuthController::class,'loginWithMobileNoPassword']);
 
 });
 

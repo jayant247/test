@@ -66,7 +66,7 @@ class AuthController extends BaseController
             {
                 return $this->sendError('Validation Error.', $validator->errors());
             }
-            $request['password']=Hash::make($request['password']);
+            $request['password']=bcrypt($request['password']);
             $user = User::create($request->toArray());
             $token = $user->createToken('Laravel Password Grant Client')->accessToken;
             $response = ['token' => $token];
@@ -111,6 +111,87 @@ class AuthController extends BaseController
 
     }
 
+    public function loginWithMobileNoPassword(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'mobile_no'=>'required|digits:10',
+                'password'=>'required|string',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+
+            if(Auth::attempt(['mobile_no'=>$request->mobile_no, 'password'=>$request->password])){
+                $user = Auth::user();
+                try {
+                    if (! $token = JWTAuth::fromUser($user)) {
+                        return $this->sendError('Wrong Email or Password.', ['error'=>"Wrong Email or Password."]);
+                    }
+                } catch (JWTException $e) {
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                }
+                $response['token']=$token;
+                $response['userData']=$user;
+                return $this->sendResponse($response, 'Login Successfully');
+            }else{
+                return $this->sendError('Wrong Mobile Number or Password.', [],200);
+            }
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function loginWithEmailPassword(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'email'=>'required|email',
+                'password'=>'required|string',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+//            $user = User::whereMobileNo($request->mobile_no)->wherePassword(bcrypt($request->password))->first();
+            if(Auth::attempt(['email'=>$request->email, 'password'=>$request->password])){
+                $user = Auth::user();
+                try {
+                    if (! $token = JWTAuth::fromUser($user)) {
+                        return $this->sendError('Wrong Email or Password.', ['error'=>"Wrong Email or Password."]);
+                    }
+                } catch (JWTException $e) {
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                }
+                $response['token']=$token;
+                $response['userData']=$user;
+                return $this->sendResponse($response, 'Login Successfully');
+            }else{
+                return $this->sendError('Wrong Email or Password.', [],200);
+            }
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function createPassword(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'password'=>'required|string',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $user = Auth::user();
+            if(!is_null($user)){
+                $user->password = bcrypt($request->password);
+                $user->save();
+                return $this->sendResponse([], 'Password Generated Successfully');
+            }else{
+                return $this->sendError('No User Available', [],200);
+            }
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
     public function customerRegistration(Request $request){
         try{
             $validator = Validator::make($request->all(), [
@@ -118,7 +199,10 @@ class AuthController extends BaseController
                 'email' => 'required|string|email|max:255|unique:users',
                 'mobile_no'=>'required|digits:10|unique:users',
                 'city'=>'string',
-                'firebase_token'=>'required|string'
+                'firebase_token'=>'required|string',
+                'imei_number'=>'string|required',
+                'device_type'=>'string|required',
+                'password'=>'string|required'
             ]);
             if($validator->fails()){
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -129,8 +213,10 @@ class AuthController extends BaseController
             $newUser->firebase_token = $request->has('firebase_token')?$request->firebase_token: null ;
             $newUser->mobile_no=$request->mobile_no;
             $newUser->email=$request->email;
+            $newUser->imei_number = $request->imei_number;
+            $newUser->device_type = $request->device_type;
+            $newUser->password= bcrypt($request->password);
             $newUser->city = $request->has('city')?$request->city: null;
-            $newUser->city = $request->has('imei_number')?$request->imei_number: null;
             $newUser->mobile_otp = rand(100000,999999);
             $newUser->mobile_otp_time = Carbon::now();
             $newUser->save();
@@ -138,16 +224,16 @@ class AuthController extends BaseController
             $role = Role::where('name','Customer')->first();
             $userData = User::query()->whereId($newUser->id)->first();
             if(!is_null($userData)){
-            
+
 
                 $userData->assignRole($role);
                 $response=['newUser'=>$userData];
                 if($this->sendOtp($userData)){
-                    return $this->sendResponse($response, 'OTP Send Successfully');    
+                    return $this->sendResponse($response, 'OTP Send Successfully');
                 }else{
-                    return $this->sendResponse([], 'OTP Send Failed',false);    
+                    return $this->sendResponse([], 'OTP Send Failed',false);
                 }
-                
+
             }
             else{
                 return $this->sendError('Something Went Wrong While Registration', [],200);
@@ -226,17 +312,17 @@ class AuthController extends BaseController
                         $user->mobile_otp_time = Carbon::now();
                         $user->save();
                         if($this->sendOtp($user)){
-                            return $this->sendResponse([], 'New OTP Send Successfully');    
+                            return $this->sendResponse([], 'New OTP Send Successfully');
                         }else{
-                            return $this->sendResponse([], 'OTP Send Failed',false);    
+                            return $this->sendResponse([], 'OTP Send Failed',false);
                         }
-                        
+
                     }else{
 
                         if($this->sendOtp($user)){
-                            return $this->sendResponse([], 'OTP Send Successfully');    
+                            return $this->sendResponse([], 'OTP Send Successfully');
                         }else{
-                            return $this->sendResponse([], 'OTP Send Failed',false);    
+                            return $this->sendResponse([], 'OTP Send Failed',false);
                         }
                     }
                 }else{
@@ -244,9 +330,9 @@ class AuthController extends BaseController
                     $user->mobile_otp_time = Carbon::now();
                     $user->save();
                     if($this->sendOtp($user)){
-                        return $this->sendResponse([], 'New OTP Send Successfully');    
+                        return $this->sendResponse([], 'New OTP Send Successfully');
                     }else{
-                        return $this->sendResponse([], 'OTP Send Failed',false);    
+                        return $this->sendResponse([], 'OTP Send Failed',false);
                     }
                 }
             }else{
@@ -367,9 +453,9 @@ class AuthController extends BaseController
                 $user->mobile_otp_time = Carbon::now();
                 $user->save();
                 if($this->sendOtp($user)){
-                    return $this->sendResponse([], 'OTP Send Successfully');    
+                    return $this->sendResponse([], 'OTP Send Successfully');
                 }else{
-                    return $this->sendResponse([], 'OTP Send Failed',false);    
+                    return $this->sendResponse([], 'OTP Send Failed',false);
                 }
             }
             else{
@@ -591,7 +677,7 @@ class AuthController extends BaseController
               CURLOPT_CUSTOMREQUEST => "GET",
               CURLOPT_POSTFIELDS => "",
               CURLOPT_HTTPHEADER => array(
-                
+
               ),
             ));
 
