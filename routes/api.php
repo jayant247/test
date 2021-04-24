@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\UserDetailsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -56,9 +57,14 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     Route::post('updateProductImages/{id}',[ProductController::class,'updateProductImages']);
     Route::delete('deleteProductImages/{id}',[ProductController::class,'deleteProductImages']);
 
+    //product Review
     Route::post('createProductReview',[ProductController::class,'createProductReview']);
     Route::post('updateProductReview/{id}',[ProductController::class,'updateProductReview']);
     Route::delete('deleteProductReview/{id}',[ProductController::class,'deleteProductReview']);
+
+    //user wishlist
+    Route::post('addUserWishList',[UserDetailsController::class,'addUserWishList']);
+    Route::get('getUserWishlist',[UserDetailsController::class,'getUserWishlist']);
 });
 
 Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function () {
@@ -75,7 +81,7 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
 
 });
 
-Route::group(['middleware' => [],'prefix' => 'frontend','as' => 'frontend.'], function () {
+Route::group(['middleware' => ['jwt.verify'],'prefix' => 'frontend','as' => 'frontend.'], function () {
 
     Route::get('getCategory',[CategoryController::class,'getCategory']);
     Route::get('getProducts',[ProductController::class,'getProduct']);

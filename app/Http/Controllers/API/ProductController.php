@@ -8,6 +8,7 @@ use App\Models\ProductImages;
 use App\Models\ProductReview;
 use App\Models\Products;
 use App\Models\ProductVariables;
+use App\Models\UserWhishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
@@ -21,8 +22,8 @@ class ProductController extends BaseController{
     public function getProduct(Request $request){
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'pageNo'=>'numeric',
-                'limit'=>'numeric',
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
                 'fields'=>'string',
                 'product_name'=>'string',
                 'sub_category_id' => 'required|numeric',
@@ -32,6 +33,7 @@ class ProductController extends BaseController{
             }
             $subCategoryId = $request->sub_category_id;
             $query = Products::query();
+
             $query->whereHas('subCategories', function ($query) use($subCategoryId){
                 $query->where('sub_category_id', $subCategoryId);
             });
@@ -42,10 +44,20 @@ class ProductController extends BaseController{
                 $fieldsArray=explode(',',$request->fields);
                 $query = $query->select($fieldsArray);
             }
-
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $query= $query->skip($skip)->limit($limit);
             $data = $query->get();
             $colorArray=[];
+            $userId = Auth::user()->id;
+            $userWishListItemIds = UserWhishlist::where('user_id',$userId)->pluck('product_id')->toArray();
             foreach($data as $key=>$product){
+                if(in_array($product['id'], $userWishListItemIds)){
+                    $product['isInUserWishList']=true;
+                }else{
+                    $product['isInUserWishList']=false;
+                }
                 $productVariable = ProductVariables::whereProductId($product['id'])->get();
                 $productColorsImageArray = [];
                 foreach ($productVariable as $prodVar){
@@ -298,6 +310,12 @@ class ProductController extends BaseController{
             if($request->has('variable_id')){
                 $query =$query->where('id',$request->variable_id);
             }
+            if($request->has('pageNo') && $request->has('limit')){
+                $limit = $request->limit;
+                $pageNo = $request->pageNo;
+                $skip = $limit*$pageNo;
+                $query= $query->skip($skip)->limit($limit);
+            }
             $data = $query->get();
             if(count($data)>0){
                 $response =  $data;
@@ -542,6 +560,12 @@ class ProductController extends BaseController{
             if($request->has('image_id')){
                 $query =$query->where('id',$request->image_id);
             }
+            if($request->has('pageNo') && $request->has('limit')){
+                $limit = $request->limit;
+                $pageNo = $request->pageNo;
+                $skip = $limit*$pageNo;
+                $query= $query->skip($skip)->limit($limit);
+            }
             $data = $query->get();
             if(count($data)>0){
                 $response =  $data;
@@ -707,7 +731,7 @@ class ProductController extends BaseController{
             if($request->has('review_id')){
                 $query =$query->where('id',$request->review_id);
             }
-            $data = $query->get();
+            $data = $query->with('userInfo')->get();
             if(count($data)>0){
                 $response =  $data;
                 return $this->sendResponse($response,'Data Fetched Successfully', true);
@@ -949,7 +973,12 @@ class ProductController extends BaseController{
             if($request->has('description_id')){
                 $query =$query->where('id',$request->description_id);
             }
-
+            if($request->has('pageNo') && $request->has('limit')){
+                $limit = $request->limit;
+                $pageNo = $request->pageNo;
+                $skip = $limit*$pageNo;
+                $query= $query->skip($skip)->limit($limit);
+            }
             $data = $query->get();
             if(count($data)>0){
                 $response =  $data;
