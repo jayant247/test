@@ -6,6 +6,8 @@ namespace App\Http\Controllers\API;
 use App\Models\Category;
 use App\Models\Products;
 use App\Models\ProductVariables;
+use App\Models\User;
+use App\Models\UserAddress;
 use App\Models\UserWhishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,7 +31,7 @@ class UserDetailsController extends BaseController{
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
             $userId = Auth::user()->id;
-            $userWishListItemIds = UserWhishlist::where('user_id',$userId)->pluck('product_id')->toArray();
+            $userWishListItemIds = UserWhishlist::where('user_id',$userId)->skip($skip)->limit($limit)->pluck('product_id')->toArray();
             $query = Products::query()->whereIn('id',$userWishListItemIds);
 
             $data = $query->get();
@@ -64,7 +66,7 @@ class UserDetailsController extends BaseController{
     public function addUserWishList(Request $request){
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'product_ids' => 'required|string',
+                'product_ids' => 'required',
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -76,7 +78,6 @@ class UserDetailsController extends BaseController{
                     array_push($productIdArray,$eachLanguageId);
                 }
             }
-
             $productsData = Products::whereIn('id',$productIdArray)->get();
             $userWishListItemMakeFalse = UserWhishlist::where('user_id',$userId)->delete();
             foreach ($productsData as $product){
@@ -92,6 +93,165 @@ class UserDetailsController extends BaseController{
                 }
             }
             return $this->sendResponse([],'User whishList Updated Successfully', true);
+
+        }
+        catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    //get user address
+    public function getUserAddress(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = (int)$request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $userId = Auth::user()->id;
+            $userAddress = UserAddress::where('user_id',$userId)->skip($skip)->limit($limit)->get();
+
+            if(count($userAddress)>0){
+                $response =  $userAddress;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    //create user address
+
+    public function createUserAddress(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'address_name' => 'required|string',
+                'is_primary'=>'required|boolean',
+                'pincode' => 'required|numeric',
+                'address_line_1' => 'required|string',
+                'city' => 'required|string',
+                'contact_number' => 'required|string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $userId = Auth::user()->id;
+            $newUserAddress = new UserAddress;
+            $newUserAddress->user_id = $userId;
+            $newUserAddress->address_name=$request->address_name;
+            $newUserAddress->pincode=$request->pincode;
+            $newUserAddress->address_line_1=$request->address_line_1;
+            $newUserAddress->city=$request->city;
+            $newUserAddress->contact_number=$request->contact_number;
+            $newUserAddress->save();
+            if($request->is_primary){
+                UserAddress::whereUserId($userId)->update(['is_primary'=>false]);
+                $newUserAddress->is_primary= true;
+                $newUserAddress->save();
+                $user = User::find($userId);
+                $user->primary_address = $newUserAddress->address_line_1;
+                $user->primary_pincode =$newUserAddress->pincode;
+                $user->city=$newUserAddress->city;
+                $user->save();
+            }
+            if($newUserAddress->save()){
+                return $this->sendResponse([],'User Address Added Successfully', true);
+            }else{
+                return $this->sendResponse([],'User Address Not Added Successfully', false);
+            }
+
+        }
+        catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function updateUserAddress(Request $request, $id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'address_name' => 'string',
+                'is_primary'=>'boolean',
+                'pincode' => 'numeric',
+                'address_line_1' => 'string',
+                'city' => 'string',
+                'contact_number' => 'string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $userId = Auth::user()->id;
+            $userAddress = UserAddress::find($id);
+            if(!is_null($userAddress)){
+                if($userAddress->user_id == $userId){
+
+                    $userAddress->address_name=$request->address_name;
+                    $userAddress->pincode=$request->pincode;
+                    $userAddress->address_line_1=$request->address_line_1;
+                    $userAddress->city=$request->city;
+                    $userAddress->contact_number=$request->contact_number;
+                    $userAddress->save();
+                    if($request->is_primary){
+                        UserAddress::whereUserId($userId)->update(['is_primary'=>false]);
+                        $userAddress->is_primary= true;
+                        $userAddress->save();
+                        $user = User::find($userId);
+                        $user->primary_address = $userAddress->address_line_1;
+                        $user->primary_pincode =$userAddress->pincode;
+                        $user->city=$userAddress->city;
+                        $user->save();
+                    }
+                    if($userAddress->save()){
+                        return $this->sendResponse([],'User Address Updated Successfully', true);
+                    }else{
+                        return $this->sendResponse([],'User Address Not Updated', false);
+                    }
+                }else{
+                    return $this->sendResponse([],'User Address Not Attached to Your Account ', false);
+                }
+
+            }
+            else{
+                return $this->sendResponse([],'No User Address With This Id ', false);
+            }
+
+        }
+        catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function deleteUserAddress(Request $request,$id){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $userId = Auth::user()->id;
+            $userAddress = UserAddress::find($id);
+            if(!is_null($userAddress)){
+                if($userAddress->user_id == $userId){
+                    if($userAddress->delete()){
+                        return $this->sendResponse([],'User Address Deleted Successfully', true);
+                    }else{
+                        return $this->sendResponse([],'User Address Not Deleted ', false);
+                    }
+                }else{
+                    return $this->sendResponse([],'User Address Not Attached to Your Account ', false);
+                }
+
+            }else{
+                return $this->sendResponse([],'No User Address With This Id ', false);
+            }
 
         }
         catch (Exception $e){

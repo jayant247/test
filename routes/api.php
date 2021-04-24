@@ -65,10 +65,15 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     //user wishlist
     Route::post('addUserWishList',[UserDetailsController::class,'addUserWishList']);
     Route::get('getUserWishlist',[UserDetailsController::class,'getUserWishlist']);
+
+    //user address
+    Route::post('createUserAddress',[UserDetailsController::class,'createUserAddress']);
+    Route::post('updateUserAddress/{id}',[UserDetailsController::class,'updateUserAddress']);
+    Route::delete('deleteUserAddress/{id}',[UserDetailsController::class,'deleteUserAddress']);
+    Route::get('getUserAddress',[UserDetailsController::class,'getUserAddress']);
 });
 
 Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function () {
-
     Route::post('customerRegistration',[AuthController::class,'customerRegistration']);
     Route::post('customerLoginWithOtp',[AuthController::class,'customerLoginWithOtp']);
     Route::post('verifyMobileOtp',[AuthController::class,'verifyMobileOtp']);
@@ -78,7 +83,6 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
     Route::post('loginWithEmailPassword',[AuthController::class,'loginWithEmailPassword']);
     Route::post('loginWithMobileNoPassword',[AuthController::class,'loginWithMobileNoPassword']);
     Route::post('customerRegistrationWithImei',[AuthController::class,'customerRegistrationWithImei']);
-
 });
 
 Route::group(['middleware' => ['jwt.verify'],'prefix' => 'frontend','as' => 'frontend.'], function () {

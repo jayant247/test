@@ -731,6 +731,12 @@ class ProductController extends BaseController{
             if($request->has('review_id')){
                 $query =$query->where('id',$request->review_id);
             }
+            if($request->has('pageNo') && $request->has('limit')){
+                $limit = $request->limit;
+                $pageNo = $request->pageNo;
+                $skip = $limit*$pageNo;
+                $query= $query->skip($skip)->limit($limit);
+            }
             $data = $query->with('userInfo')->get();
             if(count($data)>0){
                 $response =  $data;
