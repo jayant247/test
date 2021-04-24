@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Products;
 use App\Models\ProductVariables;
 use App\Models\User;
+use App\Models\UserActivity;
 use App\Models\UserAddress;
 use App\Models\UserWhishlist;
 use Carbon\Carbon;
@@ -259,4 +260,40 @@ class UserDetailsController extends BaseController{
         }
     }
 
+    public function createUserActivity(Request $request){
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'product_id'=>'required|numeric',
+                'category_id'=>'required|numeric'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $categoryId = $request->category_id;
+            $product = Products::whereId($request->product_id)->whereHas('categories', function ($query) use($categoryId){
+                $query->where('category_id', $categoryId);
+            })->first();
+            if(!is_null($product)){
+                $userId = Auth::user()->id;
+                $newActivity = new UserActivity;
+                $newActivity->product_id = $request->product_id;
+                $newActivity->category_id = $request->category_id;
+                $newActivity->user_id = $userId;
+                if($newActivity->save()>0){
+                    $response =  [];
+                    return $this->sendResponse($response,'Data Saved Successfully', true);
+                }else{
+                    return $this->sendError('No Data Saved', [],200);
+                }
+            }
+            else{
+                return $this->sendError('No Prodcut With id '.$request->product_id.' and category id '.$request->category_id.' available',[], 200);
+            }
+
+
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
 }

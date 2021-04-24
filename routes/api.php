@@ -71,6 +71,10 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     Route::post('updateUserAddress/{id}',[UserDetailsController::class,'updateUserAddress']);
     Route::delete('deleteUserAddress/{id}',[UserDetailsController::class,'deleteUserAddress']);
     Route::get('getUserAddress',[UserDetailsController::class,'getUserAddress']);
+
+    //User Activity
+    Route::post('createUserActivity',[UserDetailsController::class,'createUserActivity']);
+
 });
 
 Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function () {
