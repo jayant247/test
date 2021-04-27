@@ -98,4 +98,5 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'frontend','as' => 'fro
     Route::get('getProductImages',[ProductController::class,'getProductImages']);
     Route::get('getProductReview',[ProductController::class,'getProductReview']);
     Route::get('getSingleProductInfo/{id}',[ProductController::class,'getSingleProductInfo']);
+    Route::get('getNewProducts',[ProductController::class,'getNewProducts']);
 });

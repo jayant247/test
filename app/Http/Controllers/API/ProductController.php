@@ -78,8 +78,8 @@ class ProductController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
     //create new product
@@ -157,8 +157,8 @@ class ProductController extends BaseController{
             }
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -253,8 +253,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -285,8 +285,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -324,8 +324,8 @@ class ProductController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -405,8 +405,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -501,8 +501,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -533,8 +533,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -574,8 +574,8 @@ class ProductController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -616,8 +616,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -672,8 +672,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -704,8 +704,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -745,8 +745,8 @@ class ProductController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -797,8 +797,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -850,8 +850,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -882,8 +882,8 @@ class ProductController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
 
     }
@@ -927,8 +927,8 @@ class ProductController extends BaseController{
             }else{
                 return $this->sendError('Product Description Creation Failed', [],200);
             }
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
     //update product descriptons for the product
@@ -957,8 +957,8 @@ class ProductController extends BaseController{
             }
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
     //get product descriptons for the product.  limit and pageNo are optional, descriptio_id is also optional, product_id required
@@ -993,8 +993,8 @@ class ProductController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
     //delete product description
@@ -1019,8 +1019,8 @@ class ProductController extends BaseController{
             }
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -1049,8 +1049,40 @@ class ProductController extends BaseController{
             }
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getNewProducts(Request $request){
+        try{
+            $categories = Category::whereNull('parent_id')->get();
+            foreach ($categories as $category) {
+                $productArray=[];
+                $products  = Products::where('is_new',true)->whereHas('categories', function ($query) use($category){
+                    $query->where('category_id', $category['id']);
+                })->limit(50)->orderBy('created_at','DESC')->get()->toArray();
+
+                if(count($products)<50){
+                    $products2  = Products::where('is_new',false)->whereHas('categories', function ($query) use($category){
+                        $query->where('category_id', $category['id']);
+                    })->limit(50)->orderBy('created_at','DESC')->get()->toArray();
+
+                    $productArray = array_merge($products,$products2);
+                }else{
+                    $productArray = array_merge($products,[]);
+                }
+                $category['products']=$productArray;
+            }
+            if(count($categories)>0){
+                $response =  $categories;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+        }
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 }

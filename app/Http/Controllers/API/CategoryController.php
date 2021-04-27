@@ -19,6 +19,7 @@ class CategoryController extends BaseController{
                 'parent_id' => 'numeric',
                 'category_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'big_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'new_page_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'square_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_bigthumbnail_show'=>'boolean'
             ]);
@@ -31,6 +32,7 @@ class CategoryController extends BaseController{
             $newCategory->type=$request->has('category_type')?$request->category_type:null;
             $newCategory->parent_id=$request->has('parent_id')?$request->parent_id:null;
             $newCategory->category_thumbnail =$this->saveImage($request->category_thumbnail);
+            $newCategory->new_page_thumbnail = $request->has('new_page_thumbnail')?$this->saveImage($request->new_page_thumbnail):null;
             if($request->has('is_bigthumbnail_show') && $request->is_bigthumbnail_show==true){
                 $newCategory->is_bigthumbnail_show = $request->has('is_bigthumbnail_show')?$request->is_bigthumbnail_show:false;
                 if($request->hasFile('big_thumbnail')){
@@ -48,9 +50,19 @@ class CategoryController extends BaseController{
             if($newCategory->save()){
                 return $this->sendResponse([],'Category Created Successfully.', true);
             }else{
-                unlink(public_path().$newCategory->category_thumbnail);
-                unlink(public_path().$newCategory->square_thumbnail);
-                unlink(public_path().$newCategory->big_thumbnail);
+                if(file_exists(public_path().$newCategory->category_thumbnail)){
+                    unlink(public_path().$newCategory->category_thumbnail);
+                }
+                if(file_exists(public_path().$newCategory->square_thumbnail)){
+                    unlink(public_path().$newCategory->square_thumbnail);
+                }
+                if(file_exists(public_path().$newCategory->big_thumbnail)){
+                    unlink(public_path().$newCategory->big_thumbnail);
+                }
+                if(file_exists(public_path().$newCategory->new_page_thumbnail)){
+                    unlink(public_path().$newCategory->new_page_thumbnail);
+                }
+
                 return $this->sendError('Category Creation Failed',[], 422);
             }
 
@@ -71,13 +83,14 @@ class CategoryController extends BaseController{
     public function updateCategory(Request $request, $id){
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'category_name' => 'required|string',
+                'category_name' => 'string',
                 'category_type'=>'string',
                 'parent_id' => 'numeric',
                 'category_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'big_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'square_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'is_bigthumbnail_show'=>'boolean'
+                'is_bigthumbnail_show'=>'boolean',
+                'new_page_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -106,6 +119,13 @@ class CategoryController extends BaseController{
                 if($request->hasFile('square_thumbnail')){
                     $oldFile = $category->square_thumbnail;
                     $category->square_thumbnail =$this->saveImage($request->square_thumbnail);
+                    if($oldFile && file_exists(public_path().$oldFile)){
+                        unlink(public_path().$oldFile);
+                    }
+                }
+                if($request->hasFile('new_page_thumbnail')){
+                    $oldFile = $category->new_page_thumbnail;
+                    $category->new_page_thumbnail =$this->saveImage($request->new_page_thumbnail);
                     if($oldFile && file_exists(public_path().$oldFile)){
                         unlink(public_path().$oldFile);
                     }
