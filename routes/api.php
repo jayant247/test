@@ -74,6 +74,7 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
 
     //User Activity
     Route::post('createUserActivity',[UserDetailsController::class,'createUserActivity']);
+    Route::get('recentlyViewProducts',[UserDetailsController::class,'recentlyViewProducts']);
 
 });
 

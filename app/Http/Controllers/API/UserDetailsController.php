@@ -58,8 +58,8 @@ class UserDetailsController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -96,8 +96,8 @@ class UserDetailsController extends BaseController{
             return $this->sendResponse([],'User whishList Updated Successfully', true);
 
         }
-        catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -124,8 +124,8 @@ class UserDetailsController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -170,8 +170,8 @@ class UserDetailsController extends BaseController{
             }
 
         }
-        catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -224,8 +224,8 @@ class UserDetailsController extends BaseController{
             }
 
         }
-        catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -255,8 +255,8 @@ class UserDetailsController extends BaseController{
             }
 
         }
-        catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -273,13 +273,26 @@ class UserDetailsController extends BaseController{
             $product = Products::whereId($request->product_id)->whereHas('categories', function ($query) use($categoryId){
                 $query->where('category_id', $categoryId);
             })->first();
+            $userId = Auth::user()->id;
+            $isSaved = false;
             if(!is_null($product)){
-                $userId = Auth::user()->id;
-                $newActivity = new UserActivity;
-                $newActivity->product_id = $request->product_id;
-                $newActivity->category_id = $request->category_id;
-                $newActivity->user_id = $userId;
-                if($newActivity->save()>0){
+
+                $userActivity = UserActivity::where('user_id',$userId)->where('product_id',$request->product_id)->orderBy('id','DESC')->first();
+                if(!is_null($userActivity)){
+                    $userActivity->user_id = $userId;
+                    $userActivity->updated_at = Carbon::now();
+                    $isSaved = $userActivity->update();
+
+                }else{
+                    $newActivity = new UserActivity;
+                    $newActivity->product_id = $request->product_id;
+                    $newActivity->category_id = $request->category_id;
+                    $newActivity->user_id = $userId;
+                    $isSaved = $newActivity->save();
+                }
+
+
+                if($isSaved){
                     $response =  [];
                     return $this->sendResponse($response,'Data Saved Successfully', true);
                 }else{
@@ -292,8 +305,53 @@ class UserDetailsController extends BaseController{
 
 
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function recentlyViewProducts(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = (int)$request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $userId = Auth::user()->id;
+            $userWishListItemIds = UserActivity::where('user_id',$userId)->skip($skip)->limit($limit)->orderBy('updated_at','DESC')->pluck('product_id')->toArray();
+            $query = Products::query()->whereIn('id',$userWishListItemIds);
+
+            $data = $query->get();
+            $colorArray=[];
+
+            foreach($data as $key=>$product){
+                $productVariable = ProductVariables::whereProductId($product['id'])->get();
+                $productColorsImageArray = [];
+                foreach ($productVariable as $prodVar){
+                    if(!in_array($prodVar['color'], $colorArray)){
+                        array_push($colorArray,$prodVar['color']);
+                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        array_push($productColorsImageArray,$imageColorArray);
+                    }
+                }
+
+                $product['colorsImageArray']=$productColorsImageArray;
+            }
+            if(count($data)>0){
+                $response =  $data;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+
         }
     }
 }
