@@ -90,8 +90,7 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
     Route::post('customerRegistrationWithImei',[AuthController::class,'customerRegistrationWithImei']);
 });
 
-Route::group(['middleware' => ['jwt.verify'],'prefix' => 'frontend','as' => 'frontend.'], function () {
-
+Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'frontend','as' => 'frontend.'], function () {
     Route::get('getCategory',[CategoryController::class,'getCategory']);
     Route::get('getProducts',[ProductController::class,'getProduct']);
     Route::get('getProdcutDescription',[ProductController::class,'getProductDescription']);
@@ -100,4 +99,9 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'frontend','as' => 'fro
     Route::get('getProductReview',[ProductController::class,'getProductReview']);
     Route::get('getSingleProductInfo/{id}',[ProductController::class,'getSingleProductInfo']);
     Route::get('getNewProducts',[ProductController::class,'getNewProducts']);
+    Route::get('checkTokenExpiry',[AuthController::class,'checkToken']);
+    Route::get('getSizeColorData',[ProductController::class,'getSizeColorData']);
+    Route::get('searchProductByName',[ProductController::class,'searchProductByName']);
+    Route::get('getRandomProducts',[ProductController::class,'getRandomProducts']);
+    Route::get('getRecommendedProducts',[ProductController::class,'getRecommendedProducts']);
 });

@@ -8,6 +8,7 @@ use App\Models\ProductImages;
 use App\Models\ProductReview;
 use App\Models\Products;
 use App\Models\ProductVariables;
+use App\Models\UserActivity;
 use App\Models\UserWhishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,17 +27,44 @@ class ProductController extends BaseController{
                 'limit'=>'required|numeric',
                 'fields'=>'string',
                 'product_name'=>'string',
-                'sub_category_id' => 'required|numeric',
+                'sub_category_id' => 'string',
+                'category_id'=>'required|numeric',
+                'sortByPrice'=>'boolean',
+                'sortBySalePercentage'=>'boolean',
+                'isOnSale'=>'boolean',
+                'bestSelling'=>'boolean'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
             }
-            $subCategoryId = $request->sub_category_id;
-            $query = Products::query();
 
-            $query->whereHas('subCategories', function ($query) use($subCategoryId){
-                $query->where('sub_category_id', $subCategoryId);
+            $query = Products::query();
+            $categoryId = $request->category_id;
+            $query->whereHas('categories', function ($query) use($categoryId){
+                $query->where('category_id', $categoryId);
             });
+
+
+            if($request->has('sub_category_id')){
+                $subCategoryId = array_map('intval',explode(',',$request->sub_category_id));
+                $query->whereHas('subCategories', function ($query) use($subCategoryId){
+                    $query->whereIn('sub_category_id', $subCategoryId);
+                });
+            }
+
+            if($request->has('colors')){
+                $colors = explode(',',$request->colors);;
+                $query->whereHas('productVariables', function ($query) use($colors){
+                    $query->whereIn('color', $colors);
+                });
+            }
+            if($request->has('sizes')){
+                $sizes = explode(',',$request->sizes);;
+                $query->whereHas('productVariables', function ($query) use($sizes){
+                    $query->whereIn('size', $sizes);
+                });
+            }
+
             if($request->has('product_name')){
                 $query =$query->where('category_name','like','%'.$request->category_name.'%');
             }
@@ -44,12 +72,46 @@ class ProductController extends BaseController{
                 $fieldsArray=explode(',',$request->fields);
                 $query = $query->select($fieldsArray);
             }
+
+            if($request->has('sortByPrice')){
+                if($request->sortByPrice){
+                    $query =$query->orderBy('price','DESC');
+                }else{
+                    $query =$query->orderBy('price','ASC');
+                }
+
+            }
+            if($request->has('bestSelling')){
+                if($request->bestSelling){
+                    $query =$query->orderBy('sellCount','DESC');
+                }else{
+                    $query =$query->orderBy('sellCount','ASC');
+                }
+
+            }
+            if($request->has('sortBySalePercentage')){
+                if($request->sortBySalePercentage){
+                    $query =$query->orderBy('sale_percentage','DESC');
+                }else{
+                    $query =$query->orderBy('sale_percentage','ASC');
+                }
+
+            }
+
+            if($request->has('isOnSale')){
+                if($request->isOnSale){
+                    $query =$query->where('is_on_sale',true);
+                }else{
+                    $query =$query->where('is_on_sale',false);
+                }
+            }
+
             $limit = $request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
             $query= $query->skip($skip)->limit($limit);
             $data = $query->get();
-            $colorArray=[];
+
             $userId = Auth::user()->id;
             $userWishListItemIds = UserWhishlist::where('user_id',$userId)->pluck('product_id')->toArray();
             foreach($data as $key=>$product){
@@ -60,7 +122,9 @@ class ProductController extends BaseController{
                 }
                 $productVariable = ProductVariables::whereProductId($product['id'])->get();
                 $productColorsImageArray = [];
+                $colorArray=[];
                 foreach ($productVariable as $prodVar){
+
                     if(!in_array($prodVar['color'], $colorArray)){
                         array_push($colorArray,$prodVar['color']);
                         $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
@@ -1080,6 +1144,191 @@ class ProductController extends BaseController{
             }else{
                 return $this->sendError('No Data Available', [],200);
             }
+        }
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getSizeColorData(Request $request){
+        try{
+            $sizeData = null;
+            $colorData = null;
+
+            $colorData = ProductVariables::select('color')->distinct()->pluck('color');
+            $sizeData = ProductVariables::select('size')->distinct()->pluck('size');
+            $response['colorData'] =  $colorData;
+            $response['sizeData'] =  $sizeData;
+            return $this->sendResponse($response,'Data Fetched Successfully', true);
+        }
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getRecommendedProducts(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $user = Auth::user();
+            $productIdsUserWishlist = UserWhishlist::where('user_id',$user->id)->pluck('product_id')->toArray();
+            $productIdsUserActivity = UserActivity::where('user_id',$user->id)->pluck('product_id')->toArray();
+            $productIds = array_merge($productIdsUserActivity,$productIdsUserWishlist);
+            $categoryIds = ProductHasCategory::whereIn('product_id',$productIds)->pluck('category_id')->toArray();
+            $query = Products::query();
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $query->whereHas('categories', function ($query) use($categoryIds){
+                $query->whereIn('category_id', $categoryIds);
+            });
+            $products= $query->skip($skip)->limit($limit)->orderBy('sellCount','DESC')->get();
+            if(count($products)<1){
+                $products = Products::inRandomOrder()->limit($limit)->get();
+            }
+            foreach($products as $key=>$product){
+                $colorArray=[];
+                $productVariable = ProductVariables::whereProductId($product['id'])->get();
+                $productColorsImageArray = [];
+                foreach ($productVariable as $prodVar){
+                    if(!in_array($prodVar['color'], $colorArray)){
+                        array_push($colorArray,$prodVar['color']);
+                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        array_push($productColorsImageArray,$imageColorArray);
+                    }
+                }
+
+                $product['colorsImageArray']=$productColorsImageArray;
+            }
+            if(count($products)>0){
+                $response =  $products;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+        }
+        catch(\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function searchProductByName(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                "searchTerm" => 'required|string',
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $products = null;
+            $query = Products::query();
+            $searchString = $request->searchTerm;
+            $query=$query->where('product_name','like','%' .$searchString. '%')->orWhere('description','like','%' .$searchString. '%');
+            $query=$query->orWhereHas('categories', function ($query) use($searchString){
+                $query->where('category_name', 'like','%' .$searchString. '%');
+            });
+            $query =$query->orWhereHas('productDescriptions', function ($query) use($searchString){
+                $query->where('property_value', 'like','%' .$searchString. '%');
+            });
+            $query =$query->orWhereHas('productDescriptions', function ($query) use($searchString){
+                $query->where('property_name', 'like','%' .$searchString. '%');
+            });
+
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $products= $query->skip($skip)->limit($limit)->get();
+            foreach($products as $key=>$product){
+                $colorArray=[];
+                $productVariable = ProductVariables::whereProductId($product['id'])->get();
+                $productColorsImageArray = [];
+                foreach ($productVariable as $prodVar){
+                    if(!in_array($prodVar['color'], $colorArray)){
+                        array_push($colorArray,$prodVar['color']);
+                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        array_push($productColorsImageArray,$imageColorArray);
+                    }
+                }
+
+                $product['colorsImageArray']=$productColorsImageArray;
+            }
+            if(count($products)>0){
+                $response =  $products;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+
+        }
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getRandomProducts(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'category_id'=>'numeric',
+                'sub_category_id'=>'numeric',
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $products = null;
+
+            $query = Products::query();
+            if($request->has('category_id')){
+                $categoryId = $request->category_id;
+                $query->whereHas('categories', function ($query) use($categoryId){
+                    $query->where('category_id', $categoryId);
+                });
+            }
+            if($request->has('sub_category_id')){
+                $subCategoryId = array_map('intval',explode(',',$request->sub_category_id));
+                $query->whereHas('subCategories', function ($query) use($subCategoryId){
+                    $query->whereIn('sub_category_id', $subCategoryId);
+                });
+            }
+
+
+
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $products= $query->inRandomOrder()->limit($limit)->get();
+            foreach($products as $key=>$product){
+                $colorArray=[];
+                $productVariable = ProductVariables::whereProductId($product['id'])->get();
+                $productColorsImageArray = [];
+                foreach ($productVariable as $prodVar){
+                    if(!in_array($prodVar['color'], $colorArray)){
+                        array_push($colorArray,$prodVar['color']);
+                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        array_push($productColorsImageArray,$imageColorArray);
+                    }
+                }
+
+                $product['colorsImageArray']=$productColorsImageArray;
+            }
+            if(count($products)>0){
+                $response =  $products;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+
         }
         catch (\Exception $e){
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);

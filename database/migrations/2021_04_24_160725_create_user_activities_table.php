@@ -19,7 +19,7 @@ class CreateUserActivitiesTable extends Migration
             $table->foreign('product_id')->references('id')->on('products');
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->bigInteger('category_id')->unsigned();
+            $table->bigInteger('category_id')->unsigned()->nullable();
             $table->foreign('category_id')->references('id')->on('categories');
             $table->timestamps();
         });

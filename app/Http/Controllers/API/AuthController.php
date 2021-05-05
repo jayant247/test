@@ -747,6 +747,9 @@ class AuthController extends BaseController
         }
     }
 
-
+    public function checkToken(Request $request){
+        return $this->sendResponse([], 'Token Valid');
+    }
 
 }
+

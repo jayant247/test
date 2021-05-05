@@ -36,9 +36,10 @@ class UserDetailsController extends BaseController{
             $query = Products::query()->whereIn('id',$userWishListItemIds);
 
             $data = $query->get();
-            $colorArray=[];
+
 
             foreach($data as $key=>$product){
+                $colorArray=[];
                 $productVariable = ProductVariables::whereProductId($product['id'])->get();
                 $productColorsImageArray = [];
                 foreach ($productVariable as $prodVar){
@@ -67,18 +68,22 @@ class UserDetailsController extends BaseController{
     public function addUserWishList(Request $request){
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'product_ids' => 'required',
+                'product_ids' => '',
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
             }
+
             $userId = Auth::user()->id;
             $productIdArray=[];
-            foreach (array_map('intval',explode(',',$request->product_ids)) as $key=>$eachLanguageId){
-                if(!in_array($eachLanguageId, $productIdArray)){
-                    array_push($productIdArray,$eachLanguageId);
+            if($request->has('product_ids')){
+                foreach (array_map('intval',explode(',',$request->product_ids)) as $key=>$eachLanguageId){
+                    if(!in_array($eachLanguageId, $productIdArray)){
+                        array_push($productIdArray,$eachLanguageId);
+                    }
                 }
             }
+
             $productsData = Products::whereIn('id',$productIdArray)->get();
             $userWishListItemMakeFalse = UserWhishlist::where('user_id',$userId)->delete();
             foreach ($productsData as $product){
@@ -264,7 +269,7 @@ class UserDetailsController extends BaseController{
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'product_id'=>'required|numeric',
-                'category_id'=>'required|numeric'
+                'category_id'=>'numeric'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -327,9 +332,9 @@ class UserDetailsController extends BaseController{
             $query = Products::query()->whereIn('id',$userWishListItemIds);
 
             $data = $query->get();
-            $colorArray=[];
 
             foreach($data as $key=>$product){
+                $colorArray=[];
                 $productVariable = ProductVariables::whereProductId($product['id'])->get();
                 $productColorsImageArray = [];
                 foreach ($productVariable as $prodVar){
