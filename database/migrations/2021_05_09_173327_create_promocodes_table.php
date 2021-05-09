@@ -17,10 +17,10 @@ class CreatePromocodesTable extends Migration
             $table->id();
             $table->string('promocode');
             $table->string('type');
-            $table->decimal('discount');
-            $table->decimal('minimal_cart_total');
-            $table->decimal('max_discount');
-            $table->boolean('is_for_new_user');
+            $table->decimal('discount',15,2);
+            $table->decimal('minimal_cart_total',15,2);
+            $table->decimal('max_discount',15,2);
+            $table->boolean('is_for_new_user')->default(false);
             $table->timestamps();
         });
     }
