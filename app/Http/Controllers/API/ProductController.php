@@ -64,6 +64,12 @@ class ProductController extends BaseController{
                     $query->whereIn('size', $sizes);
                 });
             }
+            if($request->has('types')){
+                $types = explode(',',$request->types);;
+                $query->whereHas('productVariables', function ($query) use($types){
+                    $query->whereIn('type', $types);
+                });
+            }
 
             if($request->has('product_name')){
                 $query =$query->where('category_name','like','%'.$request->category_name.'%');
@@ -406,6 +412,8 @@ class ProductController extends BaseController{
                 'is_on_sale' => 'boolean',
                 'color' => 'string',
                 'size' => 'string',
+                'type'=>'string',
+                'quantity'=>'required|numeric'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -430,8 +438,10 @@ class ProductController extends BaseController{
                 $newProductVariable->primary_image =$this->saveImage($request->primary_image) ;
                 $newProductVariable->price = $request->price;
                 $newProductVariable->mrp = $request->mrp;
+                $newProductVariable->quantity = $request->quantity;
                 $newProductVariable->color = $request->has('color')?$request->color:null;
                 $newProductVariable->size = $request->has('size')?$request->size:null;
+                $newProductVariable->type = $request->has('type')?$request->type:null;
                 $newProductVariable->save();
                 if($newProductVariable->is_on_sale){
                     $product->sale_price = $request->sale_price;
@@ -487,6 +497,8 @@ class ProductController extends BaseController{
                 'is_on_sale' => 'boolean',
                 'color' => 'string',
                 'size' => 'string',
+                'type'=>'string',
+                'quantity'=>'numeric'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -524,8 +536,11 @@ class ProductController extends BaseController{
 
                 $newProductVariable->price = $request->has('price')?$request->price:$newProductVariable->price;
                 $newProductVariable->mrp = $request->has('mrp')?$request->mrp:$newProductVariable->mrp;
-                $newProductVariable->color = $request->has('color')?$request->color:null;
-                $newProductVariable->size = $request->has('size')?$request->size:null;
+                $newProductVariable->color = $request->has('color')?$request->color:$newProductVariable->color;
+                $newProductVariable->size = $request->has('size')?$request->size:$newProductVariable->size;
+                $newProductVariable->quantity = $request->has('quantity')?$request->quantity:$newProductVariable->quantity;
+                $newProductVariable->type = $request->has('type')?$request->type:$newProductVariable->type;
+
                 $newProductVariable->save();
                 $product = Products::find($newProductVariable->product_id);
                 if($newProductVariable->is_on_sale){
@@ -1154,11 +1169,14 @@ class ProductController extends BaseController{
         try{
             $sizeData = null;
             $colorData = null;
-
+            $typeData = null;
             $colorData = ProductVariables::select('color')->distinct()->pluck('color');
             $sizeData = ProductVariables::select('size')->distinct()->pluck('size');
+            $typeData = ProductVariables::select('type')->distinct()->pluck('type');
             $response['colorData'] =  $colorData;
             $response['sizeData'] =  $sizeData;
+            $response['typeData'] =  $typeData;
+
             return $this->sendResponse($response,'Data Fetched Successfully', true);
         }
         catch (\Exception $e){
