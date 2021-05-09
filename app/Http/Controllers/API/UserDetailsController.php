@@ -274,10 +274,16 @@ class UserDetailsController extends BaseController{
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
             }
-            $categoryId = $request->category_id;
-            $product = Products::whereId($request->product_id)->whereHas('categories', function ($query) use($categoryId){
-                $query->where('category_id', $categoryId);
-            })->first();
+            $product = null;
+            if($request->has('category_id') && $request->category_id!=-1){
+                $categoryId = $request->category_id;
+                $product = Products::whereId($request->product_id)->whereHas('categories', function ($query) use($categoryId){
+                    $query->where('category_id', $categoryId);
+                })->first();
+            }else{
+                $product = Products::whereId($request->product_id)->first();
+            }
+
             $userId = Auth::user()->id;
             $isSaved = false;
             if(!is_null($product)){
@@ -296,7 +302,6 @@ class UserDetailsController extends BaseController{
                     $isSaved = $newActivity->save();
                 }
 
-
                 if($isSaved){
                     $response =  [];
                     return $this->sendResponse($response,'Data Saved Successfully', true);
@@ -305,7 +310,7 @@ class UserDetailsController extends BaseController{
                 }
             }
             else{
-                return $this->sendError('No Prodcut With id '.$request->product_id.' and category id '.$request->category_id.' available',[], 200);
+                return $this->sendError('No Prodcut With id '.$request->product_id.' Available',[], 200);
             }
 
 

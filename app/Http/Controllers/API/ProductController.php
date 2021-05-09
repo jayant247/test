@@ -1118,6 +1118,11 @@ class ProductController extends BaseController{
                 $productData = Products::whereId($id)
                     ->with(['productDescriptions','productVariables','productImages','productVariables.productVariablesImages'])
                     ->first();
+                if(!is_null(UserWhishlist::whereUserId(Auth::user()->id)->whereProductId('$id')->first())){
+                    $productData['isInUserWishList']=true;
+                }else{
+                    $productData['isInUserWishList']=false;
+                }
                 if($productData){
                     return $this->sendResponse($productData,'Product Description Deleted Successfully', true);
                 }else{

@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserDetailsController;
+use App\Http\Controllers\API\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -104,4 +105,8 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'fronte
     Route::get('searchProductByName',[ProductController::class,'searchProductByName']);
     Route::get('getRandomProducts',[ProductController::class,'getRandomProducts']);
     Route::get('getRecommendedProducts',[ProductController::class,'getRecommendedProducts']);
+});
+
+Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order','as' => 'order.'], function () {
+    Route::post('cart',[OrderController::class,'cart']);
 });
