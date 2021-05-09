@@ -22,7 +22,7 @@ class OrderController extends BaseController{
     public function cart(Request $request){
         try{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-
+                'products_list' => 'required|array',
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -51,6 +51,58 @@ class OrderController extends BaseController{
                                'created_at' => $now   // remove if not using timestamps
                             ];
                          }
+
+                    }
+
+
+                }
+                Cart::insert($cart_records);
+                $response['subtotal']=$subTotal;
+            }
+
+            return $this->sendResponse($response,'Data Updated Successfully', true);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function checkout(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'products_list' => 'required|array',
+                'address_id'=>'required|numeric'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $response = [];
+            $address = UserAddress::whereUserId(Auth::user()->id)->whereId($request->address_id)->first();
+            if(is_null($address)){
+                return $this->sendError('No Address For Current User With Id '.$request->address_id, [],200);
+            }
+            if($request->has('products_list') && count($request->products_list)>0){
+                $productsList = $request->products_list;
+                $cartDelete = Cart::where('user_id',Auth::user()->id)->delete();
+                $cart_records = [];
+                $subTotal = 0;
+                foreach ($productsList as $productVariable){
+                    if(!empty($productVariable)) {
+                        $productVariableofDb = ProductVariables::find($productVariable['product_variable_id']);
+                        if(!is_null($productVariableofDb)){
+                            if($productVariableofDb['is_on_sale']){
+                                $subTotal += $productVariableofDb['sale_price']*$productVariable['customer_qty'];
+                            }else{
+                                $subTotal += $productVariableofDb['price']*$productVariable['customer_qty'];
+                            }
+                            $now = Carbon::now();
+                            $cart_records[] = [
+                                'product_variable_id' => $productVariable['product_variable_id'],
+                                'customer_qty'=> $productVariable['customer_qty'],
+                                'user_id' => Auth::user()->id,
+                                'updated_at' => $now,  // remove if not using timestamps
+                                'created_at' => $now   // remove if not using timestamps
+                            ];
+                        }
 
                     }
 

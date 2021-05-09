@@ -109,4 +109,5 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'fronte
 
 Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order','as' => 'order.'], function () {
     Route::post('cart',[OrderController::class,'cart']);
+    Route::post('checkout',[OrderController::class,'checkout']);
 });
