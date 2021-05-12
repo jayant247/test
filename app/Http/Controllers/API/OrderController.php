@@ -67,6 +67,27 @@ class OrderController extends BaseController{
         }
     }
 
+    public function getAvailablePromocodes(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $promocodes = Promocode::where('is_active',1)->where('end_on', '>=', Carbon::now())
+                ->where('start_from', '<=', Carbon::now())->get()->toArray();
+            if(count($promocodes)>0){
+                return $this->sendResponse($promocodes,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendResponse([],'No Promo codes available', false);
+            }
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
     public function checkout(Request $request){
         try{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
@@ -171,5 +192,6 @@ class OrderController extends BaseController{
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
+
 
 }
