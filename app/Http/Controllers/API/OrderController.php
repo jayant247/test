@@ -88,9 +88,9 @@ class OrderController extends BaseController{
             if(is_null($address)){
                 return $this->sendError('No Address For Current User With Id '.$request->address_id, [],200);
             }
-            if($request->has("promocode") && $request->use_wallet_balance){
-                return $this->sendError('Promo code and Wallet Balance Can\'t be used at one time. Either use promo code or wallet balance' , [],200);
-            }
+//            if($request->has("promocode") && $request->use_wallet_balance){
+//                return $this->sendError('Promo code and Wallet Balance Can\'t be used at one time. Either use promo code or wallet balance' , [],200);
+//            }
             $promocode = null;
             if($request->has('promocode')) {
                 $promocode = Promocode::wherePromocode($request->promocode)

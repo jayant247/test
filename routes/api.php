@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\DeliveryPincodeController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserDetailsController;
 use App\Http\Controllers\API\OrderController;
@@ -76,6 +77,12 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     //User Activity
     Route::post('createUserActivity',[UserDetailsController::class,'createUserActivity']);
     Route::get('recentlyViewProducts',[UserDetailsController::class,'recentlyViewProducts']);
+
+    //delivery available pincode
+    Route::post('create',[DeliveryPincodeController::class,'create']);
+    Route::post('update/{id}',[DeliveryPincodeController::class,'update']);
+    Route::get('checkDeliveryAvailable',[DeliveryPincodeController::class,'checkDeliveryAvailable']);
+    Route::delete('delete/{id}',[DeliveryPincodeController::class,'checkDeliveryAvailable']);
 
 });
 

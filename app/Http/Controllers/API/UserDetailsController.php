@@ -297,7 +297,7 @@ class UserDetailsController extends BaseController{
                 }else{
                     $newActivity = new UserActivity;
                     $newActivity->product_id = $request->product_id;
-                    $newActivity->category_id = $request->category_id;
+                    $newActivity->category_id = $request->category_id!=-1?$request->category_id:null;
                     $newActivity->user_id = $userId;
                     $isSaved = $newActivity->save();
                 }
