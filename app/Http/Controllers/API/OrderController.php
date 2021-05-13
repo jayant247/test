@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Cart;
 use App\Models\Category;
+use App\Models\Order;
+use App\Models\OrderItems;
 use App\Models\Products;
 use App\Models\ProductVariables;
 use App\Models\Promocode;
@@ -188,6 +190,188 @@ class OrderController extends BaseController{
                 $response['total']= (float)($subTotal+$response['shippingCharges'] - $discountAmount - $response['walletBalanceUsed']);
             }
             return $this->sendResponse($response,$msg==''?'Data Updated Successfully':$msg, true);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function placeOrder(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'products_list' => 'required|array',
+                'address_id'=>'required|numeric',
+                'use_wallet_balance'=>'required|boolean',
+                'promocode'=>'string',
+                'paymentMode'=>'required|numeric|min:0|max:2'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $response = [];
+            $user = Auth::user();
+            $response['walletBalance'] = (float)$user->balance;
+            $response['walletBalanceUsed'] = 0;
+            $msg = '';
+            $discountAmount = 0;
+            $is_promocode_applied = false;
+            $is_wallet_applied = false;
+            $address = UserAddress::whereUserId(Auth::user()->id)->whereId($request->address_id)->first();
+            if(is_null($address)){
+                return $this->sendError('No Address For Current User With Id '.$request->address_id, [],200);
+            }
+            $promocode = null;
+            if($request->has('promocode')) {
+                $promocode = Promocode::wherePromocode($request->promocode)
+                    ->where('end_on', '>=', Carbon::now())
+                    ->where('start_from', '<=', Carbon::now())
+                    ->first();
+                if (is_null($promocode)) {
+                    return $this->sendError('Invalid Promo code', [], 200);
+                }
+            }
+            if($request->has('products_list') && count($request->products_list)>0){
+                $productsList = $request->products_list;
+                $cart_records = [];
+                $subTotal = 0;
+                foreach ($productsList as $productVariable){
+                    if(!empty($productVariable)) {
+                        $productVariableofDb = ProductVariables::find($productVariable['product_variable_id']);
+                        if(!is_null($productVariableofDb)){
+                            if($productVariableofDb['is_on_sale']){
+                                $subTotal += $productVariableofDb['sale_price']*$productVariable['customer_qty'];
+                            }else{
+                                $subTotal += $productVariableofDb['price']*$productVariable['customer_qty'];
+                            }
+                            $now = Carbon::now();
+                            $cart_records[] = [
+                                'product_variable_id' => $productVariable['product_variable_id'],
+                                'customer_qty'=> $productVariable['customer_qty'],
+                                'user_id' => Auth::user()->id,
+                                'updated_at' => $now,  // remove if not using timestamps
+                                'created_at' => $now   // remove if not using timestamps
+                            ];
+                        }
+
+                    }
+
+
+                }
+                if($subTotal>0){
+                    if($request->has("use_wallet_balance") && $request->use_wallet_balance){
+
+                        if($response['walletBalance']<$subTotal){
+
+                            $response['walletBalanceUsed'] = $response['walletBalance'];
+                        }else{
+
+                            $response['walletBalanceUsed'] = $response['walletBalance'] - $subTotal;
+                        }
+                        $is_wallet_applied = true;
+                    }
+                    if(!is_null($promocode)){
+                        //to do for is new user
+                        if($subTotal>$promocode['minimal_cart_total']){
+                            if($promocode['type']=='percentage'){
+                                $discountAmount  =  round(($subTotal*$promocode['discount'])/100,2) ;
+                                if($discountAmount>$promocode['max_discount']){
+                                    $discountAmount = $promocode['max_discount'];
+                                }
+                            }
+                            else if($promocode['type']=='flat'){
+                                $discountAmount = $promocode['discount'];
+                                if($discountAmount>$promocode['max_discount']){
+                                    $discountAmount = $promocode['max_discount'];
+                                }
+                            }
+
+                            $is_promocode_applied = true;
+
+                        }else{
+                            $msg = '';
+                        }
+                    }
+                }
+                $response['shippingCharges']=10;
+                $response['discountAmount'] = (float)$discountAmount;
+                $response['subtotal']=(float)$subTotal;
+                $response['total']= (float)($subTotal+$response['shippingCharges'] - $discountAmount - $response['walletBalanceUsed']);
+
+                $newOrder = new Order;
+                $newOrder->user_id = $user->id;
+                $newOrder->orderRefNo = time();
+                if($is_promocode_applied){
+                    $newOrder->is_promo_code = true;
+                    $newOrder->promo_id = $promocode['id'];
+                    $newOrder->promo_discount = (float)$discountAmount;
+                }
+                if($is_wallet_applied){
+                    $newOrder->is_wallet_balance_used = true;
+                    $newOrder->wallet_balance_used = $response['walletBalanceUsed'];
+                }
+                $newOrder->subTotal = $response['subtotal'];
+                $newOrder->total = $response['total'];
+                $newOrder->shipping_charge = $response['shippingCharges'];
+                switch ($request->paymentMode) {
+                    case 0:
+                        $newOrder->paymentMode = 'Paytm';
+                    break;
+                    case 1:
+                        $newOrder->paymentMode = 'Razorpay';
+                        break;
+                    case 1:
+                        $newOrder->paymentMode = 'COD';
+                        break;
+                }
+                $newOrder->order_status = 1;
+                $newOrder->payment_status = 1;
+                if($newOrder->save()){
+                    foreach ($productsList as $productVariable){
+                        if(!empty($productVariable)) {
+                            $productVariableofDb = ProductVariables::find($productVariable['product_variable_id']);
+                            if(!is_null($productVariableofDb)){
+                                $newOrderItem = new OrderItems;
+                                $newOrderItem->order_id = $newOrder->id;
+                                $newOrderItem->product_variable_id = $productVariableofDb['id'];
+                                if($productVariableofDb['is_on_sale']){
+                                    $newOrderItem->selling_price = $productVariableofDb['sale_price'];
+                                }else{
+                                    $newOrderItem->selling_price = $productVariableofDb['price'];
+                                }
+                                $newOrderItem->quantity = $productVariable['customer_qty'];
+                                $newOrderItem->save();
+                            }
+                        }
+                    }
+                    $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($newOrder->id);
+                    return $this->sendResponse($response,$msg==''?'Data Updated Successfully':$msg, true);
+                }else{
+                    return $this->sendResponse([],$msg==''?'Order Not Created':$msg, false);
+                }
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getMyOrders(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = (int)$request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $orders = Order::with(['orderStatus','paymentStatus','orderItems'])->whereUserId(Auth::user()->id)->skip($skip)->limit($limit)->get()->toArray();
+            if(count($orders)>0){
+                return $this->sendResponse($orders,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendResponse([],'No Orders Available available', false);
+            }
+
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
