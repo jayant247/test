@@ -10,6 +10,11 @@ class Products extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $hidden = [
+        'available_sizes',
+        'available_colors',
+    ];
+
     public function subCategories()
     {
         return $this->belongsToMany(Category::class, 'product_has_category',
@@ -31,6 +36,10 @@ class Products extends Model
 
     public function productImages(){
         return $this->hasMany(ProductImages::class,'product_id','id')->select('imagePath','product_id');
+    }
+
+    public function bestReviews(){
+        return $this->hasMany(ProductReview::class,'product_id','id')->orderBy('rating','DESC')->limit(2);
     }
 
 

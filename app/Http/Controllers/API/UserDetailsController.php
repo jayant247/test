@@ -168,8 +168,9 @@ class UserDetailsController extends BaseController{
                 $user->city=$newUserAddress->city;
                 $user->save();
             }
+            $addressData = UserAddress::where('user_id',$userId)->orderBy('id','DESC')->get()->toArray();
             if($newUserAddress->save()){
-                return $this->sendResponse([],'User Address Added Successfully', true);
+                return $this->sendResponse($addressData,'User Address Added Successfully', true);
             }else{
                 return $this->sendResponse([],'User Address Not Added Successfully', false);
             }

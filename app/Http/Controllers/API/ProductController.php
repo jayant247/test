@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\ProductDescription;
 use App\Models\ProductHasCategory;
 use App\Models\ProductImages;
@@ -32,7 +33,11 @@ class ProductController extends BaseController{
                 'sortByPrice'=>'boolean',
                 'sortBySalePercentage'=>'boolean',
                 'isOnSale'=>'boolean',
-                'bestSelling'=>'boolean'
+                'bestSelling'=>'boolean',
+                'priceRangeHigh'=>'numeric',
+                'priceRangeLow'=>'numeric',
+                'salePercentageRangeHigh'=>'numeric',
+                'salePercentageRangeLow'=>'numeric'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -40,6 +45,7 @@ class ProductController extends BaseController{
 
             $query = Products::query();
             $categoryId = $request->category_id;
+
             $query->whereHas('categories', function ($query) use($categoryId){
                 $query->where('category_id', $categoryId);
             });
@@ -112,11 +118,29 @@ class ProductController extends BaseController{
                 }
             }
 
+            if($request->has('salePercentageRangeHigh') && $request->has('salePercentageRangeLow')){
+                $low = $request->salePercentageRangeLow;
+                $high = $request->salePercentageRangeHigh;
+               $query =  $query->whereHas('productVariables', function ($query) use ($low,$high) {
+                    $query->where('is_on_sale',true)->whereBetween('sale_percentage',[$low,$high]);
+                });
+            }
+
+            if($request->has('priceRangeLow') && $request->has('priceRangeHigh')){
+                $low = $request->priceRangeLow;
+                $high = $request->priceRangeHigh;
+                $query =  $query->whereHas('productVariables', function ($query) use ($low,$high) {
+                    $query->whereBetween('price',[$low,$high]);
+                });
+            }
+            $query->whereHas('productVariables', function ($query) {
+                $query->where('quantity','>',0);
+            })->with(['bestReviews','bestReviews.userInfo']);
             $limit = $request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
             $query= $query->skip($skip)->limit($limit);
-            $data = $query->get();
+            $data = $query->orderBy('id','DESC')->get();
 
             $userId = Auth::user()->id;
             $userWishListItemIds = UserWhishlist::where('user_id',$userId)->pluck('product_id')->toArray();
@@ -126,7 +150,7 @@ class ProductController extends BaseController{
                 }else{
                     $product['isInUserWishList']=false;
                 }
-                $productVariable = ProductVariables::whereProductId($product['id'])->get();
+                $productVariable = ProductVariables::whereProductId($product['id'])->where('quantity','>',0)->get();
                 $productColorsImageArray = [];
                 $colorArray=[];
                 foreach ($productVariable as $prodVar){
@@ -192,8 +216,8 @@ class ProductController extends BaseController{
             $newProduct->primary_image =$this->saveImage($request->primary_image) ;
             $newProduct->price = $request->price;
             $newProduct->mrp = $request->mrp;
-            $newProduct->available_sizes = $request->product_name;
-            $newProduct->available_colors = $request->product_name;
+            $newProduct->available_sizes = $request->has('available_sizes')?$request->available_sizes:null;
+            $newProduct->available_colors = $request->has('available_colors')?$request->available_colors:null;
             $newProduct->is_new = $request->has('is_new')? $request->is_new:false;
             $newProduct->save();
 
@@ -840,6 +864,13 @@ class ProductController extends BaseController{
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $productId = $request->product_id;
+            $order = Order::where('user_id',Auth::user()->id)->whereHas('orderItems', function ($query) use($productId){
+                $query->where('product_id', $productId);
+            })->first();
+            if(is_null($order)){
+                return $this->sendError('You Haven\'t purchased this product yet.',[], 200);
             }
 
             $product = Products::find($request->product_id);

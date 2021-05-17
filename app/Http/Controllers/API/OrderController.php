@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Cart;
 use App\Models\Category;
+use App\Models\DeliveryPincode;
 use App\Models\Order;
 use App\Models\OrderItems;
 use App\Models\Products;
@@ -108,8 +109,13 @@ class OrderController extends BaseController{
             $msg = '';
             $discountAmount = 0;
             $address = UserAddress::whereUserId(Auth::user()->id)->whereId($request->address_id)->first();
+
             if(is_null($address)){
-                return $this->sendError('No Address For Current User With Id '.$request->address_id, [],200);
+                return $this->sendError('No Address For Current User With Id '.$request->address_id, [],211);
+            }
+            $delivryPincode = DeliveryPincode::where('pincode',$address['pincode'])->first();
+            if(is_null($delivryPincode)){
+                return $this->sendError('Not deliverable in this pincode '.$address['pincode'], [],213);
             }
 //            if($request->has("promocode") && $request->use_wallet_balance){
 //                return $this->sendError('Promo code and Wallet Balance Can\'t be used at one time. Either use promo code or wallet balance' , [],200);
@@ -121,7 +127,7 @@ class OrderController extends BaseController{
                     ->where('start_from', '<=', Carbon::now())
                     ->first();
                 if (is_null($promocode)) {
-                    return $this->sendError('Invalid Promo code', [], 200);
+                    return $this->sendError('Invalid Promo code', [], 212);
                 }
             }
             if($request->has('products_list') && count($request->products_list)>0){
@@ -217,7 +223,11 @@ class OrderController extends BaseController{
             $is_wallet_applied = false;
             $address = UserAddress::whereUserId(Auth::user()->id)->whereId($request->address_id)->first();
             if(is_null($address)){
-                return $this->sendError('No Address For Current User With Id '.$request->address_id, [],200);
+                return $this->sendError('No Address For Current User With Id '.$request->address_id, [],211);
+            }
+            $delivryPincode = DeliveryPincode::where('pincode',$address['pincode'])->first();
+            if(is_null($delivryPincode)){
+                return $this->sendError('Not deliverable in this pincode '.$address['pincode'], [],213);
             }
             $promocode = null;
             if($request->has('promocode')) {
@@ -226,7 +236,7 @@ class OrderController extends BaseController{
                     ->where('start_from', '<=', Carbon::now())
                     ->first();
                 if (is_null($promocode)) {
-                    return $this->sendError('Invalid Promo code', [], 200);
+                    return $this->sendError('Invalid Promo code', [], 212);
                 }
             }
             if($request->has('products_list') && count($request->products_list)>0){
@@ -331,6 +341,7 @@ class OrderController extends BaseController{
                             if(!is_null($productVariableofDb)){
                                 $newOrderItem = new OrderItems;
                                 $newOrderItem->order_id = $newOrder->id;
+                                $newOrderItem->product_id = $productVariableofDb['product_id'];
                                 $newOrderItem->product_variable_id = $productVariableofDb['id'];
                                 if($productVariableofDb['is_on_sale']){
                                     $newOrderItem->selling_price = $productVariableofDb['sale_price'];
@@ -338,6 +349,7 @@ class OrderController extends BaseController{
                                     $newOrderItem->selling_price = $productVariableofDb['price'];
                                 }
                                 $newOrderItem->quantity = $productVariable['customer_qty'];
+
                                 $newOrderItem->save();
                             }
                         }

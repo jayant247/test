@@ -13,4 +13,8 @@ class ProductVariables extends Model
     public function productVariablesImages(){
         return $this->hasMany(ProductImages::class,'product_variable_id','id')->select('imagePath','product_variable_id');
     }
+
+    public function product(){
+        return $this->belongsTo(Products::class,'product_id');
+    }
 }
