@@ -1146,10 +1146,12 @@ class ProductController extends BaseController{
             $prodcutDescription = Products::find($id);
             if(!is_null($prodcutDescription)){
                 $productData = null;
-                $productData = Products::whereId($id)
-                    ->with(['productDescriptions','productVariables','productImages','productVariables.productVariablesImages'])
+                $productData = Products::whereId($id)->with('productVariables',function ($query) {
+                        $query->where('quantity','>','0');
+                })
+                    ->with(['productDescriptions','productImages','productVariables.productVariablesImages'])
                     ->first();
-                if(!is_null(UserWhishlist::whereUserId(Auth::user()->id)->whereProductId('$id')->first())){
+                if(!is_null(UserWhishlist::whereUserId(Auth::user()->id)->whereProductId($id)->first())){
                     $productData['isInUserWishList']=true;
                 }else{
                     $productData['isInUserWishList']=false;
@@ -1209,6 +1211,14 @@ class ProductController extends BaseController{
             $colorData = ProductVariables::select('color')->distinct()->pluck('color');
             $sizeData = ProductVariables::select('size')->distinct()->pluck('size');
             $typeData = ProductVariables::select('type')->distinct()->pluck('type');
+            $maxPriceVariable = ProductVariables::where('quantity','>',0)->orderBy('price','DESC')->first();
+            $response['maxPrice'] =  $maxPriceVariable['price'];
+            $lowPriceVariable = ProductVariables::where('quantity','>',0)->orderBy('price','ASC')->first();
+            $response['minPrice'] =  $lowPriceVariable['price'];
+            $maxPriceVariable = ProductVariables::where('quantity','>',0)->where('is_on_sale',true)->orderBy('sale_percentage','DESC')->first();
+            $response['maxSalePercentage'] =  $maxPriceVariable['sale_percentage'];
+            $lowPriceVariable = ProductVariables::where('quantity','>',0)->where('is_on_sale',true)->orderBy('sale_percentage','ASC')->first();
+            $response['minSalePercentage'] =  $lowPriceVariable['sale_percentage'];
             $response['colorData'] =  $colorData;
             $response['sizeData'] =  $sizeData;
             $response['typeData'] =  $typeData;
@@ -1341,7 +1351,6 @@ class ProductController extends BaseController{
                 return $this->sendError('Validation Error.', $validator->errors());
             }
             $products = null;
-
             $query = Products::query();
             if($request->has('category_id')){
                 $categoryId = $request->category_id;
@@ -1355,9 +1364,6 @@ class ProductController extends BaseController{
                     $query->whereIn('sub_category_id', $subCategoryId);
                 });
             }
-
-
-
             $limit = $request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
@@ -1383,6 +1389,51 @@ class ProductController extends BaseController{
                 return $this->sendError('No Data Available', [],200);
             }
 
+        }
+        catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getSingleChildProducts(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $products = null;
+            $query = Products::query();
+            $query= $query->withCount('productVariables')->having('product_variables_count',1);
+            $query= $query->whereHas('productVariables',function ($query) {
+                    $query->where('quantity','>',0);
+            });
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $products = $query->inRandomOrder()->limit($limit)->get();
+            foreach($products as $key=>$product){
+                $colorArray=[];
+                $productVariable = ProductVariables::whereProductId($product['id'])->where('quantity','>',0)->get();
+                $productColorsImageArray = [];
+                foreach ($productVariable as $prodVar){
+                    if(!in_array($prodVar['color'], $colorArray)){
+                        array_push($colorArray,$prodVar['color']);
+                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        array_push($productColorsImageArray,$imageColorArray);
+                    }
+                }
+
+                $product['colorsImageArray']=$productColorsImageArray;
+            }
+            if(count($products)>0){
+                $response =  $products;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
         }
         catch (\Exception $e){
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);

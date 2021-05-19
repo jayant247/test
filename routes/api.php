@@ -112,6 +112,7 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'fronte
     Route::get('searchProductByName',[ProductController::class,'searchProductByName']);
     Route::get('getRandomProducts',[ProductController::class,'getRandomProducts']);
     Route::get('getRecommendedProducts',[ProductController::class,'getRecommendedProducts']);
+    Route::get('getSingleChildProducts',[ProductController::class,'getSingleChildProducts']);
 });
 
 Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order','as' => 'order.'], function () {
