@@ -217,7 +217,7 @@ class AuthController extends BaseController
             $newUser->firebase_token = $request->has('firebase_token')?$request->firebase_token: null ;
             $newUser->mobile_no=$request->mobile_no;
             $newUser->email=$request->email;
-            $newUser->imei_number = $request->imei_number;
+            $newUser->imei_number = '';
             $newUser->device_type = $request->device_type;
             $newUser->password= bcrypt($request->password);
             $newUser->city = $request->has('city')?$request->city: null;
@@ -747,8 +747,47 @@ class AuthController extends BaseController
         }
     }
 
+
     public function checkToken(Request $request){
         return $this->sendResponse([], 'Token Valid');
+    }
+
+    public function customerRegistrationWithMobileOnly(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'mobile_no'=>'required|digits:10',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $response=[];
+
+            if(!is_null(User::where('mobile_no',$request->mobile_no)->first())){
+                $newUser = User::where('mobile_no',$request->mobile_no)->first();
+                $newUser->mobile_otp = rand(100000,999999);
+                $newUser->mobile_otp_time = Carbon::now();
+                $newUser->save();
+
+            }else{
+                $newUser = new User;
+                $newUser->mobile_no=$request->mobile_no;
+                $newUser->mobile_otp = rand(100000,999999);
+                $newUser->mobile_otp_time = Carbon::now();
+                $newUser->save();
+
+            }
+
+
+            if($this->sendOtp($newUser)){
+
+                return $this->sendResponse($response, 'OTP Send Successfully');
+            }else{
+                return $this->sendResponse([], 'OTP Send Failed',false);
+            }
+
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
     }
 
 }

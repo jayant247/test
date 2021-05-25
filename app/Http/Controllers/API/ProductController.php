@@ -129,9 +129,7 @@ class ProductController extends BaseController{
             if($request->has('priceRangeLow') && $request->has('priceRangeHigh')){
                 $low = $request->priceRangeLow;
                 $high = $request->priceRangeHigh;
-                $query =  $query->whereHas('productVariables', function ($query) use ($low,$high) {
-                    $query->whereBetween('price',[$low,$high]);
-                });
+                $query =  $query->whereBetween('price',[$low,$high]);
             }
             $query->whereHas('productVariables', function ($query) {
                 $query->where('quantity','>',0);
@@ -1150,7 +1148,16 @@ class ProductController extends BaseController{
                         $query->where('quantity','>','0');
                 })
                     ->with(['productDescriptions','productImages','productVariables.productVariablesImages'])
+                    ->with(['bestReviews','bestReviews.userInfo'])
                     ->first();
+                $order = Order::where('user_id',Auth::user()->id)->whereHas('orderItems', function ($query) use($id){
+                    $query->where('product_id', $id);
+                })->first();
+                if(is_null($order)){
+                    $productData['canGiveReview']=false;
+                }else{
+                    $productData['canGiveReview']=true;
+                }
                 if(!is_null(UserWhishlist::whereUserId(Auth::user()->id)->whereProductId($id)->first())){
                     $productData['isInUserWishList']=true;
                 }else{
@@ -1176,12 +1183,17 @@ class ProductController extends BaseController{
             $categories = Category::whereNull('parent_id')->get();
             foreach ($categories as $category) {
                 $productArray=[];
-                $products  = Products::where('is_new',true)->whereHas('categories', function ($query) use($category){
+
+                $products  = Products::whereHas('productVariables', function ($query) {
+                    $query->where('quantity','>',0);
+                })->where('is_new',true)->whereHas('categories', function ($query) use($category){
                     $query->where('category_id', $category['id']);
                 })->limit(50)->orderBy('created_at','DESC')->get()->toArray();
 
                 if(count($products)<50){
-                    $products2  = Products::where('is_new',false)->whereHas('categories', function ($query) use($category){
+                    $products2  = Products::whereHas('productVariables', function ($query) {
+                        $query->where('quantity','>',0);
+                    })->where('is_new',false)->whereHas('categories', function ($query) use($category){
                         $query->where('category_id', $category['id']);
                     })->limit(50)->orderBy('created_at','DESC')->get()->toArray();
 
@@ -1254,9 +1266,14 @@ class ProductController extends BaseController{
             $query->whereHas('categories', function ($query) use($categoryIds){
                 $query->whereIn('category_id', $categoryIds);
             });
+            $query->whereHas('productVariables', function ($query) {
+                $query->where('quantity','>',0);
+            });
             $products= $query->skip($skip)->limit($limit)->orderBy('sellCount','DESC')->get();
             if(count($products)<1){
-                $products = Products::inRandomOrder()->limit($limit)->get();
+                $products = Products::whereHas('productVariables', function ($query) {
+                    $query->where('quantity','>',0);
+                })->inRandomOrder()->limit($limit)->get();
             }
             foreach($products as $key=>$product){
                 $colorArray=[];
@@ -1367,6 +1384,9 @@ class ProductController extends BaseController{
             $limit = $request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
+            $query->whereHas('productVariables', function ($query) {
+                $query->where('quantity','>',0);
+            });
             $products= $query->inRandomOrder()->limit($limit)->get();
             foreach($products as $key=>$product){
                 $colorArray=[];
@@ -1421,7 +1441,10 @@ class ProductController extends BaseController{
                 foreach ($productVariable as $prodVar){
                     if(!in_array($prodVar['color'], $colorArray)){
                         array_push($colorArray,$prodVar['color']);
-                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        $imageColorArray = $prodVar;
+//                        $imageColorArray = ['color'=>$prodVar['color'],
+//                            'imagePath'=>$prodVar['primary_image'],
+//                            'id'=>$prodVar['id']];
                         array_push($productColorsImageArray,$imageColorArray);
                     }
                 }

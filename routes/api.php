@@ -96,6 +96,7 @@ Route::group(['middleware' => [],'prefix' => 'auth','as' => 'auth.'], function (
     Route::post('loginWithEmailPassword',[AuthController::class,'loginWithEmailPassword']);
     Route::post('loginWithMobileNoPassword',[AuthController::class,'loginWithMobileNoPassword']);
     Route::post('customerRegistrationWithImei',[AuthController::class,'customerRegistrationWithImei']);
+    Route::post('customerRegistrationWithMobileOnly',[AuthController::class,'customerRegistrationWithMobileOnly']);
 });
 
 Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'frontend','as' => 'frontend.'], function () {
@@ -121,4 +122,7 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::post('placeOrder',[OrderController::class,'placeOrder']);
     Route::get('getAvailablePromocodes',[OrderController::class,'getAvailablePromocodes']);
     Route::get('getMyOrders',[OrderController::class,'getMyOrders']);
+    Route::post('addToBag',[OrderController::class,'addToCart']);
+    Route::get('getBagItems',[OrderController::class,'getBagItems']);
+    Route::get('getCartItems',[OrderController::class,'getCartItems']);
 });

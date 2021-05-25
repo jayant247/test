@@ -14,6 +14,7 @@ use App\Models\Promocode;
 use App\Models\User;
 use App\Models\UserActivity;
 use App\Models\UserAddress;
+use App\Models\UserCart;
 use App\Models\UserWhishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -389,5 +390,112 @@ class OrderController extends BaseController{
         }
     }
 
+    public function addToCart(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'products_list' => 'required|array',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $response = [];
+            $user = Auth::user();
+
+            if($request->has('products_list') && count($request->products_list)>0){
+                $productsList = $request->products_list;
+                $cartDelete = UserCart::where('user_id',Auth::user()->id)->delete();
+                $cart_records = [];
+                $subTotal = 0;
+                foreach ($productsList as $productVariable){
+                    if(!empty($productVariable)) {
+                        $productVariableofDb = ProductVariables::find($productVariable['product_variable_id']);
+                        if(!is_null($productVariableofDb)){
+                            if($productVariableofDb['is_on_sale']){
+                                $subTotal += $productVariableofDb['sale_price']*$productVariable['customer_qty'];
+                            }else{
+                                $subTotal += $productVariableofDb['price']*$productVariable['customer_qty'];
+                            }
+                            $now = Carbon::now();
+                            $cart_records[] = [
+                                'product_variable_id' => $productVariable['product_variable_id'],
+                                'quantity'=> $productVariable['customer_qty'],
+                                'user_id' => Auth::user()->id,
+                                'product_id'=>$productVariableofDb['product_id'],
+                                'updated_at' => $now,  // remove if not using timestamps
+                                'created_at' => $now   // remove if not using timestamps
+                            ];
+                        }
+                    }
+
+
+                }
+                UserCart::insert($cart_records);
+            }
+            return $this->sendResponse($response,'Data Updated Successfully', true);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getBagItems(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = (int)$request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $user =  Auth::user();
+            $itemsProductVariableId = UserCart::where('user_id',$user->id)->pluck('product_variable_id');
+            $itemsProductId = UserCart::where('user_id',$user->id)->pluck('product_id');
+            $items = ProductVariables::whereIn('id',$itemsProductVariableId)->with('product', function ($query) use($itemsProductId){
+                $query->whereIn('id',$itemsProductId);
+            })->skip($skip)->limit($limit)->get();
+            if(count($items)>0){
+                return $this->sendResponse($items,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendResponse([],'No Orders Available available', false);
+            }
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function getCartItems(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $user =  Auth::user();
+
+            $items = Cart::where('user_id',$user->id)->with(['productVariable','productVariable.product'])->get();
+//            dd(Cart::where('user_id',$user->id)->with(['productVariable','productVariable.product'])->toSql());
+            $subTotal = 0;
+            foreach ($items as $item){
+                if($item['productVariable']['is_on_sale']){
+                    $subTotal += $item['productVariable']['sale_price']*$item['customer_qty'];
+                }else{
+                    $subTotal += $item['productVariable']['price']*$item['customer_qty'];
+                }
+            }
+            if(count($items)>0){
+                $response = ['items'=>$items,'cartTotal'=>$subTotal];
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendResponse([],'No Orders Available available', false);
+            }
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
 
 }
