@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Bloom App - Admin Dashboard</title>
     <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" integrity="sha512-6S2HWzVFxruDlZxI3sXOZZ4/eJ8AcxkQH1+JjSe/ONCEqR9L4Ysq5JdT5ipqtzU7WHalNwzwBv+iE51gNHJNqQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @yield('css')
 </head>
 <body>
 {{--<div id="preloader">--}}
@@ -45,7 +47,7 @@
     ***********************************-->
     <div class="content-body">
 
-
+    @yield('content')
         <!-- #/ container -->
     </div>
     <!--**********************************
@@ -76,6 +78,9 @@
 <script src="js/settings.js"></script>
 <script src="js/gleek.js"></script>
 <script src="js/styleSwitcher.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js" integrity="sha512-lbwH47l/tPXJYG9AcFNoJaTMhGvYWhVM9YI43CT+uteTRRaiLCui8snIgyAN8XWgNjNhCqlAUdzZptso6OCoFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js" integrity="sha512-baRe8aL3+Cvo8XRk+YJ/1KdJDBi4ay7ENnfap/gEdRR+rz0rCTHBNDVCYm6HlR3WmMFCvRS4fZk2qNJIYyPgGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+@yield('js')
 
 </body>
 </html>
