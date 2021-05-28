@@ -12,7 +12,10 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "kreait/firebase-php": "^5.0",
         "laravel/framework": "^8.12",
+        "laravel/jetstream": "^2.3",
+        "laravel/sanctum": "^2.6",
         "laravel/tinker": "^2.5",
+        "livewire/livewire": "^2.0",
         "spatie/laravel-permission": "^4.0",
         "tymon/jwt-auth": "^1.0"
     },

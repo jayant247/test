@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/resetAll', function () {
+Route::get('/', function () {
     $exitCode = Artisan::call('cache:clear');
     $exitCode = Artisan::call('optimize');
     $exitCode = Artisan::call('route:cache');
@@ -23,6 +23,8 @@ Route::get('/resetAll', function () {
     $exitCode = Artisan::call('config:cache');
     $exitCode = Artisan::call('migrate');
     return view('welcome');
-})->name('resetAll')->middleware('jwt.verify:web');
+})->name('resetAll');
 
-Route::get('/',[AuthController::class,'login'])->name('login');
+Route::get('/1wdw',[AuthController::class,'login'])->name('login1');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [AuthController::class,'login'])->name('dashboard');

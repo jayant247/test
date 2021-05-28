@@ -26,7 +26,7 @@
         Header start
     ***********************************-->
     @if(Auth::user())
-        @include('layout.header')
+        @include('layouts.header')
     @endif
     <!--**********************************
         Header end ti-comment-alt
@@ -36,7 +36,7 @@
         Sidebar start
     ***********************************-->
     @if(Auth::user())
-        @include('layout.sidebar')
+        @include('layouts.sidebar')
     @endif
     <!--**********************************
         Sidebar end
