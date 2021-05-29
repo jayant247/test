@@ -12,6 +12,9 @@
     @yield('css')
 </head>
 <body>
+<div id="overlay">
+    <div class="loader"></div>
+</div>
 <div id="preloader">
     <div class="loader">
         <svg class="circular" viewBox="25 25 50 50">
@@ -81,6 +84,10 @@
 <script src="{{url('js/settings.js')}}"></script>
 <script src="{{url('js/gleek.js')}}"></script>
 <script src="{{url('js/styleSwitcher.js')}}"></script>
+<script src="{{url('js/functionality/commonService/toaster.js')}}"></script>
+<script src="{{url('js/functionality/commonService/ajaxcall.js')}}"></script>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js" integrity="sha512-lbwH47l/tPXJYG9AcFNoJaTMhGvYWhVM9YI43CT+uteTRRaiLCui8snIgyAN8XWgNjNhCqlAUdzZptso6OCoFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js" integrity="sha512-baRe8aL3+Cvo8XRk+YJ/1KdJDBi4ay7ENnfap/gEdRR+rz0rCTHBNDVCYm6HlR3WmMFCvRS4fZk2qNJIYyPgGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @yield('js')

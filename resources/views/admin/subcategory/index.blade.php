@@ -13,7 +13,7 @@
 
                         <div class="row d-flex justify-content-between">
                             <div>
-                                <h4 class="card-title">Categories</h4>
+                                <h4 class="card-title">Sub - Categories</h4>
                             </div>
                             <div>
                                 <a href="{{route('category.create')}}" class="btn btn-primary">Create</a>
@@ -77,7 +77,7 @@
                <div class="modal-dialog modal-lg">
                    <div class="modal-content">
                        <div class="modal-header">
-                           <h5 class="modal-title">Category Details</h5>
+                           <h5 class="modal-title">Sub Category Details</h5>
                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
                            </button>
                        </div>

@@ -18,7 +18,7 @@ var doAjax_params_default = {
 
 function ajaxCall(doAjax_params) {
 
-    let url = '/api/'+doAjax_params['url'];
+    let url = doAjax_params['url'];
     console.log(url)
     let requestType = doAjax_params['requestType'];
     let contentType = doAjax_params.hasOwnProperty('contentType')?doAjax_params['contentType']:'';
@@ -28,7 +28,7 @@ function ajaxCall(doAjax_params) {
     let successCallbackFunction = doAjax_params.hasOwnProperty('successCallbackFunction')?doAjax_params['successCallbackFunction']:null;
     let completeCallbackFunction = doAjax_params.hasOwnProperty('completeCallbackFunction')?doAjax_params['completeCallbackFunction']:null;
     let errorCallBackFunction = doAjax_params.hasOwnProperty('errorCallBackFunction')?doAjax_params['errorCallBackFunction']:null;
-
+    $('#overlay').show()
     $.ajax({
         url: url,
         crossDomain: true,
@@ -36,6 +36,7 @@ function ajaxCall(doAjax_params) {
         data: data,
 
         success: function(data, textStatus, jqXHR) {
+            $('#overlay').hide()
             if (typeof successCallbackFunction === "function") {
                 successCallbackFunction(data);
             }else{
@@ -43,6 +44,7 @@ function ajaxCall(doAjax_params) {
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
+            $('#overlay').hide()
             if (typeof errorCallBackFunction === "function") {
                 errorCallBackFunction(errorThrown);
             }else{
@@ -51,6 +53,7 @@ function ajaxCall(doAjax_params) {
 
         },
         complete: function(jqXHR, textStatus) {
+            $('#overlay').hide()
             if (typeof completeCallbackFunction === "function") {
                 completeCallbackFunction();
             }else{

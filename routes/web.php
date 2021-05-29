@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CRM\AuthController;
 use App\Http\Controllers\CRM\CategoryController;
+use App\Http\Controllers\CRM\ProductController;
 use App\Http\Controllers\CRM\SubCategoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,16 @@ Route::get('/1wdw',[AuthController::class,'login'])->name('login1');
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [AuthController::class,'login'])->name('dashboard');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-   Route::resource('category',CategoryController::class);
+    Route::resource('category',CategoryController::class);
     Route::resource('subcategory',SubCategoryController::class);
+    Route::resource('product',ProductController::class);
+
+
+});
+
+
+//required api
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('getProductList',[ProductController::class,'getProductList'])->name('getProductList');
+
 });

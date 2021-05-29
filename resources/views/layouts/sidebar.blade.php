@@ -18,6 +18,12 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Sub-Category</span>
                 </a>
             </li>
+            <li class="nav-label">Products</li>
+            <li>
+                <a href="{{route('product.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Products</span>
+                </a>
+            </li>
             <li class="nav-label">Apps</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
