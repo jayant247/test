@@ -205,7 +205,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         let categories = {!! $categories !!}
-            console.log(categories)
         if(categories.length>0){
             $(document).ready( function () {
                 $('#category-table').DataTable({
