@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\DeliveryPincodeController;
+use App\Http\Controllers\API\GiftCardController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserDetailsController;
 use App\Http\Controllers\API\OrderController;
@@ -114,6 +115,8 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'fronte
     Route::get('getRandomProducts',[ProductController::class,'getRandomProducts']);
     Route::get('getRecommendedProducts',[ProductController::class,'getRecommendedProducts']);
     Route::get('getSingleChildProducts',[ProductController::class,'getSingleChildProducts']);
+
+
 });
 
 Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order','as' => 'order.'], function () {
@@ -125,4 +128,6 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::post('addToBag',[OrderController::class,'addToCart']);
     Route::get('getBagItems',[OrderController::class,'getBagItems']);
     Route::get('getCartItems',[OrderController::class,'getCartItems']);
+
+    Route::get('getGiftCards',[GiftCardController::class,'getGiftCards']);
 });
