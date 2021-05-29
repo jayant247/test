@@ -153,7 +153,14 @@
                                 <li>
                                     <a href="page-lock.html"><i class="icon-lock"></i> <span>Lock Screen</span></a>
                                 </li>
-                                <li><a href="page-login.html"><i class="icon-key"></i> <span>Logout</span></a></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <a href="{{ route('logout') }}"
+                                       onclick="event.preventDefault();
+                                                this.closest('form').submit();"><i class="icon-key"></i> <span>Logout</span></a>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
                     </div>

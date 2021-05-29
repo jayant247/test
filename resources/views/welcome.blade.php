@@ -132,3 +132,9 @@
 {{--        </div>--}}
 {{--    </body>--}}
 {{--</html>--}}
+@section('js')
+    <script>
+        let token = "{!! $token !!}";
+        localStorage.setItem('token',token);
+    </script>
+@endsection
