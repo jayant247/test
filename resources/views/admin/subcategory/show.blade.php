@@ -27,6 +27,10 @@
                             <td>{{$category->is_bigthumbnail_show?'True':'False'}}</td>
                         </tr>
                         <tr>
+                            <td>Parent Category</td>
+                            <td><a href="{{route('category.show',$category->parentCategory->id)}}"> {{$category->parentCategory->category_name}} </a></td>
+                        </tr>
+                        <tr>
                             <td>Type</td>
                             <td>{{$category->type}}</td>
                         </tr>
@@ -68,21 +72,7 @@
                         </tbody>
                     </table>
                 </div>
-                <br>
-                <h4 class="card-title">Subcategory List ({{count($category->subCategory)}})</h4>
-                <hr>
-                <div class="card">
-                    <div class="row">
 
-
-                        @foreach($category->subCategory as $subCategory)
-                            <div class="col-md-4">
-                                <a href="{{route('subcategory.show',$subCategory->id)}}"><li style="list-style-type: circle">{{$subCategory->category_name}}</li></a>
-                            </div>
-                        @endforeach
-
-                    </div>
-                </div>
 
             </div>
         </div>

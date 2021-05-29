@@ -13,6 +13,11 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Category</span>
                 </a>
             </li>
+            <li>
+                <a href="{{route('subcategory.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Sub-Category</span>
+                </a>
+            </li>
             <li class="nav-label">Apps</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">

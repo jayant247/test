@@ -16,7 +16,7 @@ class CategoryController extends Controller{
 
     public function show(Request $request, $id){
 
-        $category = Category::find($id);
+        $category = Category::with(['subCategory'])->find($id);
         return view('admin.category.show',compact(['category']));
 
     }

@@ -30,11 +30,7 @@
                                         <th>Name</th>
                                         <th>Is Big Thumbnail Show</th>
                                         <th>Type</th>
-                                        <th>Subcategory Count</th>
-{{--                                        <th>Thumbnail</th>--}}
-{{--                                        <th>Big Thumbnail</th>--}}
-{{--                                        <th>Square Thumbnail</th>--}}
-{{--                                        <th>New Page Thumnail</th>--}}
+                                        <th>Parent Category Name</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -44,37 +40,13 @@
                                         <td>{{$category->category_name}}</td>
                                         <td>{{$category->is_bigthumbnail_show?'True':'False'}}</td>
                                         <td>{{$category->type}}</td>
-                                        <td>{{count($category->subCategory)}}</td>
-{{--                                        <td>--}}
-{{--                                            <a href="{{env('APP_URL').$category->category_thumbnail}}" target="_blank">--}}
-{{--                                                <img style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->category_thumbnail}}">--}}
-{{--                                            </a>--}}
+                                        <td><a href="{{route('category.show',$category->parentCategory->id)}}"> {{$category->parentCategory->category_name}} </a></td>
 
-{{--                                        </td>--}}
-{{--                                        <td>--}}
-{{--                                            <a href="{{env('APP_URL').$category->big_thumbnail}}" target="_blank">--}}
-{{--                                                <img style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->big_thumbnail}}">--}}
-{{--                                            </a>--}}
-
-{{--                                        </td>--}}
-{{--                                        <td>--}}
-{{--                                            <a href="{{env('APP_URL').$category->square_thumbnail}}" target="_blank">--}}
-{{--                                                <img style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->square_thumbnail}}">--}}
-{{--                                            </a>--}}
-
-{{--                                        </td>--}}
-
-{{--                                        <td>--}}
-{{--                                            <a href="{{env('APP_URL').$category->new_page_thumbnail}}" target="_blank">--}}
-{{--                                                <img style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->new_page_thumbnail}}">--}}
-{{--                                            </a>--}}
-
-{{--                                        </td>--}}
                                         <td>
                                             <button data-toggle="modal" onclick="openDetailsModal({{$category->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('category.show',$category->id)}}">
                                                 <i class="fa fa-eye"></i>
                                             </button>
-                                            <a class="btn btn-sm btn-outline-dark" href="{{route('category.edit',$category->id)}}">
+                                            <a class="btn btn-sm btn-outline-dark" href="{{route('subcategory.edit',$category->id)}}">
                                                 <i class="fa fa-pencil"></i>
                                             </a>
                                             <a class="btn btn-sm btn-outline-dark">
@@ -135,6 +107,10 @@
                                            <td>{{$category->type}}</td>
                                        </tr>
                                        <tr>
+                                           <td>Parent Category</td>
+                                           <td><a href="{{route('category.show',$category->parentCategory->id)}}"> {{$category->parentCategory->category_name}} </a></td>
+                                       </tr>
+                                       <tr>
                                            <td>Thumbnail</td>
                                            <td>
                                                <a href="{{env('APP_URL').$category->category_thumbnail}}" target="_blank">
@@ -172,17 +148,7 @@
                                        </tbody>
                                    </table>
                                </div>
-                               <h4>Subcategory List ({{count($category->subCategory)}})</h4>
-                               <div class="row">
 
-
-                                   @foreach($category->subCategory as $subCategory)
-                                       <div class="col-md-6">
-                                           <a href="{{route('subcategory.show',$subCategory->id)}}"><li style="list-style-type: circle">{{$subCategory->category_name}}</li></a>
-                                       </div>
-                                   @endforeach
-
-                               </div>
 
                            </div>
                        </div>

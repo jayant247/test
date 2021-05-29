@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CRM\AuthController;
 use App\Http\Controllers\CRM\CategoryController;
+use App\Http\Controllers\CRM\SubCategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,4 +33,5 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [AuthControll
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
    Route::resource('category',CategoryController::class);
+    Route::resource('subcategory',SubCategoryController::class);
 });
