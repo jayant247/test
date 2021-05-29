@@ -19,7 +19,7 @@ Fixing Order => Base + Typography >> General Layout + Grid >> Page Layout + Comp
 @import url(../icons/ionicons/css/ionicons.css);
 @import url(../icons/themify-icons/themify-icons.css);
 @import url(../icons/flag-icon-css/flag-icon.min.css);
-@import url(../icons/material-design-iconic-font/materialdesignicons.min.css);
+@import url(../icons/material-design-iconic-font/css/materialdesignicons.min.css);
 @import url(../icons/pe-icon-set-weather/css/pe-icon-set-weather.min.css);
 @import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/metisMenu/2.7.9/metisMenu.css");

@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CRM\AuthController;
+use App\Http\Controllers\CRM\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,3 +29,7 @@ Route::get('/', function () {
 Route::get('/1wdw',[AuthController::class,'login'])->name('login1');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [AuthController::class,'login'])->name('dashboard');
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+   Route::resource('category',CategoryController::class);
+});

@@ -5,19 +5,20 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="_token" content="{{ csrf_token() }}">
     <title>Bloom App - Admin Dashboard</title>
-    <link href="css/style.css" rel="stylesheet">
+    <link href="{{url('css/style.css')}} " rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" integrity="sha512-6S2HWzVFxruDlZxI3sXOZZ4/eJ8AcxkQH1+JjSe/ONCEqR9L4Ysq5JdT5ipqtzU7WHalNwzwBv+iE51gNHJNqQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     @yield('css')
 </head>
 <body>
-{{--<div id="preloader">--}}
-{{--    <div class="loader">--}}
-{{--        <svg class="circular" viewBox="25 25 50 50">--}}
-{{--            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />--}}
-{{--        </svg>--}}
-{{--    </div>--}}
-{{--</div>--}}
+<div id="preloader">
+    <div class="loader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+        </svg>
+    </div>
+</div>
 <div id="main-wrapper">
 
 
@@ -76,10 +77,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha512-ldc1sPu1FZ8smgkgp+HwnYyVb1eRn2wEmKrDg1JqPEb02+Ei4kNzDIQ0Uwh0AJVLQFjJoWwG+764x70zy5Tv4A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha512-n6dYFOG599s4/mGlA6E+YLgtg9uPTOMDUb0IprSMDYVLr0ctiRryPEQ8gpM4DCMlx7M2G3CK+ZcaoOoJolzdCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-<script src="js/custom.min.js"></script>
-<script src="js/settings.js"></script>
-<script src="js/gleek.js"></script>
-<script src="js/styleSwitcher.js"></script>
+<script src="{{url('js/custom.min.js')}}"></script>
+<script src="{{url('js/settings.js')}}"></script>
+<script src="{{url('js/gleek.js')}}"></script>
+<script src="{{url('js/styleSwitcher.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js" integrity="sha512-lbwH47l/tPXJYG9AcFNoJaTMhGvYWhVM9YI43CT+uteTRRaiLCui8snIgyAN8XWgNjNhCqlAUdzZptso6OCoFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js" integrity="sha512-baRe8aL3+Cvo8XRk+YJ/1KdJDBi4ay7ENnfap/gEdRR+rz0rCTHBNDVCYm6HlR3WmMFCvRS4fZk2qNJIYyPgGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @yield('js')
