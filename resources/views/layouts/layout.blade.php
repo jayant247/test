@@ -12,8 +12,8 @@
     @yield('css')
 </head>
 <body>
-<div id="overlay">
-    <div class="loader"></div>
+<div id="overlay" style="display: none;">
+    <div class="loader1"></div>
 </div>
 <div id="preloader">
     <div class="loader">

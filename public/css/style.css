@@ -14704,7 +14704,7 @@ label.error {
     color: red !important;
     display: block;
 }
-.loader {
+.loader1 {
     position: absolute;
     border: 10px solid #f3f3f3;
     border-radius: 50%;
