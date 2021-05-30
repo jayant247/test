@@ -130,4 +130,11 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::get('getCartItems',[OrderController::class,'getCartItems']);
 
     Route::get('getGiftCards',[GiftCardController::class,'getGiftCards']);
+    Route::post('paytmGiftCardFeesCallback',[GiftCardController::class,'paytmGiftCardFeesCallback'])->name('paytmGiftCardFeesCallback');
+    Route::post('buyGiftCard',[GiftCardController::class,'buyGiftCard']);
+    Route::post('checkRazorpayPaymentStatus',[GiftCardController::class,'checkRazorpayPaymentStatus']);
+    Route::post('checkPaytmPaymentStatus',[GiftCardController::class,'checkPaytmPaymentStatus']);
+    Route::get('getMyCouponCode',[GiftCardController::class,'getMyCouponCode']);
+    Route::get('getGiftCardPurchasedByMe',[GiftCardController::class,'getGiftCardPurchasedByMe']);
+
 });

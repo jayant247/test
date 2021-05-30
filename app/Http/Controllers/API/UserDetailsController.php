@@ -9,6 +9,7 @@ use App\Models\ProductVariables;
 use App\Models\User;
 use App\Models\UserActivity;
 use App\Models\UserAddress;
+use App\Models\UserWallet;
 use App\Models\UserWhishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -363,6 +364,30 @@ class UserDetailsController extends BaseController{
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
 
+        }
+    }
+
+    public function getWalletTransaction(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'pageNo'=>'required|numeric',
+                'limit'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $user = Auth::user();
+            $userTransaction = UserWallet::where('user_id',$user->id)->where('status',1)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            if(count($userTransaction)>0){
+                return $this->sendResponse($userTransaction,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendResponse([],'No Promo codes available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
         }
     }
 }

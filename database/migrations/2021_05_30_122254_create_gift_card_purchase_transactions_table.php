@@ -20,9 +20,10 @@ class CreateGiftCardPurchaseTransactionsTable extends Migration
             $table->enum('payment_mode', ['razorpay', 'paytm']);
             $table->unsignedBigInteger('user_gift_card_id');
             $table->foreign('user_gift_card_id')->references('id')->on('user_gift_cards');
-            $table->string('gateway_transaction_id');
+            $table->string('gateway_transaction_id')->nullable();
             $table->tinyInteger('payment_status')->default(0)
                 ->comment('0=UNPAID | 1=PAID ');
+            $table->decimal('amount',15,2);
             $table->timestamps();
         });
     }

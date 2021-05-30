@@ -17,13 +17,15 @@ class CreateUserGiftCardsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('coupon_code');
+            $table->string('coupon_code')->unique();
             $table->string('gift_for_mobile_number');
             $table->timestamp('expiry_date');
             $table->integer('withdraw_otp')->nullable();
             $table->timestamp('withdraw_otp_time')->nullable();
             $table->tinyInteger('use_status')->default(0)
                 ->comment('0=UNUSED | 1=USED  ');
+            $table->decimal('purchase_amount',15,2);
+            $table->decimal('gift_amount',15,2);
             $table->unsignedBigInteger('gift_card_id');
             $table->tinyInteger('payment_status')->default(0)
                 ->comment('0=UNPAID | 1=PAID ');

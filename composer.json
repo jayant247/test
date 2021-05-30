@@ -16,6 +16,8 @@
         "laravel/sanctum": "^2.6",
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^2.0",
+        "paytm/paytmchecksum": "^1.1",
+        "razorpay/razorpay": "2.*",
         "spatie/laravel-permission": "^4.0",
         "tymon/jwt-auth": "^1.0"
     },

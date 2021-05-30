@@ -32,7 +32,7 @@ class JwtMiddleware extends BaseMiddleware
                     $refreshed = JWTAuth::refresh(JWTAuth::getToken());
                     $user = JWTAuth::setToken($refreshed)->toUser();
 
-                    return response()->json(['data'=>['token'=>$refreshed],'message' => 'Token is Refreshed','status'=>true],401);
+                    return response()->json(['data'=>['token'=>$refreshed],'message' => 'Token is Refreshed','status'=>true,'data1'=>$e],401);
                 }catch (JWTException $e){
 
                     return response()->json(['message' => 'Token Expired Can\'t be refreshed.' ,'status'=>false],401);
