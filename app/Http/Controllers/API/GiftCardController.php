@@ -51,4 +51,35 @@ class GiftCardController extends BaseController{
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
+
+    public function buyGiftCard(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'gift_card_id'=>'required|numeric',
+                'for_mobile_no'=>'required|digits:10',
+                'paymentMode'=>'required|numeric|min:0|max:1'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $payment_mode = '';
+            switch ($request->paymentMode) {
+                case 0:
+                    $payment_mode = 'paytm';
+                    break;
+                case 1:
+                    $payment_mode = 'razorpay';
+                    break;
+            }
+
+
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+
+
+
 }
