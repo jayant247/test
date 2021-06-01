@@ -384,10 +384,61 @@ class UserDetailsController extends BaseController{
             if(count($userTransaction)>0){
                 return $this->sendResponse($userTransaction,'Data Fetched Successfully', true);
             }else{
-                return $this->sendResponse([],'No Promo codes available', false);
+                return $this->sendResponse([],'No Transactions available', false);
             }
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function getWalletBalance(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $user = Auth::user();
+            $walletBalance = $user->balance();
+
+
+            return $this->sendResponse(['walletBalance'=>$walletBalance],'Data Fetched Successfully', true);
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function addWalletBalance(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $limit = $request->limit;
+            $pageNo = $request->pageNo;
+            $skip = $limit*$pageNo;
+            $user = Auth::user();
+            $data = ['type'  =>  'credit',
+                'amount' => 100,
+                'description' =>  "Temp Wallet Balance Update",
+                'status' => 1,
+            ];
+            $wallet = $user->transactions()
+                ->create($data);
+            $walletBalance = $user->balance();
+
+
+            return $this->sendResponse(['walletBalance'=>$walletBalance],'Data Added Successfully', true);
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e->getMessage(),413);
         }
     }
 }

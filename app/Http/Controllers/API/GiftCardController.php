@@ -395,7 +395,7 @@ class GiftCardController extends BaseController{
                 }
                 return $this->sendResponse($userGiftCards,'Data Fetched Successfully', true);
             }else{
-                return $this->sendResponse([],'No Promo codes available', false);
+                return $this->sendResponse([],'No  codes available', false);
             }
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', $e->getMessage(),413);
@@ -419,7 +419,7 @@ class GiftCardController extends BaseController{
             if(count($userGiftCards)>0){
                 return $this->sendResponse($userGiftCards,'Data Fetched Successfully', true);
             }else{
-                return $this->sendResponse([],'No Promo codes available', false);
+                return $this->sendResponse([],'No codes available', false);
             }
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);

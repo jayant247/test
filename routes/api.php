@@ -79,6 +79,11 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     Route::post('createUserActivity',[UserDetailsController::class,'createUserActivity']);
     Route::get('recentlyViewProducts',[UserDetailsController::class,'recentlyViewProducts']);
 
+    //wallet
+    Route::get('getWalletTransaction',[UserDetailsController::class,'getWalletTransaction']);
+    Route::get('getWalletBalance',[UserDetailsController::class,'getWalletBalance']);
+    Route::get('addWalletBalance',[UserDetailsController::class,'addWalletBalance']);
+
     //delivery available pincode
     Route::post('create',[DeliveryPincodeController::class,'create']);
     Route::post('update/{id}',[DeliveryPincodeController::class,'update']);
