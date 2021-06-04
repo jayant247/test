@@ -819,11 +819,13 @@ class OrderController extends BaseController{
                 $order->payment_status=2;
                 $order->save();
                 $response = [];
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
                 $response['payment_status']=true;
                 return  $this->sendResponse($response,'Payment Successful');
             }
             else{
                 $response = [];
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
                 $response['payment_status']=false;
                 if($order->payment_status==1){
                     $order->payment_status = 3;
@@ -932,12 +934,38 @@ class OrderController extends BaseController{
                 $order->payment_status=2;
                 $order->save();
                 $response = [];
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
                 $response['payment_status']=true;
                 return  $this->sendResponse($response,'Payment Successful');
             }
             else{
                 $response = [];
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
                 $response['payment_status']=false;
+                if($order->payment_status==1){
+                    $order->payment_status = 3;
+                    $order->save();
+                    $orderItems = OrderItems::where('order_id',$request->system_id)->get();
+                    foreach ($orderItems as $orderItem){
+                        $prodcutVariable = ProductVariables::where('id',$orderItem['product_variable_id'])->increment('quantity',$orderItem['quantity']);
+                    }
+                    if($order->is_gift_coupon_used){
+                        $userGiftCard = UserGiftCards::find($order->gift_card_id );
+                        $userGiftCard->use_status = 0;
+                        $userGiftCard->save();
+                    }
+                    if($order->is_wallet_balance_used){
+                        $user = User::find($order->user_id);
+                        $data = ['type'  =>  'credit',
+                            'amount' => $order->wallet_balance_used,
+                            'description' =>  "Wallet Balance Used For Order With refernce no. ".$order->orderRefNo,
+                            'status' => 1,
+                        ];
+                        $wallet = $user->transactions()
+                            ->create($data);
+
+                    }
+                }
                 return $this->sendResponse($response,'Payment Failed. Please contact admin in case your payment deducted.', false);
             }
         }catch (\Exception $e){
