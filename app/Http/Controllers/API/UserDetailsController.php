@@ -113,6 +113,7 @@ class UserDetailsController extends BaseController{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'pageNo'=>'required|numeric',
                 'limit'=>'required|numeric',
+                'address_id'=>'numeric'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -121,7 +122,12 @@ class UserDetailsController extends BaseController{
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
             $userId = Auth::user()->id;
-            $userAddress = UserAddress::where('user_id',$userId)->skip($skip)->limit($limit)->get();
+            if($request->has('address_id')){
+                $userAddress = UserAddress::where('user_id',$userId)->where('id',$request->address_id)->get();
+            }else{
+                $userAddress = UserAddress::where('user_id',$userId)->skip($skip)->limit($limit)->get();
+            }
+//            $userAddress = UserAddress::where('user_id',$userId)->skip($skip)->limit($limit)->get();
 
             if(count($userAddress)>0){
                 $response =  $userAddress;
