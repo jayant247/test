@@ -124,6 +124,11 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'fronte
 
 });
 
+Route::group(['middleware' => ['throttle:60,1'],'prefix' => 'payment','as' => 'payment.'], function () {
+    Route::post('paytmOrderPaymentWebhookCallback',[OrderController::class,'paytmOrderPaymentWebhookCallback'])->name('paytmOrderPaymentWebhookCallback');
+    Route::post('paytmGiftCardFeesCallback',[GiftCardController::class,'paytmGiftCardFeesCallback'])->name('paytmGiftCardFeesCallback');
+});
+
 Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order','as' => 'order.'], function () {
     Route::post('cart',[OrderController::class,'cart']);
     Route::post('checkout',[OrderController::class,'checkout']);
@@ -133,9 +138,12 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::post('addToBag',[OrderController::class,'addToCart']);
     Route::get('getBagItems',[OrderController::class,'getBagItems']);
     Route::get('getCartItems',[OrderController::class,'getCartItems']);
+    Route::post('checkOrderRazorpayPaymentStatus',[OrderController::class,'checkOrderRazorpayPaymentStatus']);
+    Route::post('checkOrderPaytmPaymentStatus',[OrderController::class,'checkOrderPaytmPaymentStatus']);
+    Route::get('getSingleOrder/{id}',[OrderController::class,'getSingleOrder']);
+    Route::get('getMyPaidOrders',[OrderController::class,'getMyPaidOrders']);
 
     Route::get('getGiftCards',[GiftCardController::class,'getGiftCards']);
-    Route::post('paytmGiftCardFeesCallback',[GiftCardController::class,'paytmGiftCardFeesCallback'])->name('paytmGiftCardFeesCallback');
     Route::post('buyGiftCard',[GiftCardController::class,'buyGiftCard']);
     Route::post('checkRazorpayPaymentStatus',[GiftCardController::class,'checkRazorpayPaymentStatus']);
     Route::post('checkPaytmPaymentStatus',[GiftCardController::class,'checkPaytmPaymentStatus']);

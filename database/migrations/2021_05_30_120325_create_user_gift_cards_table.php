@@ -19,7 +19,7 @@ class CreateUserGiftCardsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('coupon_code')->unique();
             $table->string('gift_for_mobile_number');
-            $table->timestamp('expiry_date');
+            $table->timestamp('expiry_date')->nullable();
             $table->integer('withdraw_otp')->nullable();
             $table->timestamp('withdraw_otp_time')->nullable();
             $table->tinyInteger('use_status')->default(0)

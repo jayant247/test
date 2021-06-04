@@ -135,7 +135,7 @@ class GiftCardController extends BaseController{
             "mid"           => env("PAYTM_MERCHANT_ID"),
             "websiteName"   => "WEBSTAGING",
             "orderId"       => $orderId,
-            "callbackUrl"   => route('order.paytmGiftCardFeesCallback'),
+            "callbackUrl"   => route('payment.paytmGiftCardFeesCallback'),
             "txnAmount"     => array(
                 "value"     => $amount,
                 "currency"  => "INR",
@@ -177,7 +177,7 @@ class GiftCardController extends BaseController{
             $response['orderId']=$orderId;
             $response['amount']=$amount;
             $response['txnToken']=$curlResponse['body']['txnToken'];
-            $response['callbackURL']=route('order.paytmGiftCardFeesCallback');
+            $response['callbackURL']=route('payment.paytmGiftCardFeesCallback');
             $response['isStaging']= env('PAYTM_ENVIRONMENT')=='local'?true:false;
         }
             return $response;
@@ -257,7 +257,7 @@ class GiftCardController extends BaseController{
             }
             $giftCardTransaction= GiftCardPurchaseTransactions::where('id','=',$request->system_id)->where('gateway_transaction_id','=',$request->payment_gateway_order_id)->first();
             if(is_null($giftCardTransaction)){
-                return $this->sendError('No Subscription Found. Something Went Wrong', ['error'=>"No Subscription Found"],200);
+                return $this->sendError('No Gift Card Found. Something Went Wrong', ['error'=>"No Gift Card Found"],200);
             }
             if($giftCardTransaction->payment_status==1){
                 $response = [];
@@ -304,7 +304,7 @@ class GiftCardController extends BaseController{
             $giftCardTransaction= GiftCardPurchaseTransactions::where('id','=',$request->system_id)->where('gateway_transaction_id','=',$request->payment_gateway_order_id)->first();
 
             if(is_null($giftCardTransaction)){
-                return $this->sendError('No Subscription Found. Something Went Wrong', ['error'=>"No Subscription Found"],200);
+                return $this->sendError('No Gift Card Found. Something Went Wrong', ['error'=>"No Gift Card Found"],200);
             }
             if($giftCardTransaction->payment_status==1){
                 $response = [];
@@ -328,7 +328,7 @@ class GiftCardController extends BaseController{
              * Generate checksum by parameters we have in body
              * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytm.com/next/apikeys
              */
-            $checksum = PaytmChecksum::generateSignature(json_encode($paytmParams["body"], JSON_UNESCAPED_SLASHES), "YOUR_MERCHANT_KEY");
+            $checksum = PaytmChecksum::generateSignature(json_encode($paytmParams["body"], JSON_UNESCAPED_SLASHES), env("PAYTM_MERCHANT_KEY"));
 
             /* head parameters */
             $paytmParams["head"] = array(
@@ -340,8 +340,13 @@ class GiftCardController extends BaseController{
             /* prepare JSON string for request */
             $post_data = json_encode($paytmParams, JSON_UNESCAPED_SLASHES);
 
+            if(env('PAYTM_ENVIRONMENT')=='local'){
+                $url = "https://securegw-stage.paytm.in/v3/order/status";
+            }else{
+                $url = "https://securegw.paytm.in/v3/order/status";
+            }
             /* for Staging */
-            $url = "https://securegw-stage.paytm.in/v3/order/status";
+//            $url = "https://securegw-stage.paytm.in/v3/order/status";
 
             /* for Production */
 // $url = "https://securegw.paytm.in/v3/order/status";
@@ -388,7 +393,7 @@ class GiftCardController extends BaseController{
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
             $user = Auth::user();
-            $userGiftCards = UserGiftCards::where('gift_for_mobile_number',$user->mobile_no)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            $userGiftCards = UserGiftCards::where('gift_for_mobile_number',$user->mobile_no)->where('payment_status',1)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
             if(count($userGiftCards)>0){
 
                 foreach ($userGiftCards as $card){

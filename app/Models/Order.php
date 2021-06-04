@@ -13,9 +13,11 @@ class Order extends Model
         return $this->belongsTo(OrderStatus::class,'order_status');
     }
     public function paymentStatus(){
-        return $this->belongsTo(OrderStatus::class,'payment_status');
+        return $this->belongsTo(PaymentStatus::class,'payment_status');
     }
-
+    public function giftCardUsed(){
+        return $this->belongsTo(UserGiftCards::class,'gift_card_id');
+    }
     public function orderItems(){
        return $this->hasMany(OrderItems::class,'order_id');
     }
