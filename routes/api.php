@@ -141,5 +141,7 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::post('checkPaytmPaymentStatus',[GiftCardController::class,'checkPaytmPaymentStatus']);
     Route::get('getMyCouponCode',[GiftCardController::class,'getMyCouponCode']);
     Route::get('getGiftCardPurchasedByMe',[GiftCardController::class,'getGiftCardPurchasedByMe']);
+    Route::post('sendGiftCardVerificationOTP',[GiftCardController::class,'sendGiftCardVerificationOTP']);
+    Route::post('verifyCouponOtp',[GiftCardController::class,'verifyCouponOtp']);
 
 });

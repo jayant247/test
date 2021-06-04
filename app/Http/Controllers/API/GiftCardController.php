@@ -75,7 +75,7 @@ class GiftCardController extends BaseController{
                 $couponCode = $this->generateRandomString(10);
                 $newCouponRegistration = new UserGiftCards;
                 $newCouponRegistration->user_id = Auth::user()->id;
-                $newCouponRegistration->coupon_code = Crypt::encryptString($couponCode);
+                $newCouponRegistration->coupon_code = base64_encode($couponCode);
                 $newCouponRegistration->gift_for_mobile_number = $request->for_mobile_no;
                 $newCouponRegistration->expiry_date = Carbon::now()->addDays($giftCard->validity_days_from_purchase_date);
                 $newCouponRegistration->gift_card_id = $giftCard->id;
@@ -134,7 +134,7 @@ class GiftCardController extends BaseController{
             "requestType"   => "Payment",
             "mid"           => env("PAYTM_MERCHANT_ID"),
             "websiteName"   => "WEBSTAGING",
-            "orderId"       => $orderId."cdc",
+            "orderId"       => $orderId,
             "callbackUrl"   => route('order.paytmGiftCardFeesCallback'),
             "txnAmount"     => array(
                 "value"     => $amount,
@@ -158,9 +158,9 @@ class GiftCardController extends BaseController{
         $post_data = json_encode($paytmParams, JSON_UNESCAPED_SLASHES);
 
         if(env('PAYTM_ENVIRONMENT')=='local'){
-            $url = "https://securegw-stage.paytm.in/theia/api/v1/initiateTransaction?mid=".env("PAYTM_MERCHANT_ID")."&orderId=".$orderId."cdc";
+            $url = "https://securegw-stage.paytm.in/theia/api/v1/initiateTransaction?mid=".env("PAYTM_MERCHANT_ID")."&orderId=".$orderId;
         }else{
-            $url = "https://securegw.paytm.in/theia/api/v1/initiateTransaction?mid=".env("PAYTM_MERCHANT_ID")."&orderId=".$orderId."cdc";
+            $url = "https://securegw.paytm.in/theia/api/v1/initiateTransaction?mid=".env("PAYTM_MERCHANT_ID")."&orderId=".$orderId;
         }
 
 
@@ -177,6 +177,7 @@ class GiftCardController extends BaseController{
             $response['orderId']=$orderId;
             $response['amount']=$amount;
             $response['txnToken']=$curlResponse['body']['txnToken'];
+            $response['callbackURL']=route('order.paytmGiftCardFeesCallback');
             $response['isStaging']= env('PAYTM_ENVIRONMENT')=='local'?true:false;
         }
             return $response;
@@ -271,7 +272,7 @@ class GiftCardController extends BaseController{
                 $couponCode = UserGiftCards::find($giftCardTransaction->user_gift_card_id);
                 $couponCode->payment_status = 1;
                 $couponCode->save();
-                $couponCode->coupon_code = Crypt::decryptString($couponCode->coupon_code);
+                $couponCode->coupon_code = base64_decode($couponCode->coupon_code);
                 $response = [];
                 $response['payment_status']=true;
                 $response['couponDetails']=$couponCode;
@@ -320,7 +321,7 @@ class GiftCardController extends BaseController{
                 "mid" => env("PAYTM_MERCHANT_ID"),
 
                 /* Enter your order id which needs to be check status for */
-                "orderId" => $request->system_id."cdc",
+                "orderId" => $request->system_id,
             );
 
             /**
@@ -358,7 +359,7 @@ class GiftCardController extends BaseController{
                 $couponCode = UserGiftCards::find($giftCardTransaction->user_gift_card_id);
                 $couponCode->payment_status = 1;
                 $couponCode->save();
-                $couponCode->coupon_code = Crypt::decryptString($couponCode->coupon_code);
+                $couponCode->coupon_code = base64_decode($couponCode->coupon_code);
                 $response = [];
                 $response['payment_status']=true;
                 $response['couponDetails']=$couponCode;
@@ -391,7 +392,7 @@ class GiftCardController extends BaseController{
             if(count($userGiftCards)>0){
 
                 foreach ($userGiftCards as $card){
-                    $card->coupon_code = Crypt::decryptString($card->coupon_code);
+                    $card->coupon_code = base64_decode($card->coupon_code);
                 }
                 return $this->sendResponse($userGiftCards,'Data Fetched Successfully', true);
             }else{
@@ -426,7 +427,138 @@ class GiftCardController extends BaseController{
         }
     }
 
+    public function sendGiftCardVerificationOTP(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'gift_card_code'=>'required|string',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $now = Carbon::now();
+            $couponCode = base64_encode($request->gift_card_code);
+//            dd(base64_encode('v27kBCpXQI'));
+            $userGiftCardCode = UserGiftCards::where('coupon_code',$couponCode)
+                ->where('use_status',0)
+                ->where('payment_status',1)
+                ->where('expiry_date','<',$now)
+                ->first();
+            if(!is_null($userGiftCardCode)){
+                if($userGiftCardCode->withdraw_otp) {
+                    $start_date = new \DateTime();
+                    $since_start = $start_date->diff(new \DateTime($userGiftCardCode->withdraw_otp_time));
+                    $minutes = $since_start->days * 24 * 60;
+                    $minutes += $since_start->h * 60;
+                    $minutes += $since_start->i;
+                    if ($minutes > 10) {
+                        $userGiftCardCode->withdraw_otp = rand(100000,999999);
+                        $userGiftCardCode->withdraw_otp_time = Carbon::now();
+                        $userGiftCardCode->save();
+                        if($this->sendOtp($userGiftCardCode)){
+                            return $this->sendResponse([], 'New OTP Send Successfully');
+                        }else{
+                            return $this->sendResponse([], 'OTP Send Failed',false);
+                        }
 
+                    }else{
+
+                        if($this->sendOtp($userGiftCardCode)){
+                            return $this->sendResponse([], 'OTP Send Successfully');
+                        }else{
+                            return $this->sendResponse([], 'OTP Send Failed',false);
+                        }
+                    }
+                }else{
+                    $userGiftCardCode->withdraw_otp = rand(100000,999999);
+                    $userGiftCardCode->withdraw_otp_time = Carbon::now();
+                    $userGiftCardCode->save();
+                    if($this->sendOtp($userGiftCardCode)){
+                        return $this->sendResponse([], 'New OTP Send Successfully');
+                    }else{
+                        return $this->sendResponse([], 'OTP Send Failed',false);
+                    }
+                }
+            }else{
+                return $this->sendError('Invalid Coupon Code', [],211);
+            }
+        }catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    function sendOtp($user){
+        $curl = curl_init();
+        $url = "https://2factor.in/API/V1/".env("MESSAGE_API_KEY")."/SMS/+91".$user->gift_for_mobile_number."/".$user->withdraw_otp;
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_POSTFIELDS => "",
+            CURLOPT_HTTPHEADER => array(
+
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        $response = json_decode($response,true);
+        if($response["Status"]=="Success"){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function verifyCouponOtp(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'gift_card_code'=>'required|string',
+                'otp'=>'required|numeric',
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $now = Carbon::now();
+            $couponCode = base64_encode($request->gift_card_code);
+            $userGiftCardCode = UserGiftCards::where('coupon_code',$couponCode)->where('use_status',0)
+                ->where('payment_status',1)
+                ->where('expiry_date','<',$now)
+                ->first();
+            if(!is_null($userGiftCardCode)){
+                if($userGiftCardCode->withdraw_otp){
+                    $start_date = new \DateTime();
+                    $since_start = $start_date->diff(new \DateTime($userGiftCardCode->withdraw_otp_time));
+                    $minutes = $since_start->days * 24 * 60;
+                    $minutes += $since_start->h * 60;
+                    $minutes += $since_start->i;
+                    if($minutes>10){
+                        return $this->sendError('OTP Timeout. Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                    }else{
+                        if($userGiftCardCode->withdraw_otp==$request->otp.''){
+                            $userGiftCardCode->withdraw_otp=null;
+                            $userGiftCardCode->otp_verified_at = Carbon::now();
+                            $userGiftCardCode->gift_for_user_id = Auth::user()->id;
+                            $userGiftCardCode->save();
+                            return $this->sendResponse([], 'OTP Verified Successfully');
+                        }else{
+                            return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"]);
+                        }
+                    }
+                }else{
+                    return $this->sendError('Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                }
+            }else{
+                return $this->sendError('Invalid Gift Card', [],211);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e->getMessage(),413);
+        }
+    }
 
 
 }

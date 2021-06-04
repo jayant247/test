@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\UserActivity;
 use App\Models\UserAddress;
 use App\Models\UserCart;
+use App\Models\UserGiftCards;
 use App\Models\UserWhishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -98,14 +99,15 @@ class OrderController extends BaseController{
                 'products_list' => 'required|array',
                 'address_id'=>'required|numeric',
                 'use_wallet_balance'=>'required|boolean',
-                'promocode'=>'string'
+                'promocode'=>'string',
+                'gift_card_code'=>'string'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
             }
             $response = [];
             $user = Auth::user();
-            $response['walletBalance'] = (float)$user->balance;
+            $response['walletBalance'] = (float)$user->balance();
             $response['walletBalanceUsed'] = 0;
             $msg = '';
             $discountAmount = 0;
@@ -131,6 +133,19 @@ class OrderController extends BaseController{
                     return $this->sendError('Invalid Promo code', [], 212);
                 }
             }
+            if($request->has('gift_card_code')){
+                $now = Carbon::now();
+                $couponCode = base64_encode($request->gift_card_code);
+                $userGiftCardCode = UserGiftCards::where('coupon_code',$couponCode)->where('use_status',0)
+                    ->where('payment_status',1)
+                    ->where('expiry_date','<',$now)
+                    ->where('otp_verified_at','>',Carbon::now()->subHours(1))
+                    ->first();
+                if(is_null($userGiftCardCode)){
+                    return $this->sendError('Invalid Gift Card code', [], 215);
+                }
+            }
+
             if($request->has('products_list') && count($request->products_list)>0){
                 $productsList = $request->products_list;
                 $cartDelete = Cart::where('user_id',Auth::user()->id)->delete();
@@ -209,6 +224,7 @@ class OrderController extends BaseController{
                 'address_id'=>'required|numeric',
                 'use_wallet_balance'=>'required|boolean',
                 'promocode'=>'string',
+                'gift_card_code'=>'string',
                 'paymentMode'=>'required|numeric|min:0|max:2'
             ]);
             if ($validator->fails()) {
@@ -238,6 +254,18 @@ class OrderController extends BaseController{
                     ->first();
                 if (is_null($promocode)) {
                     return $this->sendError('Invalid Promo code', [], 212);
+                }
+            }
+            if($request->has('gift_card_code')){
+                $now = Carbon::now();
+                $couponCode = base64_encode($request->gift_card_code);
+                $userGiftCardCode = UserGiftCards::where('coupon_code',$couponCode)->where('use_status',0)
+                    ->where('payment_status',1)
+                    ->where('expiry_date','<',$now)
+                    ->where('otp_verified_at','>',Carbon::now()->subHours(1))
+                    ->first();
+                if(is_null($userGiftCardCode)){
+                    return $this->sendError('Invalid Gift Card code', [], 215);
                 }
             }
             if($request->has('products_list') && count($request->products_list)>0){
