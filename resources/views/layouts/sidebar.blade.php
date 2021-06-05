@@ -18,6 +18,37 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Sub-Category</span>
                 </a>
             </li>
+
+            <!-- <li class="nav-label">Users</li> -->
+            <li>
+                <a href="{{route('user.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('role.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Roles</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('permission.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Permissions</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{route('promocode.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Promocodes</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{route('giftcard.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Gift Cards</span>
+                </a>
+            </li>
+
+
             <li class="nav-label">Products</li>
             <li>
                 <a href="{{route('product.index')}}" aria-expanded="false">

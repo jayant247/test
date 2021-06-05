@@ -13,40 +13,35 @@
 
                         <div class="row d-flex justify-content-between">
                             <div>
-                                <h4 class="card-title">Sub - Categories</h4>
+                                <h4 class="card-title">Permissions</h4>
                             </div>
                             <div>
-                                <a href="{{route('subcategory.create')}}" class="btn btn-primary">Create</a>
+                                <a href="{{route('permission.create')}}" class="btn btn-primary">Create</a>
                             </div>
 
                         </div>
-                        @if(count($categories)>0)
+                        @if(count($permissions)>0)
 
                         <div class="table-responsive">
 
-                            <table id="category-table" class="table table-striped table-bordered zero-configuration">
+                            <table id="permission-table" class="table table-striped table-bordered zero-configuration">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Is Big Thumbnail Show</th>
-                                        <th>Type</th>
-                                        <th>Parent Category Name</th>
+                                        <th>Guard Name</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($categories as $category)
+                                @foreach($permissions as $permission)
                                     <tr>
-                                        <td>{{$category->category_name}}</td>
-                                        <td>{{$category->is_bigthumbnail_show?'True':'False'}}</td>
-                                        <td>{{$category->type}}</td>
-                                        <td><a href="{{route('category.show',$category->parentCategory->id)}}"> {{$category->parentCategory->category_name}} </a></td>
-
+                                        <td>{{$permission->name}}</td>
+                                        <td>{{$permission->guard_name}}</td>
                                         <td>
-                                            <button data-toggle="modal" onclick="openDetailsModal({{$category->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('category.show',$category->id)}}">
+                                            <button data-toggle="modal" onclick="openDetailsModal({{$permission->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('permission.show',$permission->id)}}">
                                                 <i class="fa fa-eye"></i>
                                             </button>
-                                            <a class="btn btn-sm btn-outline-dark" href="{{route('subcategory.edit',$category->id)}}">
+                                            <a class="btn btn-sm btn-outline-dark" href="{{route('permission.edit',$permission->id)}}">
                                                 <i class="fa fa-pencil"></i>
                                             </a>
                                             <a class="btn btn-sm btn-outline-dark">
@@ -71,13 +66,13 @@
 
 
 {{--    Modal For Show Option--}}
-   @if(count($categories)>0)
-       @foreach($categories as $category)
-           <div class="modal fade bd-example-modal-lg" id="{{$category->id}}" tabindex="-1" role="dialog" aria-hidden="true">
+   @if(count($permissions)>0)
+       @foreach($permissions as $permission)
+           <div class="modal fade bd-example-modal-lg" id="{{$permission->id}}" tabindex="-1" permission="dialog" aria-hidden="true">
                <div class="modal-dialog modal-lg">
                    <div class="modal-content">
                        <div class="modal-header">
-                           <h5 class="modal-title">Sub Category Details</h5>
+                           <h5 class="modal-title">Permission Details</h5>
                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
                            </button>
                        </div>
@@ -96,54 +91,11 @@
 
                                        <tr>
                                            <td>Name</td>
-                                           <td>{{$category->category_name}}</td>
+                                           <td>{{$permission->name}}</td>
                                        </tr>
                                        <tr>
-                                           <td>Is Big Thumbnail Show</td>
-                                           <td>{{$category->is_bigthumbnail_show?'True':'False'}}</td>
-                                       </tr>
-                                       <tr>
-                                           <td>Type</td>
-                                           <td>{{$category->type}}</td>
-                                       </tr>
-                                       <tr>
-                                           <td>Parent Category</td>
-                                           <td><a href="{{route('category.show',$category->parentCategory->id)}}"> {{$category->parentCategory->category_name}} </a></td>
-                                       </tr>
-                                       <tr>
-                                           <td>Thumbnail</td>
-                                           <td>
-                                               <a href="{{env('APP_URL').$category->category_thumbnail}}" target="_blank">
-                                                   <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->category_thumbnail}}">
-                                               </a>
-
-                                           </td></tr>
-                                       <tr>
-                                           <td>Big Thumbnail</td>
-                                           <td>
-                                               <a href="{{env('APP_URL').$category->big_thumbnail}}" target="_blank">
-                                                   <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->big_thumbnail}}">
-                                               </a>
-
-                                           </td>
-                                       </tr>
-                                       <tr>
-                                           <td>Square Thumbnail</td>
-                                           <td>
-                                               <a href="{{env('APP_URL').$category->square_thumbnail}}" target="_blank">
-                                                   <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->square_thumbnail}}">
-                                               </a>
-
-                                           </td>
-                                       </tr>
-                                       <tr>
-                                           <td>New Page Thumnail</td>
-                                           <td>
-                                               <a href="{{env('APP_URL').$category->new_page_thumbnail}}" target="_blank">
-                                                   <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->new_page_thumbnail}}">
-                                               </a>
-
-                                           </td>
+                                           <td>Guard Name</td>
+                                           <td>{{$permission->guard_name}}</td>
                                        </tr>
                                        </tbody>
                                    </table>
@@ -170,10 +122,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha512-yCkOYsxpzPSpcbHspsH6A28Z0cgsfjJhlR78nPAfLLZSSV40tVN4VQ6ES/miqI/1z8a5FWVYwCF145+eyJx9Tw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        let categories = {!! $categories !!}
-        if(categories.length>0){
+        let permissions = {!! $permissions !!}
+        if(permissions.length>0){
             $(document).ready( function () {
-                $('#category-table').DataTable({
+                $('#permission-table').DataTable({
                     "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
                 });
             } );
