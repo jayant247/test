@@ -4,6 +4,8 @@ namespace App\Http\Controllers\CRM;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use DB;
+use Validator;
 
 class SubCategoryController extends Controller{
 

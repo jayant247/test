@@ -48,6 +48,12 @@
                 </a>
             </li>
 
+            <li>
+                <a href="{{route('pincode.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Delivery Pincodes</span>
+                </a>
+            </li>
+
 
             <li class="nav-label">Products</li>
             <li>

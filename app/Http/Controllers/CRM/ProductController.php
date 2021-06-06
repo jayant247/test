@@ -8,14 +8,21 @@ use App\Models\ProductVariables;
 use App\Models\UserWhishlist;
 use Illuminate\Http\Request;
 use Auth;
+use DB;
+use Validator;
+
+
 class ProductController extends Controller{
 
     public function index(Request $request){
-        return view('admin.products.index');
+        $products = Products::all();
+        return view('admin.products.index',compact(['products']));
     }
 
     public function show(Request $request, $id){
-        return view('admin.products.show');
+        // dd('show');
+        $product = Products::find($id);
+        return view('admin.products.show',compact(['product']));
     }
 
     public function edit(Request $request, $id){

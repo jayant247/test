@@ -56,8 +56,6 @@ class PromocodeController extends Controller{
             $newPromo->discount=$request->discount;
             $newPromo->minimal_cart_total=$request->minimal_cart_total;
             $newPromo->max_discount=$request->max_discount;
-            // $newPromo->start_from=$request->start_from;
-            // $newPromo->end_on=$request->end_on;
             $newPromo->start_from=Carbon::parse($request->start_from)->format('Y-m-d H:i:s');
             $newPromo->end_on=Carbon::parse($request->end_on)->format('Y-m-d H:i:s');
             $newPromo->description=$request->has('description')?$request->description:null;
@@ -96,16 +94,16 @@ class PromocodeController extends Controller{
     public function update(Request $request, $id){
         try {
             $request->validate([                
-                'promocode' => 'required|string',
-                //'type'=>'string',
-                'discount' => 'required|numeric',
-                'minimal_cart_total'=>'required|numeric',
-                'max_discount'=>'required|numeric',
-                //'is_for_new_user'=>'boolean',
-                //'start_from'=>'date|after:today',
-                //'end_on'=>'date|after:start_from',
+                'promocode' => 'nullable|string',
+                'type'=>'nullable|string',
+                'discount' => 'nullable|numeric',
+                'minimal_cart_total'=>'nullable|numeric',
+                'max_discount'=>'nullable|numeric',
+                'is_for_new_user'=>'nullable|boolean',
+                'start_from'=>'nullable|date|after:today',
+                'end_on'=>'nullable|date|after:start_from',
                 'description'=>'nullable|string',
-                //'is_active'=>'boolean'
+                'is_active'=>'nullable|boolean'
             ]);
             $promocode=Promocode::find($id);
 

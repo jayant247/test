@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use DB;
+use Validator;
 use Hash;
 use Illuminate\Support\Arr;
   
@@ -55,6 +56,8 @@ class UserController extends Controller
             'email' => 'required|email|unique:user,email',
 
             'password' => 'required|same:confirm-password',
+
+            'mobile' => 'nullable|numeric|between:9,11',
 
             'roles' => 'required'
 
@@ -122,6 +125,8 @@ class UserController extends Controller
             'email' => 'email|unique:user,email,'.$id,
 
             'password' => 'same:confirm-password',
+
+            'mobile' => 'nullable|numeric|between:9,11',
 
             'roles' => 'required'
 

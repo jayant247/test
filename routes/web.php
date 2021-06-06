@@ -8,6 +8,7 @@ use App\Http\Controllers\CRM\RoleController;
 use App\Http\Controllers\CRM\PermissionController;
 use App\Http\Controllers\CRM\UserController;
 use App\Http\Controllers\CRM\PromocodeController;
+use App\Http\Controllers\CRM\PincodeController;
 use App\Http\Controllers\CRM\GiftCardController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('permission',PermissionController::class);
     Route::resource('promocode',PromocodeController::class);
     Route::resource('giftcard',GiftCardController::class);
+    Route::resource('pincode',PincodeController::class);
 
 });
 

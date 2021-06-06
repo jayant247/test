@@ -4,6 +4,8 @@ namespace App\Http\Controllers\CRM;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Illuminate\Http\Request;
+use DB;
+use Validator;
 
 class PermissionController extends Controller{
 
