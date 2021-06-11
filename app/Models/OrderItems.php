@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class OrderItems extends Model
 {
     use HasFactory;
+
+    public function productVariable(){
+        return $this->belongsTo(ProductVariables::class,'product_variable_id')
+            ->select(['price',"mrp","color","size","type","primary_image",'id'])
+            ;
+    }
 }

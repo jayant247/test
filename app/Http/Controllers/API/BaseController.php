@@ -21,7 +21,7 @@ class BaseController extends Controller
         ];
 
 
-        return response()->json($response, 200);
+        return response()->json($response, 200,[],JSON_NUMERIC_CHECK);
     }
 
 

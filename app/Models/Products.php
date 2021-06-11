@@ -31,7 +31,7 @@ class Products extends Model
     }
 
     public function productVariables(){
-        return $this->hasMany(ProductVariables::class,'product_id','id');
+        return $this->hasMany(ProductVariables::class,'product_id','id')->where('quantity','>',0);;
     }
 
     public function productImages(){

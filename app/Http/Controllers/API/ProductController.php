@@ -167,7 +167,7 @@ class ProductController extends BaseController{
                 $response =  $data;
                 return $this->sendResponse($response,'Data Fetched Successfully', true);
             }else{
-                return $this->sendError('No Data Available', [],200);
+                return $this->sendResponse([],'No Data Available', true);
             }
 
         }catch (\Exception $e){

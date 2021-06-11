@@ -30,7 +30,7 @@ class OrderController extends BaseController{
     public function cart(Request $request){
         try{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'products_list' => 'required|array',
+                'products_list' => 'array',
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -198,7 +198,7 @@ class OrderController extends BaseController{
                     }
                 }
                 if(count($outOfStockItemId)>0){
-                    return $this->sendError('Some Items Are Out Of Stock', $outOfStockItemId, 217);
+                    return $this->sendError('Some Items Are Out Of Stock', ["outOfStockItemIds"=>$outOfStockItemId], 217);
                 }
                 $tempSubTotal = $subTotal;
                 $remainingAmountToBePaid = $subTotal;
@@ -382,7 +382,7 @@ class OrderController extends BaseController{
                     }
                 }
                 if(count($outOfStockItemId)>0){
-                    return $this->sendError('Some Items Are Out Of Stock', $outOfStockItemId, 217);
+                    return $this->sendError('Some Items Are Out Of Stock', ["outOfStockItemIds"=>$outOfStockItemId], 217);
                 }
                 $tempSubTotal = $subTotal;
                 $remainingAmountToBePaid = $subTotal;
@@ -469,6 +469,7 @@ class OrderController extends BaseController{
                 $response['pointsEarned']=round($response['total']*0.1,0);
                 $newOrder = new Order;
                 $newOrder->user_id = $user->id;
+                $newOrder->address_id = $request->address_id;
                 $newOrder->orderRefNo = time();
                 if($is_promocode_applied){
                     $newOrder->is_promo_code = true;
@@ -510,7 +511,7 @@ class OrderController extends BaseController{
                         $user = Auth::user();
                         $data = ['type'  =>  'debit',
                             'amount' => $response['walletBalanceUsed'],
-                            'description' =>  "Wallet Balance Used For Order With refernce no. ".$newOrder->orderRefNo,
+                            'description' =>  "Wallet Balance Used For Order With Reference No. ".$newOrder->orderRefNo,
                             'status' => 1,
                         ];
                         $wallet = $user->transactions()
@@ -551,14 +552,14 @@ class OrderController extends BaseController{
                             }
                         }
                     }
-                    $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($newOrder->id);
+                    $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->find($newOrder->id);
                     return $this->sendResponse($response,$msg==''?'Data Updated Successfully':$msg, true);
                 }else{
                     return $this->sendResponse([],$msg==''?'Order Not Created':$msg, false);
                 }
             }
         }catch (\Exception $e){
-            return $this->sendError('Something Went Wrong', [$e->getTrace()],413);
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
 
@@ -574,7 +575,7 @@ class OrderController extends BaseController{
             $limit = (int)$request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
-            $orders = Order::with(['orderStatus','paymentStatus','orderItems'])->whereUserId(Auth::user()->id)->skip($skip)->limit($limit)->orderBy('id','DESC')->get()->toArray();
+            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->whereUserId(Auth::user()->id)->skip($skip)->limit($limit)->orderBy('id','DESC')->get()->toArray();
             if(count($orders)>0){
                 return $this->sendResponse($orders,'Data Fetched Successfully', true);
             }else{
@@ -588,7 +589,7 @@ class OrderController extends BaseController{
     public function addToCart(Request $request){
         try{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'products_list' => 'required|array',
+                'products_list' => 'array',
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -818,14 +819,22 @@ class OrderController extends BaseController{
             if($razorpay_order->status == 'paid'){
                 $order->payment_status=2;
                 $order->save();
+                $user = User::find($order->user_id);
+                $data = ['type'  =>  'credit',
+                    'amount' => round($order->total*0.1,0),
+                    'description' =>  "Points Earned For Order With Reference No. ".$order->orderRefNo,
+                    'status' => 1,
+                ];
+                $wallet = $user->transactions()
+                    ->create($data);
                 $response = [];
-                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems','addressDetails'])->find($order->id);
                 $response['payment_status']=true;
                 return  $this->sendResponse($response,'Payment Successful');
             }
             else{
                 $response = [];
-                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems','addressDetails'])->find($order->id);
                 $response['payment_status']=false;
                 if($order->payment_status==1){
                     $order->payment_status = 3;
@@ -843,7 +852,7 @@ class OrderController extends BaseController{
                         $user = User::find($order->user_id);
                         $data = ['type'  =>  'credit',
                             'amount' => $order->wallet_balance_used,
-                            'description' =>  "Wallet Balance Used For Order With refernce no. ".$order->orderRefNo,
+                            'description' =>  "Wallet Balance Used For Order With Reference No. ".$order->orderRefNo,
                             'status' => 1,
                         ];
                         $wallet = $user->transactions()
@@ -933,14 +942,22 @@ class OrderController extends BaseController{
             if($curlResponse['body']['resultInfo']['resultStatus']  == 'TXN_SUCCESS'){
                 $order->payment_status=2;
                 $order->save();
+                $user = User::find($order->user_id);
+                $data = ['type'  =>  'credit',
+                    'amount' => round($order->total*0.1,0),
+                    'description' =>  "Points Earned For Order With Reference No. ".$order->orderRefNo,
+                    'status' => 1,
+                ];
+                $wallet = $user->transactions()
+                    ->create($data);
                 $response = [];
-                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems','addressDetails'])->find($order->id);
                 $response['payment_status']=true;
                 return  $this->sendResponse($response,'Payment Successful');
             }
             else{
                 $response = [];
-                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems'])->find($order->id);
+                $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems','addressDetails'])->find($order->id);
                 $response['payment_status']=false;
                 if($order->payment_status==1){
                     $order->payment_status = 3;
@@ -958,7 +975,7 @@ class OrderController extends BaseController{
                         $user = User::find($order->user_id);
                         $data = ['type'  =>  'credit',
                             'amount' => $order->wallet_balance_used,
-                            'description' =>  "Wallet Balance Used For Order With refernce no. ".$order->orderRefNo,
+                            'description' =>  "Wallet Balance Used Refund For Order With Reference No. ".$order->orderRefNo,
                             'status' => 1,
                         ];
                         $wallet = $user->transactions()
@@ -984,7 +1001,7 @@ class OrderController extends BaseController{
             $limit = (int)$request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
-            $orders = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$id)->whereUserId(Auth::user()->id)->get()->toArray();
+            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('id',$id)->whereUserId(Auth::user()->id)->get()->toArray();
             if(count($orders)>0){
                 return $this->sendResponse($orders,'Data Fetched Successfully', true);
             }else{
@@ -1007,7 +1024,7 @@ class OrderController extends BaseController{
             $limit = (int)$request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
-            $orders = Order::with(['orderStatus','paymentStatus','orderItems'])->where('payment_status',2)->whereUserId(Auth::user()->id)->skip($skip)->limit($limit)->orderBy('id','DESC')->get()->toArray();
+            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('payment_status',2)->whereUserId(Auth::user()->id)->skip($skip)->limit($limit)->orderBy('id','DESC')->get()->toArray();
             if(count($orders)>0){
                 return $this->sendResponse($orders,'Data Fetched Successfully', true);
             }else{

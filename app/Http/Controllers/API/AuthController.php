@@ -42,11 +42,11 @@ class AuthController extends BaseController
                     $response['userData']=$user;
                     return $this->sendResponse($response,'Login Success', true);
                 } else {
-                    return $this->sendError('Password mismatch',[], 422);
+                    return $this->sendError('Password mismatch',[], 200);
                 }
             } else {
                 $response = ["message" =>''];
-                return $this->sendError('User does not exist',[], 422);
+                return $this->sendError('User does not exist',[], 200);
             }
         }
         catch (Exception $e){
@@ -102,7 +102,7 @@ class AuthController extends BaseController
             if($user){
                 return $this->sendResponse(['userData'=>$user], 'User Exist');
             }else{
-                return $this->sendError('No User Found. Something Went Wrong', ['error'=>"No User Found"]);
+                return $this->sendError('No User Found. Something Went Wrong', ['error'=>"No User Found"],200);
             }
 
         }catch (Exception $e){
@@ -125,10 +125,10 @@ class AuthController extends BaseController
                 $user = Auth::user();
                 try {
                     if (! $token = JWTAuth::fromUser($user)) {
-                        return $this->sendError('Wrong Email or Password.', ['error'=>"Wrong Email or Password."]);
+                        return $this->sendError('Wrong Email or Password.', ['error'=>"Wrong Email or Password."],200);
                     }
                 } catch (JWTException $e) {
-                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"],413);
                 }
                 $response['token']=$token;
                 $response['userData']=$user;
@@ -155,10 +155,10 @@ class AuthController extends BaseController
                 $user = Auth::user();
                 try {
                     if (! $token = JWTAuth::fromUser($user)) {
-                        return $this->sendError('Wrong Email or Password.', ['error'=>"Wrong Email or Password."]);
+                        return $this->sendError('Wrong Email or Password.', ['error'=>"Wrong Email or Password."],200);
                     }
                 } catch (JWTException $e) {
-                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"],413);
                 }
                 $response['token']=$token;
                 $response['userData']=$user;
@@ -265,7 +265,7 @@ class AuthController extends BaseController
                     $minutes += $since_start->h * 60;
                     $minutes += $since_start->i;
                     if($minutes>10){
-                        return $this->sendError('OTP Timeout. Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                        return $this->sendError('OTP Timeout. Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"],200);
                     }else{
                         if($user->mobile_otp==$request->otp.''){
                             $user->mobile_otp=null;
@@ -273,19 +273,19 @@ class AuthController extends BaseController
                             $response= ['userInfo'=>$user->toArray()];
                             try {
                                 if (! $token = JWTAuth::fromUser($user)) {
-                                    return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"]);
+                                    return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"],200);
                                 }
                             } catch (JWTException $e) {
-                                return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                                return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"],413);
                             }
                             $response['token']=$token;
                             return $this->sendResponse($response, 'OTP Verified Successfully');
                         }else{
-                            return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"]);
+                            return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"],200);
                         }
                     }
                 }else{
-                    return $this->sendError('Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                    return $this->sendError('Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"],200);
                 }
             }else{
                 return $this->sendError('User Does Not Exist', [],200);
@@ -365,7 +365,7 @@ class AuthController extends BaseController
                     $minutes += $since_start->h * 60;
                     $minutes += $since_start->i;
                     if($minutes>10){
-                        return $this->sendError('OTP Timeout. Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                        return $this->sendError('OTP Timeout. Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"],200);
                     }else{
                         if($user->email_otp==$request->otp.''){
                             $user->email_otp=null;
@@ -375,11 +375,11 @@ class AuthController extends BaseController
 
                             return $this->sendResponse($response, 'Email OTP Verified Successfully');
                         }else{
-                            return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"]);
+                            return $this->sendError('Wrong OTP', ['error'=>"Wrong OTP"],200);
                         }
                     }
                 }else{
-                    return $this->sendError('Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"]);
+                    return $this->sendError('Please Generate New OTP', ['error'=>"OTP Timeout. Please Generate New OTP"],200);
                 }
             }else{
                 return $this->sendError('User Does Not Exist', [],200);
@@ -710,10 +710,10 @@ class AuthController extends BaseController
                 $newUser = User::where('imei_number',$request->imei_number)->first();
                 try {
                     if (! $token = JWTAuth::fromUser($newUser)) {
-                        return $this->sendError('Error in token generation.', ['error'=>"Error in token generationord."]);
+                        return $this->sendError('Error in token generation.', ['error'=>"Error in token generationord."],413);
                     }
                 } catch (JWTException $e) {
-                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"],413);
                 }
                 $response['token']=$token;
             }else{
@@ -726,10 +726,10 @@ class AuthController extends BaseController
 
                 try {
                     if (! $token = JWTAuth::fromUser($newUser)) {
-                        return $this->sendError('Error in token generation.', ['error'=>"Error in token generationord."]);
+                        return $this->sendError('Error in token generation.', ['error'=>"Error in token generationord."],413);
                     }
                 } catch (JWTException $e) {
-                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
+                    return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"],413);
                 }
                 $response['token']=$token;
             }

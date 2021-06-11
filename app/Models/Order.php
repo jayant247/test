@@ -18,6 +18,10 @@ class Order extends Model
     public function giftCardUsed(){
         return $this->belongsTo(UserGiftCards::class,'gift_card_id');
     }
+
+    public function addressDetails(){
+        return $this->belongsTo(UserAddress::class,'address_id');
+    }
     public function orderItems(){
        return $this->hasMany(OrderItems::class,'order_id');
     }

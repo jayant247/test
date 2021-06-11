@@ -17,4 +17,8 @@ class ProductVariables extends Model
     public function product(){
         return $this->belongsTo(Products::class,'product_id');
     }
+
+    public function productDetails(){
+        return $this->belongsTo(Products::class,'product_id')->select('id','product_name');
+    }
 }
