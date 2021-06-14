@@ -61,6 +61,8 @@
                                         <thead>
                                         <tr>
                                             <th>Name</th>
+                                            <th>Price</th>
+                                            <th>MRP</th>
 
                                             <th>Actions</th>
                                         </tr>
@@ -223,7 +225,9 @@
                 $("p").css("background-color");
 
                 tableBody+='<tr><td>'+
-                    products[i]['product_name']+'</td>'+
+                    products[i]['product_name']+'</td>'+'<td>'+
+                    products[i]['price']+'</td>'+'<td>'+
+                    products[i]['mrp']+'</td>'+
                     '<td>'+
                     '<a class="btn btn-sm btn-outline-dark"  href="'+showurl+'">'+
                             '<i class="fa fa-eye" ></i>'+
@@ -242,8 +246,6 @@
 
         }
         $(document).ready(function () {
-
-
             getData();
             $('#filtersOption').hide()
 
@@ -257,9 +259,6 @@
                     currentPageNo++;
                     getData();
                 }
-
-
-
             })
             $(document).on('click','#previous',function () {
 
@@ -267,8 +266,6 @@
                     currentPageNo--;
                     getData();
                 }
-
-
             })
 
         });

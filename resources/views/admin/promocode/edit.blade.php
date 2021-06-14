@@ -131,13 +131,6 @@
 						                <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is Active</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_active" value="{{ $promocode->is_active }}">
-	                                        	<!-- @if($promocode->is_active == 1){
-	                                        		<option selected="selected">Yes</option>
-	                                        	}
-	                                            @else{
-	                                            	<option selected="selected">NO</option>
-	                                        	}
-	                                        	@endif -->
 	                                        	<option selected="selected">Choose...</option>
 	                                            <option value="1">YES</option>
 	                                            <option value="0">NO</option>

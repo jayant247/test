@@ -4,6 +4,8 @@ namespace App\Http\Controllers\CRM;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Products;
+use App\Models\ProductHasCategory;
+use App\Models\ProductDescription;
 use App\Models\ProductVariables;
 use App\Models\UserWhishlist;
 use Illuminate\Http\Request;
@@ -22,14 +24,149 @@ class ProductController extends Controller{
     public function show(Request $request, $id){
         // dd('show');
         $product = Products::find($id);
-        return view('admin.products.show',compact(['product']));
+        $productDescriptions = ProductDescription::where("product_id", "=", $product->id)->get();
+        //dd($productDescriptions);
+        $productVariables = ProductVariables::where("product_id", "=", $product->id)->get();
+        return view('admin.products.show',compact(['product','productDescriptions','productVariables']));
     }
 
     public function edit(Request $request, $id){
-
-       dd('edit');
+        $product = Products::find($id);
+        $categories = Category::all();
+        $product_categories = ProductHasCategory::
+        where("product_id", "=", $product->id)->select('category_id')->distinct()->pluck('category_id');
+        $product_sub_categories = ProductHasCategory::
+        where("product_id", "=", $product->id)->select('sub_category_id')->distinct()->pluck('sub_category_id');
+        //dd($product_categories);
+        //dd($product->description);
+        return view('admin.products.edit',compact(['product','categories','product_categories','product_sub_categories']));
 
     }
+
+    public function create(Request $request){
+        $categories = Category::all();
+
+        return view('admin.products.create',compact(['categories']));
+    }
+
+    public function store(Request $request){        
+        try {
+            $request->validate([
+                'product_name'=>'required|string',
+                'price'=>'required|numeric',
+                'mrp' => 'required|numeric',
+                'sale_price'=>'nullable|numeric',
+                'sale_percentage'=>'nullable|numeric',
+                'is_on_sale'=>'required|boolean',
+                'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'is_new'=>'required|boolean',
+                'description'=>'nullable|string'
+            ]);
+
+            //dd($request->all());
+
+            $newProduct = new Products;
+            $newProduct->product_name=$request->product_name;
+            $newProduct->price=$request->price;
+            $newProduct->mrp=$request->mrp;
+            $newProduct->available_sizes="NA";
+            $newProduct->available_colors="NA";
+            $newProduct->description=$request->has('description')?$request->description:null;
+            $newProduct->is_new=$request->is_new;
+            $newProduct->is_on_sale=$request->is_on_sale;
+            $newProduct->sale_price=$request->has('sale_price')?$request->sale_price:null;
+            $newProduct->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
+            $newProduct->primary_image =$this->saveImage($request->primary_image);
+            $newProduct->save();
+
+            foreach ($request->subCategories as $key=>$subCategory){
+                $originalSubcategory = Category::find($subCategory);
+                if(!is_null($originalSubcategory)){
+                    if(is_null(ProductHasCategory::where('product_id',$newProduct->id)->where('sub_category_id',$subCategory)->first())){
+                        $newCategoryMapping = new ProductHasCategory();
+                        $newCategoryMapping->product_id = $newProduct->id;
+                        $newCategoryMapping->category_id = $originalSubcategory->parent_id;
+                        $newCategoryMapping->sub_category_id = $subCategory;
+                        $newCategoryMapping->save();
+                    }
+                }
+
+            }
+
+            if($newProduct->save()){
+                return redirect()->route('product.index')
+                        ->with('success','Product created successfully.');
+            }else{        
+                return $this->sendError('Product Creation Failed',[], 422);
+            }
+        }
+        catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    public function update(Request $request, $id){        
+        try {
+            $request->validate([
+                'product_name'=>'nullable|string',
+                'price'=>'nullable|numeric',
+                'mrp' => 'nullable|numeric',
+                'sale_price'=>'nullable|numeric',
+                'sale_percentage'=>'nullable|numeric',
+                'is_on_sale'=>'nullable|boolean',
+                'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'is_new'=>'nullable|boolean',
+                'description'=>'nullable|string'
+            ]);
+            //dd($request->all());
+            $product=Products::find($id);
+            $product->product_name=$request->has('product_name')?$request->product_name:null;
+            $product->mrp=$request->has('mrp')?$request->mrp:null;
+            $product->price=$request->has('price')?$request->price:null;
+            $product->description=$request->has('description')?$request->description:null;
+            $product->is_new = $request->has('is_new')? $request->is_new:$product->is_new;
+            $product->is_on_sale = $request->has('is_on_sale')? $request->is_on_sale:$product->is_on_sale;
+            $product->sale_price=$request->has('sale_price')?$request->sale_price:null;
+            $product->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
+            if($request->hasFile('primary_image')){
+                    $oldImage = $product->primary_image;
+                    $product->primary_image = $this->saveImage($request->primary_image);
+                    unlink(public_path().$oldImage);
+                }
+            $product->save();
+            foreach ($request->subCategories as $key=>$subCategory){
+                $originalSubcategory = Category::find($subCategory);
+                if(!is_null($originalSubcategory)){
+                    if(is_null(ProductHasCategory::where('product_id',$product->id)->where('sub_category_id',$subCategory)->first())){
+                        $newCategoryMapping = new ProductHasCategory();
+                        $newCategoryMapping->product_id = $product->id;
+                        $newCategoryMapping->category_id = $originalSubcategory->parent_id;
+                        $newCategoryMapping->sub_category_id = $subCategory;
+                        $newCategoryMapping->save();
+                    }
+                }
+
+            }
+            if($product->save()){
+                return redirect()->route('product.index')
+                        ->with('success','Product Updated successfully.');
+            }else{        
+                return $this->sendError('Product Updation Failed',[], 422);
+            }
+        }
+        catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
+    function saveImage($image){
+        $image_name = 'product'.time().'.'.$image->getClientOriginalExtension();
+        $destinationPath = public_path('images/product/');
+        $image->move($destinationPath, $image_name);
+        $imageURL='/images/product/'.$image_name;
+        return $imageURL;
+    }
+
 
     public function getProductList(Request $request){
         try {

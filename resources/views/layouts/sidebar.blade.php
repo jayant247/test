@@ -7,17 +7,8 @@
                     <i class="icon-speedometer menu-icon"></i><span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li class="nav-label">Metadata</li>
-            <li>
-                <a href="{{route('category.index')}}" aria-expanded="false">
-                    <i class="icon-badge menu-icon"></i><span class="nav-text">Category</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{route('subcategory.index')}}" aria-expanded="false">
-                    <i class="icon-badge menu-icon"></i><span class="nav-text">Sub-Category</span>
-                </a>
-            </li>
+            <li class="nav-label">User Info</li>
+            
 
             <!-- <li class="nav-label">Users</li> -->
             <li>
@@ -35,7 +26,23 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Permissions</span>
                 </a>
             </li>
-
+            
+            <li class="nav-label">Product Info</li>
+            <li>
+                <a href="{{route('product.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Products</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('category.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Category</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('subcategory.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Sub-Category</span>
+                </a>
+            </li>
             <li>
                 <a href="{{route('promocode.index')}}" aria-expanded="false">
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Promocodes</span>
@@ -55,12 +62,7 @@
             </li>
 
 
-            <li class="nav-label">Products</li>
-            <li>
-                <a href="{{route('product.index')}}" aria-expanded="false">
-                    <i class="icon-badge menu-icon"></i><span class="nav-text">Products</span>
-                </a>
-            </li>
+
             <li class="nav-label">Apps</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">

@@ -186,4 +186,33 @@ class CategoryController extends Controller{
                         ->with('success','Product deleted successfully');
     }
 
+    public function getSubCategory(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'parent_id'=>'required|string'
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $query = Category::query();
+            
+            $parent_idArray=[];
+            if($request->has('parent_id')){
+                $parent_idArray = array_map('intval',explode(',',$request->parent_id));
+                
+            }
+            $query=$query->whereIn('parent_id',$parent_idArray)->whereNotNull('parent_id');
+            $data= $query->orderBy('id','ASC')->get();
+            if(count($data)>0){
+                $response =  $data;
+                return $this->sendResponse($response,'Data Fetched Successfully', true);
+            }else{
+                return $this->sendError('No Data Available', [],200);
+            }
+        }
+        catch (Exception $e){
+            return $this->sendError('Something Went Wrong', $e,413);
+        }
+    }
+
 }

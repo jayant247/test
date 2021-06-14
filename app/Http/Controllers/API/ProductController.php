@@ -19,7 +19,6 @@ use Validator;
 
 class ProductController extends BaseController{
 
-
     //get all products
     public function getProduct(Request $request){
         try {
