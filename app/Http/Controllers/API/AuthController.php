@@ -756,12 +756,12 @@ class AuthController extends BaseController
         try{
             $validator = Validator::make($request->all(), [
                 'mobile_no'=>'required|digits:10',
+                'imei_number'=>'string|required',
             ]);
             if($validator->fails()){
                 return $this->sendError('Validation Error.', $validator->errors());
             }
             $response=[];
-
             if(!is_null(User::where('mobile_no',$request->mobile_no)->first())){
                 $newUser = User::where('mobile_no',$request->mobile_no)->first();
                 $newUser->mobile_otp = rand(100000,999999);
@@ -769,11 +769,23 @@ class AuthController extends BaseController
                 $newUser->save();
 
             }else{
-                $newUser = new User;
-                $newUser->mobile_no=$request->mobile_no;
-                $newUser->mobile_otp = rand(100000,999999);
-                $newUser->mobile_otp_time = Carbon::now();
-                $newUser->save();
+                $newUser = User::where('imei_number',$request->imei_number)->first();
+                if(!is_null($newUser)){
+                    $newUser->mobile_no=$request->mobile_no;
+                    $newUser->imei_number = '';
+                    $newUser->name = '';
+                    $newUser->email = '';
+                    $newUser->mobile_otp = rand(100000,999999);
+                    $newUser->mobile_otp_time = Carbon::now();
+                    $newUser->save();
+                }else{
+                    $newUser = new User;
+                    $newUser->mobile_no=$request->mobile_no;
+                    $newUser->mobile_otp = rand(100000,999999);
+                    $newUser->mobile_otp_time = Carbon::now();
+                    $newUser->save();
+                }
+
 
             }
 
