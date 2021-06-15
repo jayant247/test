@@ -61,11 +61,13 @@
                                         <thead>
                                         <tr>
                                             <th>Name</th>
+                                            <th>Price</th>
+                                            <th>MRP</th>
 
                                             <th>Actions</th>
                                         </tr>
                                         </thead>
-                                        <tbody id="tbody">
+                                        <tbody id="tbody">                                         
 
                                         </tbody>
                                     </table>
@@ -215,17 +217,35 @@
         function generateResult() {
             let tableBody=''
             for(let i=0;i<products.length;i++){
+                let showurl = "{{ route('product.show',':id' ) }}";
+                showurl = showurl.replace(':id', products[i].id);
+                let editurl = "{{ route('product.edit',':id' ) }}";
+                editurl = editurl.replace(':id', products[i].id);
+
+                $("p").css("background-color");
+
                 tableBody+='<tr><td>'+
-                    products[i]['product_name']+'</td>'+
-                    '<td>Action</td><tr>';
+                    products[i]['product_name']+'</td>'+'<td>'+
+                    products[i]['price']+'</td>'+'<td>'+
+                    products[i]['mrp']+'</td>'+
+                    '<td>'+
+                    '<a class="btn btn-sm btn-outline-dark"  href="'+showurl+'">'+
+                            '<i class="fa fa-eye" ></i>'+
+                        '</a>'+
+                        '<a class="btn btn-sm btn-outline-dark" href="'+editurl+'">'+
+                            '<i class="fa fa-pencil"></i>'+
+                        '</a>'+
+                        '<a class="btn btn-sm btn-outline-dark">'+
+                            '<i class="fa fa-trash"></i>'+
+                        '</a>'
+                    +'</td></tr>';
             }
             $('#tbody').empty();
+            console.log(tableBody)
             $('#tbody').append(tableBody);
 
         }
         $(document).ready(function () {
-
-
             getData();
             $('#filtersOption').hide()
 
@@ -239,9 +259,6 @@
                     currentPageNo++;
                     getData();
                 }
-
-
-
             })
             $(document).on('click','#previous',function () {
 
@@ -249,8 +266,6 @@
                     currentPageNo--;
                     getData();
                 }
-
-
             })
 
         });

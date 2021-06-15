@@ -4,6 +4,14 @@ use App\Http\Controllers\CRM\AuthController;
 use App\Http\Controllers\CRM\CategoryController;
 use App\Http\Controllers\CRM\ProductController;
 use App\Http\Controllers\CRM\SubCategoryController;
+use App\Http\Controllers\CRM\RoleController;
+use App\Http\Controllers\CRM\PermissionController;
+use App\Http\Controllers\CRM\UserController;
+use App\Http\Controllers\CRM\PromocodeController;
+use App\Http\Controllers\CRM\PincodeController;
+use App\Http\Controllers\CRM\GiftCardController;
+use App\Http\Controllers\CRM\ProductDescriptionController;
+use App\Http\Controllers\CRM\ProductVariableController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,16 +41,32 @@ Route::get('/1wdw',[AuthController::class,'login'])->name('login1');
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [AuthController::class,'login'])->name('dashboard');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::resource('role', RoleController::class);
+    Route::resource('user', UserController::class);
     Route::resource('category',CategoryController::class);
     Route::resource('subcategory',SubCategoryController::class);
     Route::resource('product',ProductController::class);
-
+    Route::resource('permission',PermissionController::class);
+    Route::resource('promocode',PromocodeController::class);
+    Route::resource('giftcard',GiftCardController::class);
+    Route::resource('pincode',PincodeController::class);    
+    Route::resource('productDescription',ProductDescriptionController::class);
+    Route::resource('productVariable',ProductVariableController::class);
 
 });
+
+
+
+
 
 
 //required api
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('getProductList',[ProductController::class,'getProductList'])->name('getProductList');
+    Route::get('getSubCategory',[CategoryController::class,'getSubCategory'])->name('getSubCategory');
+    //Product Description
+    Route::get('productDescription/create/{id}',[ProductDescriptionController::class,'createNewProductDescription'])->name('productDescription.create');
+    //Product Variable
+    Route::get('productVariable/create/{id}',[ProductVariableController::class,'createNewProductVariable'])->name('productVariable.create');
 
 });

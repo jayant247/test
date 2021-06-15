@@ -16,7 +16,7 @@
                                 <h4 class="card-title">Sub - Categories</h4>
                             </div>
                             <div>
-                                <a href="{{route('category.create')}}" class="btn btn-primary">Create</a>
+                                <a href="{{route('subcategory.create')}}" class="btn btn-primary">Create</a>
                             </div>
 
                         </div>

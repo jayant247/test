@@ -7,7 +7,32 @@
                     <i class="icon-speedometer menu-icon"></i><span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li class="nav-label">Metadata</li>
+            <li class="nav-label">User Info</li>
+            
+
+            <!-- <li class="nav-label">Users</li> -->
+            <li>
+                <a href="{{route('user.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('role.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Roles</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('permission.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Permissions</span>
+                </a>
+            </li>
+            
+            <li class="nav-label">Product Info</li>
+            <li>
+                <a href="{{route('product.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Products</span>
+                </a>
+            </li>
             <li>
                 <a href="{{route('category.index')}}" aria-expanded="false">
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Category</span>
@@ -18,12 +43,26 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Sub-Category</span>
                 </a>
             </li>
-            <li class="nav-label">Products</li>
             <li>
-                <a href="{{route('product.index')}}" aria-expanded="false">
-                    <i class="icon-badge menu-icon"></i><span class="nav-text">Products</span>
+                <a href="{{route('promocode.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Promocodes</span>
                 </a>
             </li>
+
+            <li>
+                <a href="{{route('giftcard.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Gift Cards</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{route('pincode.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Delivery Pincodes</span>
+                </a>
+            </li>
+
+
+
             <li class="nav-label">Apps</li>
             <li>
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">

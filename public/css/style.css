@@ -1360,7 +1360,7 @@ pre {
 @media (max-width: 575.98px) {
   .table-responsive-sm {
     display: block;
-    width: 100%;
+    width: 60%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     -ms-overflow-style: -ms-autohiding-scrollbar; }
@@ -14704,15 +14704,15 @@ label.error {
     color: red !important;
     display: block;
 }
-.loader {
+.loader1 {
     position: absolute;
     border: 10px solid #f3f3f3;
     border-radius: 50%;
     border-top: 10px solid #3498db;
     width: 70px;
     height: 70px;
-    /*left:50%;*/
-    /*top:50%;*/
+    left:50%;
+    top:50%;
     -webkit-animation: spin 2s linear infinite; /* Safari */
     animation: spin 2s linear infinite;
 }
