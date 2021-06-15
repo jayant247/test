@@ -8,6 +8,7 @@ use App\Http\Controllers\API\GiftCardController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserDetailsController;
 use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\TicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -152,5 +153,15 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::get('getGiftCardPurchasedByMe',[GiftCardController::class,'getGiftCardPurchasedByMe']);
     Route::post('sendGiftCardVerificationOTP',[GiftCardController::class,'sendGiftCardVerificationOTP']);
     Route::post('verifyCouponOtp',[GiftCardController::class,'verifyCouponOtp']);
+
+    Route::post('createTicket',[TicketController::class,'addTicket']);
+
+    Route::post('createCustomTicket',[TicketController::class,'createCustomTicket']);
+
+    Route::post('addTicketMessage',[TicketController::class,'addMessage']);
+
+    Route::get('getAllTickets',[TicketController::class,'getAllTickets']);
+
+    Route::get('getAllTicketMessage',[TicketController::class,'getAllTicketMessage']);
 
 });

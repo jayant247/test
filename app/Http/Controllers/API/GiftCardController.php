@@ -446,7 +446,7 @@ class GiftCardController extends BaseController{
             $userGiftCardCode = UserGiftCards::where('coupon_code',$couponCode)
                 ->where('use_status',0)
                 ->where('payment_status',1)
-                ->where('expiry_date','<',$now)
+                ->where('expiry_date','>',$now)
                 ->first();
             if(!is_null($userGiftCardCode)){
                 if($userGiftCardCode->withdraw_otp) {
@@ -532,7 +532,7 @@ class GiftCardController extends BaseController{
             $couponCode = base64_encode($request->gift_card_code);
             $userGiftCardCode = UserGiftCards::where('coupon_code',$couponCode)->where('use_status',0)
                 ->where('payment_status',1)
-                ->where('expiry_date','<',$now)
+                ->where('expiry_date','>',$now)
                 ->first();
             if(!is_null($userGiftCardCode)){
                 if($userGiftCardCode->withdraw_otp){

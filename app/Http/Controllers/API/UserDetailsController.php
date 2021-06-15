@@ -410,9 +410,11 @@ class UserDetailsController extends BaseController{
             $skip = $limit*$pageNo;
             $user = Auth::user();
             $walletBalance = $user->balance();
-
-
-            return $this->sendResponse(['walletBalance'=>$walletBalance],'Data Fetched Successfully', true);
+            $response= [];
+            $response['walletBalance'] = $walletBalance;
+            $response['totalCredit'] = (float)$user->credit();
+            $response['totalDebit'] = (float)$user->debit();
+            return $this->sendResponse($response,'Data Fetched Successfully', true);
 
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
