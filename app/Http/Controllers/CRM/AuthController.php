@@ -18,8 +18,6 @@ class AuthController extends Controller{
             } catch (JWTException $e) {
                 return $this->sendError('JWT Token creation failed', ['error'=>"could_not_create_token"]);
             }
-
-
             return view('welcome',compact(['token']));
         }else{
             return view('Auth.login');

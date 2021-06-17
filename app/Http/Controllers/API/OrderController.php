@@ -138,10 +138,13 @@ class OrderController extends BaseController{
                 if(count($orders)>0){
                     return $this->sendError('Promo code Already Used', [], 220);
                 }
-                $orders = Order::where('user_id',Auth::user()->id)->get();
-                if(count($orders)>1){
-                    return $this->sendError('Promo code is for new user only', [], 221);
+                if($promocode->is_for_new_user){
+                    $orders = Order::where('user_id',Auth::user()->id)->get();
+                    if(count($orders)>0){
+                        return $this->sendError('Promo code is for new user only', [], 221);
+                    }
                 }
+
             }
             if($request->has('gift_card_code')){
                 $now = Carbon::now();
@@ -233,12 +236,13 @@ class OrderController extends BaseController{
                         }
                     }
                     if(!is_null($promocode)){
-                        $isPromoCodeAllowedOrNot= false;
+                        $isPromoCodeAllowedOrNot= true;
                         if($promocode['is_for_new_user']){
                             $orders = Order::where('user_id',Auth::user()->id)->get();
-                           if(count($orders)<1){
-                               $isPromoCodeAllowedOrNot = true;
-                           }
+
+                            if(count($orders)>=1){
+                                $isPromoCodeAllowedOrNot = false;
+                            }
                         }
                         if($isPromoCodeAllowedOrNot){
                             if($remainingAmountToBePaid>=$promocode['minimal_cart_total']){
@@ -277,6 +281,7 @@ class OrderController extends BaseController{
                 $response['totalGiftCardValue']=$totalGiftCardValue;
                 $response['total']= (float)($remainingAmountToBePaid+$shippingCharges - $discountAmount);
                 $response['pointsEarned']=round($response['total']*0.1,0);
+                $response['giftCardBalanceUsed'] = $totalGiftCardValue - $giftCardAmountRemaining;
             }
             return $this->sendResponse($response,$msg==''?'Data Updated Successfully':$msg, true);
         }catch (\Exception $e){
@@ -327,9 +332,11 @@ class OrderController extends BaseController{
                 if(count($orders)>0){
                     return $this->sendError('Promo code Already Used', [], 220);
                 }
-                $orders = Order::where('user_id',Auth::user()->id)->get();
-                if(count($orders)>0){
-                    return $this->sendError('Promo code is for new user only', [], 221);
+                if($promocode->is_for_new_user){
+                    $orders = Order::where('user_id',Auth::user()->id)->get();
+                    if(count($orders)>0){
+                        return $this->sendError('Promo code is for new user only', [], 221);
+                    }
                 }
             }
             if($request->has('gift_card_code')){
@@ -422,11 +429,12 @@ class OrderController extends BaseController{
                         }
                     }
                     if(!is_null($promocode)){
-                        $isPromoCodeAllowedOrNot= false;
+                        $isPromoCodeAllowedOrNot= true;
                         if($promocode['is_for_new_user']){
                             $orders = Order::where('user_id',Auth::user()->id)->get();
-                            if(count($orders)<1){
-                                $isPromoCodeAllowedOrNot = true;
+
+                            if(count($orders)>=1){
+                                $isPromoCodeAllowedOrNot = false;
                             }
                         }
                         if($isPromoCodeAllowedOrNot){
@@ -467,6 +475,8 @@ class OrderController extends BaseController{
                 $response['totalGiftCardValue']=$totalGiftCardValue;
                 $response['total']= (float)($remainingAmountToBePaid+$shippingCharges - $discountAmount);
                 $response['pointsEarned']=round($response['total']*0.1,0);
+                $response['giftCardBalanceUsed'] = $totalGiftCardValue - $giftCardAmountRemaining;
+                $response['isFullPaymentDone']=false;
                 $newOrder = new Order;
                 $newOrder->user_id = $user->id;
                 $newOrder->address_id = $request->address_id;
@@ -502,6 +512,10 @@ class OrderController extends BaseController{
                 }
                 $newOrder->order_status = 1;
                 $newOrder->payment_status = 1;
+                if($response['total']<=0){
+                    $newOrder->payment_status = 2;
+                    $response['isFullPaymentDone']=true;
+                }
                 if($newOrder->save()){
                     if($is_gift_coupon_applied){
                         $userGiftCardCode->use_status = 1;

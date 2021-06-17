@@ -50,7 +50,7 @@ class TicketController extends BaseController{
                     $ticketMessage->message_by='customer';
                     $ticketMessageSaveStatus=$ticketMessage->save();
                     if($ticketMessageSaveStatus){
-                        return $this->sendResponse([],'Ticket Stored Successfully', true);
+                        return $this->sendResponse($ticket,'Ticket Stored Successfully', true);
 
                     }else{
                         return $this->sendResponse([],'Error in saving ticket message', false);
@@ -83,7 +83,7 @@ class TicketController extends BaseController{
                     return response()->json(['success' => false,
                         'msg'=>'No User Found'], 200);
                 } else {
-                    $tickets = Ticket::with(['customer','admin','ticketStatus','message.supportAgent'])->where('customer_id',$customer->id)->get();
+                    $tickets = Ticket::with(['customer','admin','ticketStatus','message.supportAgent'])->where('customer_id',$customer->id)->orderBy('id','DESC')->get();
                     if($tickets->isEmpty()){
                         return $this->sendResponse([],'No Tickets Found', false);
 
@@ -209,7 +209,7 @@ class TicketController extends BaseController{
                             return $this->sendResponse([],'No User Found', false);
 
                         } else {
-                            $tickets = Ticket::with(['customer','admin','ticketStatus','message','message.supportAgent'])->where('customer_id',$customer->id)->get();
+                            $tickets = Ticket::with(['customer','admin','ticketStatus','message','message.supportAgent'])->where('customer_id',$customer->id)->orderBy('id','DESC')->get();
                             if($tickets->isEmpty()){
                                 return $this->sendResponse([],'No Tickets Found', false);
 
