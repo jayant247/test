@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CRM\TicketsController;
 use App\Http\Controllers\CRM\AuthController;
 use App\Http\Controllers\CRM\CategoryController;
 use App\Http\Controllers\CRM\ProductController;
@@ -26,13 +27,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $exitCode = Artisan::call('cache:clear');
-    $exitCode = Artisan::call('optimize');
-    $exitCode = Artisan::call('route:cache');
-    $exitCode = Artisan::call('route:clear');
-    $exitCode = Artisan::call('view:clear');
-    $exitCode = Artisan::call('config:cache');
-    $exitCode = Artisan::call('migrate');
+//    $exitCode = Artisan::call('cache:clear');
+//    $exitCode = Artisan::call('optimize');
+//    $exitCode = Artisan::call('route:cache');
+//    $exitCode = Artisan::call('route:clear');
+//    $exitCode = Artisan::call('view:clear');
+//    $exitCode = Artisan::call('config:cache');
+//    $exitCode = Artisan::call('migrate');
     return view('welcome');
 })->name('resetAll');
 
@@ -49,9 +50,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('permission',PermissionController::class);
     Route::resource('promocode',PromocodeController::class);
     Route::resource('giftcard',GiftCardController::class);
-    Route::resource('pincode',PincodeController::class);    
+    Route::resource('pincode',PincodeController::class);
     Route::resource('productDescription',ProductDescriptionController::class);
     Route::resource('productVariable',ProductVariableController::class);
+
+    Route::get('tickets',[TicketsController::class,'index'])->name('tickets.index');
+
+    Route::get('tickets/assignToMe/{id}',[TicketsController::class,'assignToMe'])->name('tickets.assign');
+
+    Route::get('tickets/closeTicket/{id}',[TicketsController::class,'close'])->name('tickets.close');
+
+    Route::get('tickets/openTicket/{id}',[TicketsController::class,'open'])->name('tickets.open');
+
+    Route::post('tickets/addMessage',[TicketsController::class,'addMessage'])->name('tickets.addMessage');
+
+    Route::get('tickets/getMessage/{id}',[TicketsController::class,'getMessage'])->name('tickets.getMessage');
+
 
 });
 

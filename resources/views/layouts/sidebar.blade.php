@@ -8,7 +8,7 @@
                 </a>
             </li>
             <li class="nav-label">User Info</li>
-            
+
 
             <!-- <li class="nav-label">Users</li> -->
             <li>
@@ -26,7 +26,7 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Permissions</span>
                 </a>
             </li>
-            
+
             <li class="nav-label">Product Info</li>
             <li>
                 <a href="{{route('product.index')}}" aria-expanded="false">
@@ -60,6 +60,12 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Delivery Pincodes</span>
                 </a>
             </li>
+            <li >
+                <a href="{{route('pincode.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Support</span>
+                </a>
+            </li>
+
 
 
 
