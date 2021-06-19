@@ -61,7 +61,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{route('pincode.index')}}" aria-expanded="false">
+                <a href="{{route('tickets.index')}}" aria-expanded="false">
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Support</span>
                 </a>
             </li>
