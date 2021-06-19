@@ -135,7 +135,7 @@ class GiftCardController extends BaseController{
             "mid"           => env("PAYTM_MERCHANT_ID"),
             "websiteName"   => "WEBSTAGING",
             "orderId"       => $orderId,
-            "callbackUrl"   => route('payment.paytmGiftCardFeesCallback'),
+            "callbackUrl"   => "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=".$orderId,
             "txnAmount"     => array(
                 "value"     => $amount,
                 "currency"  => "INR",
@@ -385,6 +385,7 @@ class GiftCardController extends BaseController{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'pageNo'=>'required|numeric',
                 'limit'=>'required|numeric',
+                'is_active'=>'required|boolean'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -393,7 +394,12 @@ class GiftCardController extends BaseController{
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
             $user = Auth::user();
-            $userGiftCards = UserGiftCards::where('gift_for_mobile_number',$user->mobile_no)->where('payment_status',1)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            if($request->is_active){
+                $userGiftCards = UserGiftCards::where('gift_for_mobile_number',$user->mobile_no)->where('payment_status',1)->where('use_status',0)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            }else{
+                $userGiftCards = UserGiftCards::where('gift_for_mobile_number',$user->mobile_no)->where('payment_status',1)->where('use_status',1)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            }
+
             if(count($userGiftCards)>0){
 
                 foreach ($userGiftCards as $card){
@@ -413,6 +419,7 @@ class GiftCardController extends BaseController{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'pageNo'=>'required|numeric',
                 'limit'=>'required|numeric',
+                'is_active'=>'required|boolean'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -421,7 +428,11 @@ class GiftCardController extends BaseController{
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
             $user = Auth::user();
-            $userGiftCards = UserGiftCards::where('user_id',$user->id)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            if($request->is_active){
+                $userGiftCards = UserGiftCards::where('gift_for_mobile_number',$user->mobile_no)->where('payment_status',1)->where('use_status',0)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            }else{
+                $userGiftCards = UserGiftCards::where('gift_for_mobile_number',$user->mobile_no)->where('payment_status',1)->where('use_status',1)->skip($skip)->limit($limit)->orderBy('id','DESC')->get();
+            }
             if(count($userGiftCards)>0){
                 return $this->sendResponse($userGiftCards,'Data Fetched Successfully', true);
             }else{

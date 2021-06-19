@@ -260,6 +260,7 @@ class OrderController extends BaseController{
                                 }
                             }else{
                                 $msg = 'Minimum Cart Amount Should Be '.$promocode['minimal_cart_total'];
+                                return $this->sendError($msg, [], 222);
                             }
                         }
 
@@ -456,6 +457,7 @@ class OrderController extends BaseController{
                                 }
                             }else{
                                 $msg = 'Minimum Cart Amount Should Be '.$promocode['minimal_cart_total'];
+                                return $this->sendError($msg, [], 222);
                             }
                         }
                     }
@@ -716,7 +718,7 @@ class OrderController extends BaseController{
             "mid"           => env("PAYTM_MERCHANT_ID"),
             "websiteName"   => "WEBSTAGING",
             "orderId"       => 'order_'.$orderId,
-            "callbackUrl"   => route('payment.paytmOrderPaymentWebhookCallback'),
+            "callbackUrl"   => "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=order_".$orderId,
             "txnAmount"     => array(
                 "value"     => $amount,
                 "currency"  => "INR",
