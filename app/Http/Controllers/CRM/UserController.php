@@ -31,6 +31,14 @@ class UserController extends Controller
 
     }
 
+    public function getCustomers(Request $request)
+    {
+        $customers = User::whereHas('roles', function ($query) {
+            return $query->where('name','=', 'Customer');
+        })->get();
+        return view('admin.user.customer_index',compact('customers'));
+    }
+
 
 
     public function create()
@@ -92,6 +100,12 @@ class UserController extends Controller
 
         return view('user.show',compact('user'));
 
+    }
+
+    public function showCustomer($id)
+    {
+        $customer = User::find($id);
+        return view('user.showCustomer',compact('customer'));
     }
 
 

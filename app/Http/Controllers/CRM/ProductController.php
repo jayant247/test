@@ -7,6 +7,7 @@ use App\Models\Products;
 use App\Models\ProductHasCategory;
 use App\Models\ProductDescription;
 use App\Models\ProductVariables;
+use App\Models\ProductImages;
 use App\Models\UserWhishlist;
 use Illuminate\Http\Request;
 use Auth;
@@ -25,9 +26,11 @@ class ProductController extends Controller{
         // dd('show');
         $product = Products::find($id);
         $productDescriptions = ProductDescription::where("product_id", "=", $product->id)->get();
-        //dd($productDescriptions);
+        $productImages = ProductImages::where("product_id", "=", '146')->get();
+        //dd($productImages);
         $productVariables = ProductVariables::where("product_id", "=", $product->id)->get();
-        return view('admin.products.show',compact(['product','productDescriptions','productVariables']));
+        //$productImages = ProductImages::where('product_id', '=', $id)->get();
+        return view('admin.products.show',compact(['product','productDescriptions','productVariables','productImages']));
     }
 
     public function edit(Request $request, $id){
@@ -37,10 +40,7 @@ class ProductController extends Controller{
         where("product_id", "=", $product->id)->select('category_id')->distinct()->pluck('category_id');
         $product_sub_categories = ProductHasCategory::
         where("product_id", "=", $product->id)->select('sub_category_id')->distinct()->pluck('sub_category_id');
-        //dd($product_categories);
-        //dd($product->description);
         return view('admin.products.edit',compact(['product','categories','product_categories','product_sub_categories']));
-
     }
 
     public function create(Request $request){
@@ -59,6 +59,7 @@ class ProductController extends Controller{
                 'sale_percentage'=>'nullable|numeric',
                 'is_on_sale'=>'required|boolean',
                 'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_new'=>'required|boolean',
                 'description'=>'nullable|string'
             ]);
@@ -78,6 +79,15 @@ class ProductController extends Controller{
             $newProduct->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
             $newProduct->primary_image =$this->saveImage($request->primary_image);
             $newProduct->save();
+
+            if($request->has('other_images')){
+                 foreach ($request->other_images as $image) {
+                    $productImages = new ProductImages;
+                    $productImages->product_id = $newProduct->id;
+                    $productImages->imagePath = $this->saveImage($image);
+                    $productImages->save();
+                }  
+            }
 
             foreach ($request->subCategories as $key=>$subCategory){
                 $originalSubcategory = Category::find($subCategory);
@@ -115,6 +125,7 @@ class ProductController extends Controller{
                 'sale_percentage'=>'nullable|numeric',
                 'is_on_sale'=>'nullable|boolean',
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_new'=>'nullable|boolean',
                 'description'=>'nullable|string'
             ]);
@@ -134,6 +145,16 @@ class ProductController extends Controller{
                     unlink(public_path().$oldImage);
                 }
             $product->save();
+
+            if($request->has('other_images')){
+                 foreach ($request->other_images as $image) {
+                    $productImages = new ProductImages;
+                    $productImages->product_id = $product->id;
+                    $productImages->imagePath = $this->saveImage($image);
+                    $productImages->save();
+                }  
+            }
+
             foreach ($request->subCategories as $key=>$subCategory){
                 $originalSubcategory = Category::find($subCategory);
                 if(!is_null($originalSubcategory)){
@@ -166,7 +187,6 @@ class ProductController extends Controller{
         $imageURL='/images/product/'.$image_name;
         return $imageURL;
     }
-
 
     public function getProductList(Request $request){
         try {

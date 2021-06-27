@@ -17,6 +17,11 @@
                 </a>
             </li>
             <li>
+                <a href="{{route('getCustomers')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Customers</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{route('role.index')}}" aria-expanded="false">
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Roles</span>
                 </a>
@@ -31,6 +36,11 @@
             <li>
                 <a href="{{route('product.index')}}" aria-expanded="false">
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Products</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{route('order.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Orders</span>
                 </a>
             </li>
             <li>

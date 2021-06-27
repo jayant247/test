@@ -11,7 +11,6 @@ use App\Http\Controllers\API\CategoryController as ApiCategorycontroller;
 class CategoryController extends Controller{
 
     public function index(Request $request){
-
         $categories = Category::with(['subCategory'])->whereNull('parent_id')->get();
         return view('admin.category.index',compact(['categories']));
 

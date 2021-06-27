@@ -68,7 +68,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Quantity*</label>
-			                                <input type="number" name="quantity" class="form-control input-default" placeholder="Enter Product Size">
+			                                <input type="number" name="quantity" class="form-control input-default" placeholder="Enter Product Quantity">
 			                                @if($errors->has('quantity'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('quantity') }}
@@ -114,7 +114,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Sale Percentage</label>
-			                                <input type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product MRP">
+			                                <input type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
 			                                @if($errors->has('sale_percentage'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('sale_percentage') }}
@@ -130,6 +130,18 @@
 		                                        @if($errors->has('primary_image'))
 								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 								                        {{ $errors->first('primary_image') }}
+								                    </p>
+								                @endif
+		                                    </div>
+		                                </div>
+
+		                                <div class="form-group col-md-4">
+		                                	<label><br>Other Images</label>
+		                                	<div class="form-group">
+		                                        <input type="file" accept=".png, .jpg, .jpeg" name="other_images[]" class="form-control-file" multiple>
+		                                        @if($errors->has('other_images'))
+								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+								                        {{ $errors->first('other_images') }}
 								                    </p>
 								                @endif
 		                                    </div>

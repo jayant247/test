@@ -123,6 +123,32 @@
 							                @endif
 			                            </div>
 							        </div>
+							        <div class="row">
+							        	<div class="form-group col-md-4">
+			                            	<label><br>Primary Image</label>
+		                                	<div class="form-group">
+		                                        <input type="file" accept=".png, .jpg, .jpeg" name="primary_image" class="form-control-file">
+		                                        @if($errors->has('primary_image'))
+								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+								                        {{ $errors->first('primary_image') }}
+								                    </p>
+								                @endif
+		                                    </div>
+		                                </div>
+
+		                                <div class="form-group col-md-4">
+		                                	<label><br>Other Images</label>
+		                                	<div class="form-group">
+		                                        <input type="file" accept=".png, .jpg, .jpeg" name="other_images[]" class="form-control-file" multiple>
+		                                        @if($errors->has('other_images'))
+								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+								                        {{ $errors->first('other_images') }}
+								                    </p>
+								                @endif
+		                                    </div>
+		                                </div>
+		                                
+							        </div>
 		                            <div class="col-xs-12 col-sm-12 col-md-12 ">
 						            	<button type="submit" class="btn btn-primary">Update</button>
 						            </div>

@@ -12,6 +12,7 @@ use App\Http\Controllers\CRM\PincodeController;
 use App\Http\Controllers\CRM\GiftCardController;
 use App\Http\Controllers\CRM\ProductDescriptionController;
 use App\Http\Controllers\CRM\ProductVariableController;
+use App\Http\Controllers\CRM\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,7 +50,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('permission',PermissionController::class);
     Route::resource('promocode',PromocodeController::class);
     Route::resource('giftcard',GiftCardController::class);
-    Route::resource('pincode',PincodeController::class);    
+    Route::resource('pincode',PincodeController::class);   
+    Route::resource('order',OrderController::class);    
     Route::resource('productDescription',ProductDescriptionController::class);
     Route::resource('productVariable',ProductVariableController::class);
 
@@ -63,10 +65,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 //required api
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('getProductList',[ProductController::class,'getProductList'])->name('getProductList');
+    //Customer
+    Route::get('getCustomers',[UserController::class,'getCustomers'])->name('getCustomers');
+    Route::get('showCustomer/{id}',[UserController::class,'showCustomer'])->name('showCustomer');
+    //Orders
+    Route::get('getOrderList',[OrderController::class,'getOrderList'])->name('getOrderList');
+    //Categories
     Route::get('getSubCategory',[CategoryController::class,'getSubCategory'])->name('getSubCategory');
     //Product Description
     Route::get('productDescription/create/{id}',[ProductDescriptionController::class,'createNewProductDescription'])->name('productDescription.create');
     //Product Variable
     Route::get('productVariable/create/{id}',[ProductVariableController::class,'createNewProductVariable'])->name('productVariable.create');
+    Route::get('productVariable/destroyImage/{id}',[ProductVariableController::class,'destroyImage'])->name('productVariable.destroyImage');
 
 });

@@ -1,9 +1,58 @@
 @extends('layouts.layout')
 
 @section('css')
+<!-- <style type="text/css">
+    .multi-item-carousel{
+  .carousel-inner{
+    > .item{
+      transition: 500ms ease-in-out left;
+    }
+    .active{
+      &.left{
+        left:-33%;
+      }
+      &.right{
+        left:33%;
+      }
+    }
+    .next{
+      left: 33%;
+    }
+    .prev{
+      left: -33%;
+    }
+    @media all and (transform-3d), (-webkit-transform-3d) {
+      > .item{
+        // use your favourite prefixer here
+        transition: 500ms ease-in-out left;
+        transition: 500ms ease-in-out all;
+        backface-visibility: visible;
+        transform: none!important;
+      }
+    }
+  }
+  .carouse-control{
+    &.left, &.right{
+      background-image: none;
+    }
+  }
+}
+</style> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.8.2/css/lightbox.min.css">
+
+  <style type="text/css">
+    .lightbox{
+      z-index: 9999;
+    }
+    .small-img{
+      width: 100px;height: 100px;
+    }
+  </style>
 @endsection
 
 @section('content')
+
     <div class="container-fluid">
         <div class="card">
             <div class="card-body">
@@ -14,7 +63,8 @@
                         <table class="table table-striped table-bordered zero-configuration">
                             <thead>
                                 <tr>
-                                    <th>Property Name</th>                                    <th>Property Value</th>                                   
+                                    <th>Property Name</th>
+                                    <th>Property Value</th>                                   
                                 </tr>
                             </thead>
                             <tbody>                                   
@@ -102,9 +152,42 @@
                                     <td>{{$product->is_new}}</td>
                                 </tr>
                             </tbody>
+                            <tbody>                                   
+                                <tr>
+                                    <td>Product Image :</td>
+                                    <td>
+                                        <a href="{{env('APP_URL').$product->primary_image}}" target="_blank" data-lightbox="primary_photo">
+                                            <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$product->primary_image}}">
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>                                       
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Product Images</h4>
+                <br>
+                <div class="row">
+                    @foreach($productImages as $index=>$image)
+                    <div class="col-md-2">
+                        <div class="d-flex justify-content-center">
+                            <a href="{{asset(env('APP_URL').$image->imagePath)}}"  data-lightbox="Other_Photos">
+                                <img class="img-fluid" loading="lazy" style="width: 100px;max-height: 100px;min-height: 100px;" src="{{asset(env('APP_URL').$image->imagePath)}}">
+                            </a>
+                        </div>
+                        <div class="d-flex justify-content-center my-2">
+                            <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.destroyImage',$image->id)}}">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
             </div>
         </div>
 
@@ -126,7 +209,7 @@
                         <table class="table table-striped table-bordered zero-configuration">
                         <thead>
                             <tr>
-                                <th>Property Namw</th>
+                                <th>Property Name</th>
                                 <th>Property Value</th>
                                 <th>Actions</th>
                             </tr>
@@ -290,6 +373,7 @@
                         <thead>
                             <tr>
                                 <th>Colour</th>
+                                <th>Image</th>
                                 <th>Size</th>
                                 <th>Price</th>
                                 <th>Is On sale</th>
@@ -303,6 +387,11 @@
                         @foreach($productVariables as $productVariable)
                             <tr>
                                 <td>{{$productVariable->color}}</td>
+                                <td>
+                                    <a href="{{env('APP_URL').$productVariable->primary_image}}" target="_blank">
+                                        <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$productVariable->primary_image}}">
+                                    </a>
+                                </td>
                                 <td>{{$productVariable->size}}</td>                           
                                 <td>{{$productVariable->price}}</td>
                                 <td>{{$productVariable->is_on_sale}}</td>
@@ -310,9 +399,9 @@
                                 <td>{{$productVariable->sale_percentage}}</td>
                                 <td>{{$productVariable->quantity}}</td>
                                 <td>
-                                    <button data-toggle="modal" onclick="openDetailsModal({{$productVariable->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('productVariable.show',$productVariable->id)}}">
+                                    <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.show',$productVariable->id)}}">
                                         <i class="fa fa-eye"></i>
-                                    </button>
+                                    </a>
                                     <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.edit',$productVariable->id)}}">
                                         <i class="fa fa-pencil"></i>
                                     </a>
@@ -327,86 +416,11 @@
                 </div>
                 @else
                     <div class="text-center">
-                        <h5>No Data Available</h5>
+                        <h5>Product Variables Not Available</h5>
                     </div>
                 @endif
             </div>
         </div>
-
-        {{--    Modal For Product Variables  --}}
-            @if(count($productVariables)>0)
-               @foreach($productVariables as $productVariable)
-                   <div class="modal fade bd-example-modal-lg" id="{{$productVariable->id}}" tabindex="-1" permission="dialog" aria-hidden="true">
-                       <div class="modal-dialog modal-lg">
-                           <div class="modal-content">
-                               <div class="modal-header">
-                                   <h5 class="modal-title">Product Variable Details</h5>
-                                   <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
-                                   </button>
-                               </div>
-                               <div class="modal-body">
-
-                                   <div class="container-fluid">
-                                       <div class="row">
-                                           <table  class="table table-striped table-bordered zero-configuration">
-                                               <thead>
-                                               <tr>
-                                                   <th>Field</th>
-                                                   <th>Value</th>
-                                               </tr>
-                                               </thead>
-                                               <tbody>
-                                                   <tr>
-                                                       <th>Colour</th>
-                                                       <td>{{$productVariable->color}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>Size</th>
-                                                       <td>{{$productVariable->size}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>Price</th>
-                                                       <td>{{$productVariable->price}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>MRP</th>
-                                                       <td>{{$productVariable->mrp}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>Is On Sale?</th>
-                                                       <td>{{$productVariable->is_on_sale}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>Sale Price</th>
-                                                       <td>{{$productVariable->sale_price}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>Sale Percentage</th>
-                                                       <td>{{$productVariable->sale_percentage}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>Quantity</th>
-                                                       <td>{{$productVariable->quantity}}</td>
-                                                   </tr>
-                                                   <tr>
-                                                       <th>Type</th>
-                                                       <td>{{$productVariable->type}}</td>
-                                                   </tr>                                           
-                                                </tbody>
-                                           </table>
-                                       </div>
-
-
-                                   </div>
-                               </div>
-                               <div class="modal-footer">
-                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-               @endforeach
-            @endif
 
     </div>
 @endsection
@@ -415,6 +429,13 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha512-yCkOYsxpzPSpcbHspsH6A28Z0cgsfjJhlR78nPAfLLZSSV40tVN4VQ6ES/miqI/1z8a5FWVYwCF145+eyJx9Tw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="{{url('js/lightbox.js')}}" ></script>
+      <script>
+        lightbox.option({
+          'resizeDuration': 200,
+          'wrapAround': true
+        })
+      </script>
     <script>
         let productVariables = {!! $productVariables !!}
         if(productVariables.length>0){
@@ -428,6 +449,28 @@
             $("#"+id).modal()
         }
     </script>
+
+    // Instantiate the Bootstrap carousel
+<!--     <script>
+        $('.multi-item-carousel').carousel({
+          interval: false
+        });
+
+        $('.multi-item-carousel .item').each(function(){
+          var next = $(this).next();
+          if (!next.length) {
+            next = $(this).siblings(':first');
+          }
+          next.children(':first-child').clone().appendTo($(this));
+          
+          if (next.next().length>0) {
+            next.next().children(':first-child').clone().appendTo($(this));
+          } else {
+            $(this).siblings(':first').children(':first-child').clone().appendTo($(this));
+          }
+        });        
+    </script> -->
+
 
 @endsection
 
