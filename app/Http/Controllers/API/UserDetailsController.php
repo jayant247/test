@@ -353,7 +353,7 @@ class UserDetailsController extends BaseController{
                 foreach ($productVariable as $prodVar){
                     if(!in_array($prodVar['color'], $colorArray)){
                         array_push($colorArray,$prodVar['color']);
-                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image']];
+                        $imageColorArray = ['color'=>$prodVar['color'],'imagePath'=>$prodVar['primary_image'],'quantity'=>$prodVar['quantity']];
                         array_push($productColorsImageArray,$imageColorArray);
                     }
                 }

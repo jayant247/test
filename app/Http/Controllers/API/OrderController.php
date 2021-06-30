@@ -200,9 +200,11 @@ class OrderController extends BaseController{
                         }
                     }
                 }
+                Cart::insert($cart_records);
                 if(count($outOfStockItemId)>0){
                     return $this->sendError('Some Items Are Out Of Stock', ["outOfStockItemIds"=>$outOfStockItemId], 217);
                 }
+
                 $tempSubTotal = $subTotal;
                 $remainingAmountToBePaid = $subTotal;
                 $giftCardAmountUtilized = 0;
@@ -263,10 +265,9 @@ class OrderController extends BaseController{
                                 return $this->sendError($msg, [], 222);
                             }
                         }
-
                     }
                 }
-                Cart::insert($cart_records);
+
                 $response['shippingCharges']=10;
                 $shippingCharges = $response['shippingCharges'];
                 $response['discountAmount'] = (float)$discountAmount;
@@ -702,7 +703,7 @@ class OrderController extends BaseController{
                 $response = ['items'=>$items,'cartTotal'=>$subTotal];
                 return $this->sendResponse($response,'Data Fetched Successfully', true);
             }else{
-                return $this->sendResponse([],'No Orders Available available', false);
+                return $this->sendResponse([],'No Orders Available', false);
             }
 
         }catch (\Exception $e){

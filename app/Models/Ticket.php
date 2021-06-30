@@ -24,7 +24,7 @@ class Ticket extends Model
     }
 
     public function message(){
-        return $this->hasMany(TicketMessage::class,'ticket_id','id');
+        return $this->hasMany(TicketMessage::class,'ticket_id','id')->orderBy('id','DESC');
     }
 
     public function orders(){

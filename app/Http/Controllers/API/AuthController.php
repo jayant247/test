@@ -473,51 +473,36 @@ class AuthController extends BaseController
     public function updateProfile(Request $request){
         try{
             $validator = Validator::make($request->all(), [
-                'experience'=>'numeric|max:90',
+                'name' => 'string|max:255',
+                'email' => 'string|email|max:255|unique:users',
+                'city'=>'string',
+                'mobile_no'=>'digits:10|unique:users',
+                'firebase_token'=>'string',
+                'device_type'=>'string',
             ]);
             if($validator->fails()){
                 return $this->sendError('Validation Error.', $validator->errors());
             }
-            $user = Auth::guard('api')->user();
+            $user = Auth::user();
             if(is_null($user)){
                 return $this->sendError('No User Found', [],200);
             }
-            $allwedFieldList = ['name','email','city','marital_status','education','interest','experience','short_bio'];
+            $allwedFieldList = ['name','email','city','firebase_token','device_type','mobile_no'];
             foreach ($request->all() as $key=>$field){
                 if(in_array($key,$allwedFieldList)){
                     $user->$key=$field;
                 }
             }
             $user->save();
-            if($request->has('languageSpoken')){
-                $languageArray = [];
-                foreach (array_map('intval',explode(',',$request->languageSpoken)) as $key=>$eachLanguageId){
 
-                    if(!in_array($eachLanguageId, $languageArray)){
-                        array_push($languageArray,$eachLanguageId);
-                    }
-                }
-                $user->languages()->sync($languageArray);
-            }
-            if($request->has('interest')){
-                $interestArray= [];
-                foreach (array_map('intval',explode(',',$request->interest)) as $key=>$eachLanguageId){
 
-                    if(!in_array($eachLanguageId, $interestArray)){
-                        array_push($interestArray,$eachLanguageId);
-                    }
-                }
-                $user->category()->sync($interestArray);
-            }
-
-            $userData = User::query()->whereId($user->id)->with('languages','category')->first();
+            $userData = User::query()->whereId($user->id)->first();
             if(!is_null($userData)){
-
                 $response['userData']=$userData;
-                return $this->sendResponse($response,'Registered Successfully', true);
+                return $this->sendResponse($response,'Updated Successfully', true);
             }
             else{
-                return $this->sendError('Something Went Wrong While Registration', [],200);
+                return $this->sendError('Something Went Wrong While Updating', [],413);
             }
 
 

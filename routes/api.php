@@ -30,6 +30,8 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     //Create Password
     Route::post('createPassword',[AuthController::class,'createPassword']);
 
+    Route::post('updateProfile',[AuthController::class,'updateProfile']);
+
     //Roles & Permissions
     Route::post('createRole',[AuthController::class,'createRole']);
     Route::post('createPermission',[AuthController::class,'createPermission']);

@@ -175,6 +175,7 @@ class GiftCardController extends BaseController{
         if($curlResponse['body']['resultInfo']['resultStatus'] == "S"){
             $response['mid']=env('PAYTM_MERCHANT_ID');
             $response['orderId']=$orderId;
+            $response['system_order_id']=$orderId;
             $response['amount']=$amount;
             $response['txnToken']=$curlResponse['body']['txnToken'];
             $response['callbackURL']=route('payment.paytmGiftCardFeesCallback');
