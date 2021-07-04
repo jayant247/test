@@ -759,7 +759,7 @@ class AuthController extends BaseController
                     $newUser->mobile_no=$request->mobile_no;
                     $newUser->imei_number = '';
                     $newUser->name = '';
-                    $newUser->email = '';
+//                    $newUser->email = '';
                     $newUser->mobile_otp = rand(100000,999999);
                     $newUser->mobile_otp_time = Carbon::now();
                     $newUser->save();

@@ -36,7 +36,7 @@ class OrderController extends BaseController{
                 return $this->sendError('Validation Error.', $validator->errors());
             }
             $response = [];
-            if($request->has('products_list') && count($request->products_list)>0){
+            if($request->has('products_list') && count($request->products_list)>=0){
                 $productsList = $request->products_list;
                 $cartDelete = Cart::where('user_id',Auth::user()->id)->delete();
                 $cart_records = [];
