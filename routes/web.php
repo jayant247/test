@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CRM\OrderController;
 use App\Http\Controllers\CRM\TicketsController;
 use App\Http\Controllers\CRM\AuthController;
 use App\Http\Controllers\CRM\CategoryController;
@@ -54,16 +55,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('productDescription',ProductDescriptionController::class);
     Route::resource('productVariable',ProductVariableController::class);
 
+    //order
+    Route::resource('order',OrderController::class);
+    //tickets
     Route::get('tickets',[TicketsController::class,'index'])->name('tickets.index');
-
     Route::get('tickets/assignToMe/{id}',[TicketsController::class,'assignToMe'])->name('tickets.assign');
-
     Route::get('tickets/closeTicket/{id}',[TicketsController::class,'close'])->name('tickets.close');
-
     Route::get('tickets/openTicket/{id}',[TicketsController::class,'open'])->name('tickets.open');
-
     Route::post('tickets/addMessage',[TicketsController::class,'addMessage'])->name('tickets.addMessage');
-
     Route::get('tickets/getMessage/{id}',[TicketsController::class,'getMessage'])->name('tickets.getMessage');
 
 
