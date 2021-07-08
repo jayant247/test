@@ -37,7 +37,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Price*</label>
-			                                <input type="text" name="price" class="form-control input-default" placeholder="Enter Product Price">
+			                                <input type="number" name="price" class="form-control input-default" placeholder="Enter Product Price">
 			                                @if($errors->has('price'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('price') }}
@@ -118,6 +118,18 @@
 								                @endif
 		                                    </div>
 		                                </div>
+
+		                                <div class="form-group col-md-4">
+		                                	<label><br>Other Images</label>
+		                                	<div class="form-group">
+		                                        <input type="file" accept=".png, .jpg, .jpeg" name="other_images[]" class="form-control-file" multiple>
+		                                        @if($errors->has('other_images'))
+								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+								                        {{ $errors->first('other_images') }}
+								                    </p>
+								                @endif
+		                                    </div>
+		                                </div>
 							        </div>
 
 
@@ -125,7 +137,8 @@
 
 		                                <div class="form-group col-md-6">
 							                <label>Category*</label>
-			                                <select class="form-control select2" id="categories" name="categories[]" multiple="true">
+			                                <select class="form-control 
+			                                " id="categories" name="categories[]" multiple="true">
 							                	@foreach($categories as $category)
 							                    	<option  value="{{$category->id}}">{{$category->category_name}} </option>
 							                    @endforeach

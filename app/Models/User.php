@@ -12,11 +12,12 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable  implements JWTSubject
 {
     use HasApiTokens;
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     //use HasProfilePhoto;
     use Notifiable, HasRoles;
     use TwoFactorAuthenticatable;
@@ -54,14 +55,8 @@ class User extends Authenticatable  implements JWTSubject
         return [];
     }
 
-    /*public function role()
-    {
-        return $this->belongsToMany(Role::class);
-    }*/
-
-    public function role()
-    {
-        return $this->belongsTo('App\Model\Role');
+    public function userRole(){
+        return $this->belongsTo(Role::class,'userRole');
     }
 
     public function transactions()
@@ -92,4 +87,5 @@ class User extends Authenticatable  implements JWTSubject
     {
         return $this->balance() >= $amount;
     }
+
 }

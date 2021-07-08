@@ -62,7 +62,6 @@
                                 <a href="{{env('APP_URL').$category->new_page_thumbnail}}" target="_blank">
                                     <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->new_page_thumbnail}}">
                                 </a>
-
                             </td>
                         </tr>
                         </tbody>

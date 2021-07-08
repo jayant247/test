@@ -38,7 +38,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Price</label>
-			                                <input type="text" name="price" class="form-control input-default" placeholder="Enter Product Price" value="{{$product->price}}">
+			                                <input type="number" name="price" class="form-control input-default" placeholder="Enter Product Price" value="{{$product->price}}">
 			                                @if($errors->has('price'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('price') }}
@@ -61,9 +61,13 @@
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is On Sale</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_on_sale" value="{{ $product->is_on_sale }}">
-	                                        	<option  value="{{$product->is_new}}">Choose... </option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($product->is_on_sale === 1)
+	                                            	<option value="{{ $product->is_on_sale}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($product->is_on_sale === 0)
+	                                            	<option value="{{ $product->is_on_sale}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_on_sale'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -97,9 +101,13 @@
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is New</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_new" value="{{ $product->is_new }}">
-	                                        	<option  value="{{$product->is_new}}">Choose... </option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($product->is_new === 1)
+	                                            	<option value="{{ $product->is_new}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($product->is_new === 0)
+	                                            	<option value="{{ $product->is_new}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_new'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -108,13 +116,24 @@
 							                @endif
 	                                	</div>
 
-	                                	<div class="form-group col-md-3">
+	                                	<div class="form-group col-md-4">
 			                            	<label><br>Primary Image</label>
 		                                	<div class="form-group">
 		                                        <input type="file" accept=".png, .jpg, .jpeg" name="primary_image" class="form-control-file">
 		                                        @if($errors->has('primary_image'))
 								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 								                        {{ $errors->first('primary_image') }}
+								                    </p>
+								                @endif
+		                                    </div>
+		                                </div>
+		                                <div class="form-group col-md-4">
+		                                	<label><br>Other Images</label>
+		                                	<div class="form-group">
+		                                        <input type="file" accept=".png, .jpg, .jpeg" name="other_images[]" class="form-control-file" multiple>
+		                                        @if($errors->has('other_images'))
+								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+								                        {{ $errors->first('other_images') }}
 								                    </p>
 								                @endif
 		                                    </div>
@@ -168,19 +187,17 @@
 
  	<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha512-yCkOYsxpzPSpcbHspsH6A28Z0cgsfjJhlR78nPAfLLZSSV40tVN4VQ6ES/miqI/1z8a5FWVYwCF145+eyJx9Tw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-	   
-
-    </script>
-    <script>
-    	$(document).ready(function() {
-	    $('#categories').select2();
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js">
+</script>
+<script>
+	$(document).ready(function() {
+		$('#categories').select2();
 	});
 	
 	$(document).ready(function() {
 	    $('#subCategories').select2();
 	});
+
     $( document ).ready(function() {
     	var orgCategory = {!! json_encode($product_categories)!!}
     	var orgSubCategory = {!! json_encode($product_sub_categories)!!}
@@ -197,7 +214,7 @@
 		});
 		getData(orgCategory.join())
     	$('#categories').on('select2:change', function (e) {
-		  console.log("shubham")
+		  //console.log("shubham")
 		});
         function getData(parent_ids) {
     	
@@ -211,7 +228,7 @@
         }
 
         function onGetDataSuccess(data){
-        	 if(data['success']){
+        	if(data['success']){
                 for(let item of data['data']){
                 	if(!storeOptions.includes(item["id"])){
                 	$("#subCategories").append('<option value=' + item["id"] + '>' + item["category_name"] + '</option>');
@@ -230,37 +247,22 @@
                 showToast('error','Error',/*data['message']*/'Select Category First');
             }
         }
-
-
-
-
-	$('#categories').on('change', function (e) {
-	    // var data = e.params.data;
-	    // console.log(data);
-	    var theID = $('#categories').select2('data');
-	    let parent_ids_string = '';
-	    for (let eachSelectedOpt of  theID) {
-	    	if(parent_ids_string == ''){
-	    		parent_ids_string = eachSelectedOpt.id
-	    	}else{
-	    		parent_ids_string= parent_ids_string+','+eachSelectedOpt.id
-	    	}
-	    }
-	    getData(parent_ids_string);
-	 });
-
-
-	// $.each(product_categories, function(e){
-	//     $("#subCategories option[value='" + e + "']").prop("selected", true);
-	// });
-
-	//subCategories.forEach(apndSubCat);
-
-	// $('#subCategories').each(product_categories, function(e){
-	// 	$("#subCategories option[value='" + e.category_id + "']").prop("selected", true);
-	// });
+		$('#categories').on('change', function (e) {
+		    // var data = e.params.data;
+		    // console.log(data);
+		    var theID = $('#categories').select2('data');
+		    let parent_ids_string = '';
+		    for (let eachSelectedOpt of  theID) {
+		    	if(parent_ids_string == ''){
+		    		parent_ids_string = eachSelectedOpt.id
+		    	}else{
+		    		parent_ids_string= parent_ids_string+','+eachSelectedOpt.id
+		    	}
+		    }
+		    getData(parent_ids_string);
+	 	});
     });
-    </script>
+</script>
 
 @endsection
 

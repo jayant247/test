@@ -90,4 +90,11 @@ class PincodeController extends Controller{
             return $this->sendError('Something Went Wrong', $e,413);
         }
     }
+
+    public function destroy(Request $request, $id)
+    {
+        DeliveryPincode::find($id)->delete();
+        return redirect()->route('pincode.index')
+                        ->with('success','Pincode deleted successfully');
+    }
 }

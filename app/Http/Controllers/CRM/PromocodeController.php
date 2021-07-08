@@ -3,6 +3,8 @@ namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
 use App\Models\Promocode;
+use App\Models\DeliveryPincode;
+use App\Models\PromocodeHasPincode;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
@@ -11,15 +13,12 @@ use Validator;
 class PromocodeController extends Controller{
 
     public function index(Request $request){
-        // $promocodes = DB::table('promocodes')
-        // ->where('is_active', 1)->get();
         $promocodes = Promocode::all();
         return view('admin.promocode.index',compact(['promocodes']));
 
     }
 
     public function show(Request $request, $id){
-
         $promocode = Promocode::find($id);
         return view('admin.promocode.show',compact(['promocode']));
 
@@ -27,11 +26,15 @@ class PromocodeController extends Controller{
 
     public function edit(Request $request, $id){
         $promocode = Promocode::find($id);
-        return view('admin.promocode.edit',compact(['promocode']));
+        $pincodes = DeliveryPincode::all();
+        $promo_pincodes = PromocodeHasPincode::
+        where("promo_id", "=", $promocode->id)->select('pincode_id')->pluck('pincode_id');
+        return view('admin.promocode.edit',compact(['promocode','pincodes','promo_pincodes']));
     }
 
     public function create(Request $request){
-        return view('admin.promocode.create');
+        $pincodes = DeliveryPincode::all();
+        return view('admin.promocode.create',compact(['pincodes']));
     }
 
     public function store(Request $request){
@@ -46,18 +49,27 @@ class PromocodeController extends Controller{
                 'start_from'=>'required|date|after:sysdate',
                 'end_on'=>'required|date|after:start_from',
                 'description'=>'nullable',
+                'is_for_registered_between'=>'required|boolean',
+                'registered_from'=>'required_if:is_for_registered_between,==,1|date',
+                 'registered_till'=>'required_if:is_for_registered_between,==,1|date|after:registered_from',
+                'is_for_specific_pincode'=>'required|boolean',
+                'pincodes'=>'required_if:is_for_specific_pincode,==,1',
                 'is_active'=>'required|boolean'
-
             ]);
 
             $newPromo = new Promocode;
             $newPromo->promocode=$request->promocode;
-            //$newPromo->type=$request->type;
             $newPromo->discount=$request->discount;
             $newPromo->minimal_cart_total=$request->minimal_cart_total;
             $newPromo->max_discount=$request->max_discount;
+            $newPromo->is_for_registered_between=$request->is_for_registered_between;
+            $newPromo->is_for_specific_pincode=$request->is_for_specific_pincode;
             $newPromo->start_from=Carbon::parse($request->start_from)->format('Y-m-d H:i:s');
             $newPromo->end_on=Carbon::parse($request->end_on)->format('Y-m-d H:i:s');
+            if ($request->is_for_registered_between == 1) {
+                $newPromo->registered_from=Carbon::parse($request->registered_from)->format('Y-m-d H:i:s');
+                $newPromo->registered_till=Carbon::parse($request->registered_till)->format('Y-m-d H:i:s');
+            }
             $newPromo->description=$request->has('description')?$request->description:null;
             if($request->type == 1){
                 $newPromo->type = "percentage";
@@ -77,6 +89,18 @@ class PromocodeController extends Controller{
             elseif ($request->is_active == 0) {
                 $newPromo->is_active = false;
             }
+
+            $newPromo->save();
+            //dd($request->pincodes);
+
+            if ($request->is_for_specific_pincode == 1) {
+                foreach($request->pincodes as $key=>$pincode){
+                    $promoHasPin = new PromocodeHasPincode;
+                    $promoHasPin->promo_id=$newPromo->id;
+                    $promoHasPin->pincode_id=$pincode;
+                    $promoHasPin->save();
+                }                
+            }
             if($newPromo->save()){
                 return redirect()->route('promocode.index')
                         ->with('success','Promocode created successfully.');
@@ -92,6 +116,7 @@ class PromocodeController extends Controller{
 
 
     public function update(Request $request, $id){
+        //dd($request->all());
         try {
             $request->validate([                
                 'promocode' => 'nullable|string',
@@ -103,6 +128,10 @@ class PromocodeController extends Controller{
                 'start_from'=>'nullable|date|after:today',
                 'end_on'=>'nullable|date|after:start_from',
                 'description'=>'nullable|string',
+                'is_for_registered_between'=>'nullable|boolean',
+                'registered_from'=>'nullable|date',
+                'registered_till'=>'nullable|date|after:registered_from',
+                'is_for_specific_pincode'=>'nullable|boolean',
                 'is_active'=>'nullable|boolean'
             ]);
             $promocode=Promocode::find($id);
@@ -143,6 +172,23 @@ class PromocodeController extends Controller{
                         $promocode->is_active = false;
                     } 
                 }
+                $promocode->is_for_registered_between=$request->has('is_for_registered_between')?$request->is_for_registered_between:$promocode->is_for_registered_between;
+                if ($request->is_for_registered_between == 1) {
+                    $promocode->registered_from=Carbon::parse($request->registered_from)->format('Y-m-d H:i:s');
+                    if($request->has('end_on')){
+                        $promocode->registered_till=Carbon::parse($request->registered_till)->format('Y-m-d H:i:s');
+                    }                    
+                }
+                $promocode->is_for_specific_pincode=$request->has('is_for_specific_pincode')?$request->is_for_specific_pincode:$promocode->is_for_specific_pincode;
+                $promocode->save();
+                if ($request->is_for_specific_pincode == 1) {
+                    foreach($request->pincodes as $key=>$pincode){
+                        $promoHasPin = new PromocodeHasPincode;
+                        $promoHasPin->promo_id=$promocode->id;
+                        $promoHasPin->pincode_id=$pincode;
+                        $promoHasPin->save();
+                    }  
+                }
                               
                 if($promocode->save()){
                     return redirect()->route('promocode.index')
@@ -157,5 +203,12 @@ class PromocodeController extends Controller{
         }catch (Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
         }
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        Promocode::find($id)->delete();
+        return redirect()->route('promocode.index')
+                        ->with('success','Promocode deleted successfully');
     }
 }

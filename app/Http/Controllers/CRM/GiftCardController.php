@@ -39,9 +39,9 @@ class GiftCardController extends Controller{
             $request->validate([
                 'title' => 'required|string',
                 'description'=>'nullable|string',
-                'purchase_amount' => 'required|number',
-                'gift_amount' => 'required|number',
-                'validity_days_from_purchase_date' => 'required|number',
+                'purchase_amount' => 'required|numeric',
+                'gift_amount' => 'required|numeric',
+                'validity_days_from_purchase_date' => 'required|numeric',
                 'start_from' => 'required|date|after:today',
                 'end_on' => 'required|after:start_from',
                 'is_active' => 'required|'
@@ -79,9 +79,9 @@ class GiftCardController extends Controller{
             $request->validate([
                 'title' => 'nullable|string',
                 'description'=>'nullable|string',
-                'purchase_amount' => 'nullable|number',
-                'gift_amount' => 'nullable|number',
-                'validity_days_from_purchase_date' => 'nullable|number',
+                'purchase_amount' => 'nullable|numeric',
+                'gift_amount' => 'nullable|numeric',
+                'validity_days_from_purchase_date' => 'nullable|numeric',
                 'start_from' => 'nullable|date|after:today',
                 'end_on' => 'nullable|after:start_from',
                 'is_active' => 'nullable'
@@ -124,5 +124,12 @@ class GiftCardController extends Controller{
         catch (Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
         }
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        GiftCard::find($id)->delete();
+        return redirect()->route('giftcard.index')
+                        ->with('success','Giftcard deleted successfully');
     }
 }

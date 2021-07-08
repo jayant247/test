@@ -92,9 +92,13 @@
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is On Sale</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_on_sale" >
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($productVariable->is_on_sale === 1)
+	                                            	<option value="{{ $productVariable->is_on_sale}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($productVariable->is_on_sale === 0)
+	                                            	<option value="{{ $productVariable->is_on_sale}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_on_sale'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -122,6 +126,32 @@
 							                    </p>
 							                @endif
 			                            </div>
+							        </div>
+							        <div class="row">
+							        	<div class="form-group col-md-4">
+			                            	<label><br>Primary Image</label>
+		                                	<div class="form-group">
+		                                        <input type="file" accept=".png, .jpg, .jpeg" name="primary_image" class="form-control-file">
+		                                        @if($errors->has('primary_image'))
+								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+								                        {{ $errors->first('primary_image') }}
+								                    </p>
+								                @endif
+		                                    </div>
+		                                </div>
+
+		                                <div class="form-group col-md-4">
+		                                	<label><br>Other Images</label>
+		                                	<div class="form-group">
+		                                        <input type="file" accept=".png, .jpg, .jpeg" name="other_images[]" class="form-control-file" multiple>
+		                                        @if($errors->has('other_images'))
+								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+								                        {{ $errors->first('other_images') }}
+								                    </p>
+								                @endif
+		                                    </div>
+		                                </div>
+		                                
 							        </div>
 		                            <div class="col-xs-12 col-sm-12 col-md-12 ">
 						            	<button type="submit" class="btn btn-primary">Update</button>

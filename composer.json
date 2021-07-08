@@ -19,6 +19,8 @@
         "livewire/livewire": "^2.0",
         "paytm/paytmchecksum": "^1.1",
         "razorpay/razorpay": "2.*",
+        "milon/barcode": "^8.0",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^4.0",
         "tymon/jwt-auth": "^1.0"
     },

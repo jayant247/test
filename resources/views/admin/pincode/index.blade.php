@@ -37,15 +37,20 @@
                                         <td>{{$pincode->pincode}}</td>
                                         <td>{{$pincode->is_active}}</td>
                                         <td>
-                                            <button data-toggle="modal" onclick="openDetailsModal({{$pincode->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('pincode.show',$pincode->id)}}">
-                                                <i class="fa fa-eye"></i>
-                                            </button>
-                                            <a class="btn btn-sm btn-outline-dark" href="{{route('pincode.edit',$pincode->id)}}">
-                                                <i class="fa fa-pencil"></i>
-                                            </a>
-                                            <a class="btn btn-sm btn-outline-dark">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <form action="{{ route('pincode.destroy',$pincode->id) }}" method="POST">
+                                                <button data-toggle="modal" onclick="openDetailsModal({{$pincode->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                                <a class="btn btn-sm btn-outline-dark" href="{{route('pincode.edit',$pincode->id)}}" >
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
+                                                
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -105,7 +110,6 @@
                        </div>
                        <div class="modal-footer">
                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-{{--                           <button type="button" class="btn btn-primary">Save changes</button>--}}
                        </div>
                    </div>
                </div>

@@ -3,10 +3,12 @@ namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductVariables;
+use App\Models\ProductImages;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
 use Validator;
+use QrCode;
 
 
 class ProductVariableController extends Controller{
@@ -16,14 +18,16 @@ class ProductVariableController extends Controller{
         $productVariables = ProductVariables::orderBy('id','DESC')->get();
         return view('admin.productVariable.index',compact(['productVariables']));
 
-    }
+    }*/
 
     public function show(Request $request, $id){
 
         $productVariable = ProductVariables::find($id);
-        return view('admin.productVariable.show',compact(['productVariable']));
+        $image = QrCode::size(100)->generate($productVariable);
+        $productImages = ProductImages::where('product_variable_id', '=', $id)->get();
+        return view('admin.productVariable.show',compact(['productVariable','productImages','image']));
 
-    }*/
+    }
 
     public function edit(Request $request, $id){
         //dd("edit");
@@ -43,6 +47,7 @@ class ProductVariableController extends Controller{
     // }
 
     public function store(Request $request){
+        //dd($request->other_images);
         try {
             $request->validate([
                 'color' => 'required|string',
@@ -53,7 +58,9 @@ class ProductVariableController extends Controller{
                 'sale_price' => 'nullable|numeric',
                 'sale_percentage' => 'nullable|numeric',                
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'required|numeric',
+                'shelf_no' => 'required',
                 'type' => 'nullable|string'
             ]);
 
@@ -63,6 +70,7 @@ class ProductVariableController extends Controller{
             $newProductVariable->price=$request->price;           
             $newProductVariable->mrp=$request->mrp;
             $newProductVariable->quantity=$request->quantity;
+            $newProductVariable->shelf_no=$request->shelf_no;
             $newProductVariable->primary_image =$this->saveImage($request->primary_image);
             $newProductVariable->sale_price=$request->has('sale_price')?$request->sale_price:null;
             $newProductVariable->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
@@ -72,8 +80,29 @@ class ProductVariableController extends Controller{
             }elseif ($request->is_on_sale == 0) {
                 $newProductVariable->is_on_sale = false;
             }
-
             $newProductVariable->product_id=$request->product_id;
+            $newProductVariable->save();
+
+            if($request->has('other_images')){
+                 foreach ($request->other_images as $image) {
+                    $productImages = new ProductImages;
+                    $productImages->product_id = $request->product_id;
+                    $productImages->imagePath = $this->saveImage($image);
+                    $productImages->product_variable_id = $newProductVariable->id;
+                    $productImages->save();
+                }  
+            }            
+            //$productVariable = ProductVariables::find($newProductVariable->id);
+            $qrData = new ProductVariables;
+            $qrData->id = $newProductVariable->id;
+            $qrData->product_id = $newProductVariable->product_id;
+            $qrData->color = $newProductVariable->color;
+            $qrData->size = $newProductVariable->size;
+            $qrData->shelf_no = $newProductVariable->shelf_no;
+            $image = QrCode::size(90)
+                        ->generate($qrData);
+            $newProductVariable->qr_image = $this->saveImage($image);
+            $newProductVariable->save();
             if($newProductVariable->save()){
                 return redirect()->route('product.index')
                         ->with('success','Product Variable created successfully.');
@@ -101,11 +130,13 @@ class ProductVariableController extends Controller{
             $request->validate([
                 'color' => 'nullable|string',
                 'size'=>'nullable|string',
-                'price' => 'nullable|number',
-                'mrp' => 'nullable|number',
+                'price' => 'nullable|numeric',
+                'mrp' => 'nullable|numeric',
                 'is_on_sale' => 'nullable|boolean',
                 'sale_price' => 'nullable|numeric',
-                'sale_percentage' => 'nullable|numeric',
+                'sale_percentage' => 'nullable|numeric',                
+                'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'nullable|numeric',
                 'type' => 'nullable|string'
             ]);
@@ -130,8 +161,25 @@ class ProductVariableController extends Controller{
                         $productVariable->is_on_sale = false;
                     }
                 }
+                if($request->hasFile('primary_image')){
+                    $oldFile = $productVariable->primary_image;
+                    $productVariable->primary_image=$this->saveImage($request->primary_image);
+                    if($oldFile && file_exists(public_path().$oldFile)){
+                        unlink(public_path().$oldFile);
+                    }
+                }
+                $productVariable->save();
+                if($request->has('other_images')){
+                     foreach ($request->other_images as $image) {
+                        $productImages = new ProductImages;
+                        $productImages->product_id = $productVariable->product_id;
+                        $productImages->imagePath = $this->saveImage($image);
+                        $productImages->product_variable_id = $productVariable->id;
+                        $productImages->save();
+                    }  
+                }
                 if($productVariable->save()){
-                    return redirect()->route('productVariable.index')
+                    return redirect()->route('product.index')
                         ->with('success','Product Variable Updated successfully.');
                 }else{
                     return $this->sendError('Product Variable Updation Failed',[], 422);
@@ -144,5 +192,18 @@ class ProductVariableController extends Controller{
         catch (Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
         }
+    }
+
+    public function destroyImage(ProductImages $producImage){
+        $producImage->delete();
+        return redirect()->route('product.index')
+                        ->with('success','Product Image deleted successfully');
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        ProductVariables::find($id)->delete();
+        return redirect()->route('product.index')
+                        ->with('success','product Variable deleted successfully');
     }
 }

@@ -39,32 +39,26 @@ class SubCategoryController extends Controller{
 
     public function store(Request $request){
         try {
-            //dd($request);
             $request->validate([
                 'category_name' => 'required|string',
-                'category_type'=>'string',
+                'category_type'=>'nullable|string',
                 'parent_id' => 'required|numeric',
                 'category_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'big_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'new_page_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'big_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'new_page_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'square_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'is_bigthumbnail_show'=>'boolean'
+                'is_bigthumbnail_show'=>'required|boolean'
             ]);
-
-            $ApiCategorycontroller = new ApiCategorycontroller;
             $newCategory = new Category;
             $newCategory->category_name=$request->category_name;
             $newCategory->type=$request->has('category_type')?$request->category_type:null;
             $newCategory->parent_id=$request->has('parent_id')?$request->parent_id:null;
             $newCategory->category_thumbnail = $this->saveImage($request->category_thumbnail);
             $newCategory->new_page_thumbnail = $request->hasFile('new_page_thumbnail')?$this->saveImage($request->new_page_thumbnail):null;
-            //dd($newCategory);
             if($request->has('is_bigthumbnail_show') && $request->is_bigthumbnail_show==true){
                 $newCategory->is_bigthumbnail_show = $request->has('is_bigthumbnail_show')?$request->is_bigthumbnail_show:false;
                 if($request->hasFile('big_thumbnail')){
                     $newCategory->big_thumbnail =$this->saveImage($request->big_thumbnail);
-                }else{
-                    return $this->sendError('Validation Error.', ['big_thumbnail'=>'Big Thumbnail Image Required']);
                 }
             }
 
@@ -188,5 +182,12 @@ class SubCategoryController extends Controller{
         $imageURL='/images/category/'.$image_name;
         //dd($imageURL);
         return $imageURL;
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        Category::find($id)->delete();
+        return redirect()->route('subcategory.index')
+                        ->with('success','Sub-Category deleted successfully');
     }
 }

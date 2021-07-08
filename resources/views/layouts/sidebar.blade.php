@@ -17,6 +17,11 @@
                 </a>
             </li>
             <li>
+                <a href="{{route('getCustomers')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Customers</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{route('role.index')}}" aria-expanded="false">
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Roles</span>
                 </a>
@@ -61,6 +66,11 @@
                 </a>
             </li>
 
+            <li>
+                <a href="{{route('notification.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Notifications</span>
+                </a>
+            </li>
 
 
             <li class="nav-label">Apps</li>
