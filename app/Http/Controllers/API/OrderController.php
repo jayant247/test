@@ -230,10 +230,12 @@ class OrderController extends BaseController{
                             if($response['walletBalance']<$remainingAmountToBePaid){
                                 $response['walletBalanceUsed'] = $response['walletBalance'];
                                 $remainingAmountToBePaid = $remainingAmountToBePaid - $response['walletBalance'];
+                                $response['walletBalanceRemaining'] = 0;
                             }else{
-                                $response['tem']="Dv";
-                                $response['walletBalanceUsed'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceRemaining'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceUsed'] = $remainingAmountToBePaid;
                                 $remainingAmountToBePaid = 0;
+
                             }
                         }
                     }
@@ -418,13 +420,12 @@ class OrderController extends BaseController{
                     if($request->has("use_wallet_balance") && $request->use_wallet_balance){
                         if($remainingAmountToBePaid>0){
                             if($response['walletBalance']<$remainingAmountToBePaid){
-
                                 $response['walletBalanceUsed'] = $response['walletBalance'];
                                 $remainingAmountToBePaid = $remainingAmountToBePaid - $response['walletBalance'];
-
+                                $response['walletBalanceRemaining'] = 0;
                             }else{
-                                $response['tem']="Dv";
-                                $response['walletBalanceUsed'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceRemaining'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceUsed'] = $remainingAmountToBePaid;
                                 $remainingAmountToBePaid = 0;
                             }
                             $is_wallet_applied = true;
@@ -1032,20 +1033,159 @@ class OrderController extends BaseController{
     public function getMyPaidOrders(Request $request){
         try{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'pageNo'=>'required|numeric',
-                'limit'=>'required|numeric',
+
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
             }
-            $limit = (int)$request->limit;
-            $pageNo = $request->pageNo;
-            $skip = $limit*$pageNo;
-            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('payment_status',2)->whereUserId(Auth::user()->id)->skip($skip)->limit($limit)->orderBy('id','DESC')->get()->toArray();
+//            $limit = (int)$request->limit;
+//            $pageNo = $request->pageNo;
+//            $skip = $limit*$pageNo;
+            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('payment_status',2)->whereUserId(Auth::user()->id)->orderBy('id','DESC')->get()->toArray();
             if(count($orders)>0){
                 return $this->sendResponse($orders,'Data Fetched Successfully', true);
             }else{
                 return $this->sendResponse([],'No Orders Available available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function cancelOrder(Request  $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'order_id'=>'required|numeric',
+                'cancellation_reason'=>'required|string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 1 ){
+                    $order->order_status = 4;
+                    $order->cancellation_reason = $request->cancellation_reason;
+                    $order->cancellation_time = Carbon::now();
+
+                    if($order->save()){
+                        $this->initiateRefund($order);
+                        return $this->sendResponse($order,'Order Cancelled Successfully And Refund Initiated.', true);
+                    }else{
+                        return $this->sendResponse($order,'Order Cancellation failed.', true);
+                    }
+                }else if($order->order_status == 2){
+                    $order->order_status = 4;
+                    $order->cancellation_reason = $request->cancellation_reason;
+                    $order->cancellation_time = Carbon::now();
+                    if($order->save()){
+                        $this->initiateRefund($order);
+                        return $this->sendResponse($order,'Order Cancelled Successfully And Refund Initiated.', true);
+                    }else{
+                        return $this->sendResponse($order,'Order Cancellation failed.', true);
+                    }
+                }
+
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+
+    function  initiateRefund($order){
+        $order->payment_status = 4;
+//        dd($order);
+        foreach ($order["orderItems"] as $orderItem){
+            $prodcutVariable = ProductVariables::where('id',$orderItem['product_variable_id'])->increment('quantity',$orderItem['quantity']);
+        }
+        if($order->is_gift_coupon_used){
+            $userGiftCard = UserGiftCards::find($order->gift_card_id );
+            $userGiftCard->use_status = 0;
+            $userGiftCard->save();
+        }
+        if($order->is_wallet_balance_used){
+            $user = User::find($order->user_id);
+            $data = ['type'  =>  'credit',
+                'amount' => $order->wallet_balance_used,
+                'description' =>  "Wallet Balance Used Refund For Order With Reference No. ".$order->orderRefNo,
+                'status' => 1,
+            ];
+            $wallet = $user->transactions()
+                ->create($data);
+
+        }
+        $order->save();
+    }
+
+    function fullOrderReturn(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'order_id'=>'required|numeric',
+                'return_reason'=>'required|string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 3 ){
+
+                    if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
+                        $order->order_status = 7;
+                        $order->return_replacement_reason = $request->return_reason;
+                        $order->return_replacement_requested_at = Carbon::now();
+                        if($order->save()){
+                            return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
+                        }else{
+                            return $this->sendResponse($order,'Order Cancellation failed.', false);
+                        }
+                    }else{
+                        return $this->sendResponse($order,'Order Return Can Not Be Proceed as it\'s more than 3 days from delivery', false);
+                    }
+                }else {
+                    return $this->sendResponse($order,'Order Return Can Not Be Proceed ', false);
+                }
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    function fullOrderReplacement(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'order_id'=>'required|numeric',
+                'replacement_reason'=>'required|string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 3 ){
+
+                    if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
+                        $order->order_status = 8;
+                        $order->return_replacement_reason = $request->return_reason;
+                        $order->return_replacement_requested_at = Carbon::now();
+                        if($order->save()){
+                            return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
+                        }else{
+                            return $this->sendResponse($order,'Order Cancellation failed.', false);
+                        }
+                    }else{
+                        return $this->sendResponse($order,'Order Return Can Not Be Proceed as it\'s more than 3 days from delivery', false);
+                    }
+                }else {
+                    return $this->sendResponse($order,'Order Return Can Not Be Proceed ', false);
+                }
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
             }
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);

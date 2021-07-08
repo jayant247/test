@@ -147,6 +147,11 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::get('getSingleOrder/{id}',[OrderController::class,'getSingleOrder']);
     Route::get('getMyPaidOrders',[OrderController::class,'getMyPaidOrders']);
 
+    //order cancellation
+    Route::post('cancelOrder',[OrderController::class,'cancelOrder']);
+    Route::post('fullOrderReturn',[OrderController::class,'fullOrderReturn']);
+    Route::post('fullOrderReplacement',[OrderController::class,'fullOrderReplacement']);
+
     Route::get('getGiftCards',[GiftCardController::class,'getGiftCards']);
     Route::post('buyGiftCard',[GiftCardController::class,'buyGiftCard']);
     Route::post('checkRazorpayPaymentStatus',[GiftCardController::class,'checkRazorpayPaymentStatus']);
@@ -165,5 +170,6 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::get('getAllTickets',[TicketController::class,'getAllTickets']);
 
     Route::get('getAllTicketMessage',[TicketController::class,'getAllTicketMessage']);
+
 
 });
