@@ -221,6 +221,8 @@
                 showurl = showurl.replace(':id', products[i].id);
                 let editurl = "{{ route('product.edit',':id' ) }}";
                 editurl = editurl.replace(':id', products[i].id);
+                let deleteurl = "{{ route('deleteProduct',':id' ) }}";
+                deleteurl = deleteurl.replace(':id', products[i].id);
 
                 $("p").css("background-color");
 
@@ -235,7 +237,7 @@
                         '<a class="btn btn-sm btn-outline-dark" href="'+editurl+'">'+
                             '<i class="fa fa-pencil"></i>'+
                         '</a>'+
-                        '<a class="btn btn-sm btn-outline-dark">'+
+                        '<a class="btn btn-sm btn-outline-dark" href="'+deleteurl+'">'+
                             '<i class="fa fa-trash"></i>'+
                         '</a>'
                     +'</td></tr>';

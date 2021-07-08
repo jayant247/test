@@ -39,11 +39,6 @@
                 </a>
             </li>
             <li>
-                <a href="{{route('order.index')}}" aria-expanded="false">
-                    <i class="icon-badge menu-icon"></i><span class="nav-text">Orders</span>
-                </a>
-            </li>
-            <li>
                 <a href="{{route('category.index')}}" aria-expanded="false">
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Category</span>
                 </a>
@@ -71,6 +66,11 @@
                 </a>
             </li>
 
+            <li>
+                <a href="{{route('notification.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Notifications</span>
+                </a>
+            </li>
 
 
             <li class="nav-label">Apps</li>

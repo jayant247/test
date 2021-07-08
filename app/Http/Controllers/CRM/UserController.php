@@ -17,16 +17,10 @@ class UserController extends Controller
     public function index(Request $request)
 
     {
-
         $users = User::whereHas('roles', function ($query) {
             return $query->where('name','!=', 'Customer');
         })->get();
-        //$users = User::role('Customer')->get();
-        // $users = User::orderBy('id','DESC')->get();
-        // return view('admin.user.index',compact('users'));
-        // dd($users);
-        //$users = User::all();
-        //dd($users);
+        
         return view('admin.user.index',compact('users'));
 
     }
@@ -56,18 +50,19 @@ class UserController extends Controller
     public function store(Request $request)
 
     {
+        //dd($request->all());
 
         $this->validate($request, [
 
             'name' => 'required',
 
-            'email' => 'required|email|unique:user,email',
+            'email' => 'required|email|unique:users,email',
 
             'password' => 'required|same:confirm-password',
 
             'mobile' => 'nullable|numeric|between:9,11',
 
-            'roles' => 'required'
+            //'roles' => 'required'
 
         ]);
 
@@ -85,7 +80,7 @@ class UserController extends Controller
 
     
 
-        return redirect()->route('admin.user.index')
+        return redirect()->route('user.index')
 
                         ->with('success','User created successfully');
 
@@ -183,15 +178,10 @@ class UserController extends Controller
 
 
     public function destroy($id)
-
     {
-
         User::find($id)->delete();
-
         return redirect()->route('admin.user.index')
-
                         ->with('success','User deleted successfully');
-
     }
 
 }

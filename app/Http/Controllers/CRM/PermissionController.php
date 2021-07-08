@@ -36,12 +36,12 @@ class PermissionController extends Controller{
         try {
             $request->validate([
                 'name' => 'required|string',
-                'guard_name'=>'string'                
+                'guard_name'=>'nullable'                
             ]);
 
             $newPermission = new Permission;
             $newPermission->name=$request->name;
-            $newPermission->guard_name=$request->has('guard_name')?$request->guard_name:null;
+            $newPermission->guard_name=$request->has('guard_name')?$request->guard_name:'api';
             if($newPermission->save()){
                 return redirect()->route('permission.index')
                         ->with('success','Permission created successfully.');

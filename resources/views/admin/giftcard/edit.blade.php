@@ -69,7 +69,7 @@
 
 		                        		<div class="form-group col-md-4">
 						                    <label>Starts From*</label>
-						                    <input type="date" id="start_from" name="start_from" class="form-control input-default" value ="{{$giftcard->start_from}}">
+						                    <input type="date" id="start_from" name="start_from" class="form-control input-default" value ="{{$giftcard->start_from->format('Y-m-d') }}">
 						                    @if($errors->has('start_from'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('start_from') }}
@@ -79,7 +79,7 @@
 
 						                <div class="form-group col-md-4">
 						                    <label>Ends On*</label>
-						                    <input type="date" id="end_on" name="end_on" class="form-control input-default" value="{{$giftcard->end_on}}">
+						                    <input type="date" id="end_on" name="end_on" class="form-control input-default" value="{{$giftcard->end_on->format('Y-m-d') }}">
 						                    @if($errors->has('end_on'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('end_on') }}
@@ -102,9 +102,13 @@
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is Active*</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_active" >
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($giftcard->is_active === 1)
+	                                            	<option value="{{$giftcard->is_active}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($giftcard->is_active === 0)
+	                                            	<option value="{{$giftcard->is_active}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_active'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">

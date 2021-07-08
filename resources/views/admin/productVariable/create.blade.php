@@ -1,6 +1,7 @@
 @extends('layouts.layout')
 
 @section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section('content')
@@ -46,7 +47,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Price*</label>
-			                                <input type="text" name="price" class="form-control input-default" placeholder="Enter Product Price">
+			                                <input type="number" name="price" class="form-control input-default" placeholder="Enter Product Price">
 			                                @if($errors->has('price'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('price') }}
@@ -90,7 +91,7 @@
 			                        <div class="row">
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is On Sale*</label>
-	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_on_sale" >
+	                                        <select class="form-control mr-sm-2" id="is_on_sale" name="is_on_sale" >
 	                                            <option selected="selected">Choose...</option>
 	                                            <option value="1">YES</option>
 	                                            <option value="0">NO</option>
@@ -102,7 +103,7 @@
 							                @endif
 	                                	</div>
 
-	                                	<div class="form-group col-md-4">
+	                                	<div class="form-group col-md-4" id="sale_price">
 			                            	<label>Product Sale Price</label>
 			                                <input type="number" name="sale_price" class="form-control input-default" placeholder="Enter Product Sale Price">
 			                                @if($errors->has('sale_price'))
@@ -112,7 +113,7 @@
 							                @endif
 			                            </div>
 
-			                            <div class="form-group col-md-4">
+			                            <div class="form-group col-md-4" id="sale_percentage">
 			                            	<label>Product Sale Percentage</label>
 			                                <input type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
 			                                @if($errors->has('sale_percentage'))
@@ -121,8 +122,7 @@
 							                    </p>
 							                @endif
 			                            </div>
-							        </div>
-							        <div class="row">
+
 							        	<div class="form-group col-md-4">
 			                            	<label><br>Primary Image</label>
 		                                	<div class="form-group">
@@ -148,6 +148,16 @@
 		                                </div>
 
 		                                <div class="form-group col-md-4">
+			                            	<label>Shelf number</label>
+			                                <input type="text" name="shelf_no" class="form-control input-default" placeholder="Enter Shelf Number">
+			                                @if($errors->has('shelf_no'))
+							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+							                        {{ $errors->first('shelf_no') }}
+							                    </p>
+							                @endif
+			                            </div>	
+
+		                                <div class="form-group col-md-4">
 							                <label>Product</label>
 							                <select class="form-control" name="product_id" id="product_id">
 							                    <option  value="{{$product->id}}">{{$product->product_name}} </option>
@@ -169,6 +179,24 @@
 @endsection
 
 @section('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha512-yCkOYsxpzPSpcbHspsH6A28Z0cgsfjJhlR78nPAfLLZSSV40tVN4VQ6ES/miqI/1z8a5FWVYwCF145+eyJx9Tw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js">
+</script>
+<script type="text/javascript">
+    $('#sale_price').hide();
+    $('#sale_percentage').hide();  
+	$('#is_on_sale').change(function(){	
+		if( $(this).val()=== "1"){
+        $("#sale_price").show();
+        $("#sale_percentage").show();
+        }
+        else{
+        $("#sale_price").hide();
+        $("#sale_percentage").hide();
+        }   	
+	});
+</script>
 @endsection
 
 

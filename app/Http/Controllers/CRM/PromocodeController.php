@@ -13,8 +13,6 @@ use Validator;
 class PromocodeController extends Controller{
 
     public function index(Request $request){
-        // $promocodes = DB::table('promocodes')
-        // ->where('is_active', 1)->get();
         $promocodes = Promocode::all();
         return view('admin.promocode.index',compact(['promocodes']));
 
@@ -118,6 +116,7 @@ class PromocodeController extends Controller{
 
 
     public function update(Request $request, $id){
+        //dd($request->all());
         try {
             $request->validate([                
                 'promocode' => 'nullable|string',
@@ -175,11 +174,10 @@ class PromocodeController extends Controller{
                 }
                 $promocode->is_for_registered_between=$request->has('is_for_registered_between')?$request->is_for_registered_between:$promocode->is_for_registered_between;
                 if ($request->is_for_registered_between == 1) {
-                    $newPromo->registered_from=Carbon::parse($request->registered_from)->format('Y-m-d H:i:s');
+                    $promocode->registered_from=Carbon::parse($request->registered_from)->format('Y-m-d H:i:s');
                     if($request->has('end_on')){
-                        $newPromo->registered_till=Carbon::parse($request->registered_till)->format('Y-m-d H:i:s');
-                    }
-                    
+                        $promocode->registered_till=Carbon::parse($request->registered_till)->format('Y-m-d H:i:s');
+                    }                    
                 }
                 $promocode->is_for_specific_pincode=$request->has('is_for_specific_pincode')?$request->is_for_specific_pincode:$promocode->is_for_specific_pincode;
                 $promocode->save();
@@ -205,5 +203,12 @@ class PromocodeController extends Controller{
         }catch (Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
         }
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        Promocode::find($id)->delete();
+        return redirect()->route('promocode.index')
+                        ->with('success','Promocode deleted successfully');
     }
 }

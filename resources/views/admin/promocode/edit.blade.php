@@ -39,24 +39,32 @@
 
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Type</label>
-	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="type" value="{{ $promocode->type }}">
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="1">Percentage</option>
-	                                            <option value="0">Flat</option>
+	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="type">
+	                                            @if($promocode->type === "percentage")
+	                                            	<option value="{{ $promocode->type}}" selected="selected">Percentage</option>
+	                                            	<option value="0">flat</option>
+	                                            @elseif($promocode->type === "flat")
+	                                            	<option value="{{ $promocode->type}}" selected="selected">Flat</option>
+	                                            	<option value="1">Percentage</option>
+	                                            @endif
 	                                        </select>
-	                                        @if($errors->has('is_for_new_user'))
+	                                        @if($errors->has('type'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
-							                        {{ $errors->first('is_for_new_user') }}
+							                        {{ $errors->first('type') }}
 							                    </p>
 							                @endif
 	                                	</div>
 
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Only for New Customers</label>
-	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_for_new_user" value="{{ $promocode->is_for_new_user }}">
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_for_new_user">
+	                                        	@if($promocode->is_for_new_user === 1)
+	                                            	<option value="{{ $promocode->is_for_new_user}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($promocode->is_for_new_user === 0)
+	                                            	<option value="{{ $promocode->is_for_new_user}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_for_new_user'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -101,7 +109,7 @@
 		                        	<div class="row">
 		                        		<div class="form-group col-md-4">
 						                    <label>Starts From</label>
-						                    <input type="date" id="start_from" name="start_from" class="form-control input-default" value="{{ $promocode->start_from }}">
+						                    <input type="date" id="start_from" name="start_from" class="form-control input-default" value="{{ $promocode->start_from->format('Y-m-d') }}">
 						                    @if($errors->has('start_from'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('start_from') }}
@@ -111,7 +119,7 @@
 
 						                <div class="form-group col-md-4">
 						                    <label>Ends On</label>
-						                    <input type="date" id="end_on" name="end_on" class="form-control input-default" value="{{ $promocode->end_on }}">
+						                    <input type="date" id="end_on" name="end_on" class="form-control input-default" value="{{ $promocode->end_on->format('Y-m-d') }}">
 						                    @if($errors->has('end_on'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('end_on') }}
@@ -122,9 +130,13 @@
 						                <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is Active</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_active" value="{{ $promocode->is_active }}">
-	                                        	<option selected="selected">Choose...</option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($promocode->is_active === 1)
+	                                            	<option value="{{ $promocode->is_active}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($promocode->is_active === 0)
+	                                            	<option value="{{ $promocode->is_active}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_active'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -139,9 +151,13 @@
 		                        		<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is for users registered between?*</label>
 	                                        <select class="form-control mr-sm-2" id="register_between" name="is_for_registered_between" >
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($promocode->is_for_registered_between === 1)
+	                                            	<option value="{{ $promocode->is_for_registered_between}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($promocode->is_for_registered_between === 0)
+	                                            	<option value="{{ $promocode->is_for_registered_between}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif   
 	                                        </select>
 	                                        @if($errors->has('is_for_registered_between'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -152,7 +168,7 @@
 
 		                        		<div class="form-group col-md-4" id="registered_from">
 						                    <label>Registerd From*</label>
-						                    <input type="date" id="registered_from" name="registered_from" class="form-control input-default" value="$promocode->registered_from">
+						                    <input type="date" id="registered_from" name="registered_from" class="form-control input-default" value="{{ $promocode->registered_from->format('Y-m-d') }}">
 						                    @if($errors->has('registered_from'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('registered_from') }}
@@ -162,7 +178,7 @@
 
 						                <div class="form-group col-md-4" id="registered_till">
 						                    <label>Registered Till*</label>
-						                    <input type="date" id="registered_till" name="registered_till" class="form-control input-default" value="$promocode->registered_from">
+						                    <input type="date" id="registered_till" name="registered_till" class="form-control input-default" value="{{ $promocode->registered_till->format('Y-m-d') }}">
 						                    @if($errors->has('registered_till'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('registered_till') }}
@@ -173,9 +189,13 @@
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is for Specific Pincodes?*</label>
 	                                        <select class="form-control mr-sm-2" id="specific_pincode" name="is_for_specific_pincode" >
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($promocode->is_for_specific_pincode === 1)
+	                                            	<option value="{{ $promocode->is_for_specific_pincode}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($promocode->is_for_specific_pincode === 0)
+	                                            	<option value="{{ $promocode->is_for_specific_pincode}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_for_specific_pincode'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -250,6 +270,33 @@
         	$("#pincode_class").hide();
         }   	
 	});
+	$(document).ready(function() {
+		let is_for_specific_pincode = {!! json_encode($promocode->is_for_specific_pincode)!!}
+		let is_for_registered_between = {!! json_encode($promocode->is_for_registered_between)!!}
+		//console.log(is_for_specific_pincode);
+		if (is_for_specific_pincode) {
+			$(document).ready(function() {
+			    $("#pincodes").select2();
+			});
+	        $("#pincode_class").show();
+		}
+		if (is_for_registered_between) {
+			$("#registered_from").show();
+	        $("#registered_till").show();
+		}
+    	var savedpincode = {!! json_encode($promo_pincodes)!!}
+    	//console.log(orgCategory)
+    	$('#pincodes').select2().val(savedpincode);
+    	
+    	$('#pincodes').select2().trigger({
+		    type: 'select2:select',
+		    params: {
+		        data: []
+		    }
+		});
+	});
+
+	
 
 	
 </script>

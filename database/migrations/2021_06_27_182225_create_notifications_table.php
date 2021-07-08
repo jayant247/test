@@ -15,6 +15,15 @@ class CreateNotificationsTable extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+            $table->text('user_type');
+            $table->text('notification_type');
+            $table->string('heading');
+            $table->text('mobile_body')->nullable();
+            $table->text('mail_body')->nullable();
+            $table->text('sms_body')->nullable();
+            $table->string('mobile_image')->nullable();
+            $table->timestamp('registered_from')->nullable();
+            $table->timestamp('registered_till')->nullable();
             $table->timestamps();
         });
     }

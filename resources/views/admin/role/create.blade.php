@@ -1,6 +1,7 @@
 @extends('layouts.layout')
 
 @section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section('content')
@@ -44,33 +45,10 @@
 							                @endif
 			                            </div>			                            
 		                        	</div>
-
-
-		                        	<!-- <div class="col-xs-12 col-sm-12 col-md-12">
-
-								        <div class="form-group">
-
-								            <strong>Permission:</strong>
-
-								            <br/>
-
-								            @foreach($permissions as $value)
-
-								                <label>{{ Form::checkbox('permission[]', $value->id, false, array('class' => 'name')) }}
-
-								                {{ $value->name }}</label>
-
-								            <br/>
-
-								            @endforeach
-
-								        </div>
-
-								    </div> -->
 		                            
 
 								    <div class="row">
-			                        	<div class="form-group col-md-12">
+			                        	<!-- <div class="form-group col-md-12">
 			                            	<label>Permissions</label>
 			                            	<br/>
 			                            	<div class="row">
@@ -79,7 +57,7 @@
 								                <label>{{ Form::checkbox('permission[]', $value->id, false, array('class' => 'name')) }}
 								                {{ $value->name }}</label>
 								            </div>
-								            <!-- <br/> -->
+								            <br/>
 								            @endforeach
 								        </div>
 								            @if($errors->has('permissions'))
@@ -87,30 +65,18 @@
 							                        {{ $errors->first('permissions') }}
 							                    </p>
 							                @endif
-							            </div>
-							        </div>
+							            </div> -->
 
-
-		                            <!-- <div class="row">
-			                        	<div class="form-group col-md-8">
-			                            	<label>Permissions
-							                    <span class="btn btn-info btn-xs select-all">Select all</span>
-							                    <span class="btn btn-info btn-xs deselect-all">Deselect all</span></label>
-							                <select name="permissions[]" id="permissions" class="form-control select2" multiple="multiple">
-							                    @foreach($permissions as $id => $permissions)
-							                        <option value="{{ $id }}" >
-							                            {{ $permissions }}
-							                        </option>
+							            <div class="form-group col-md-6" id="permission_class">
+							                <label>Seelct Permissions*</label>
+			                                <select class="form-control select2" id="permissions" name="permissions[]" multiple="true">
+							                	@foreach($permissions as $permission)
+							                    	<option  value="{{$permission->id}}">{{$permission->name}} </option>
 							                    @endforeach
-							                </select>
-							                @if($errors->has('permissions'))
-							                    <p class="help-block">
-							                        {{ $errors->first('permissions') }}
-							                    </p>
-							                @endif
-							            </div>
-							        </div> -->
-		                        	
+											</select>
+										</div>
+		                        	</div>	
+							        </div>	                        	
 		                            
 		                            <div class="col-xs-12 col-sm-12 col-md-12 ">
 						            	<button type="submit" class="btn btn-primary">Create New Role</button>
@@ -127,6 +93,14 @@
 @endsection
 
 @section('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha512-yCkOYsxpzPSpcbHspsH6A28Z0cgsfjJhlR78nPAfLLZSSV40tVN4VQ6ES/miqI/1z8a5FWVYwCF145+eyJx9Tw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+	$(document).ready(function() {
+	    $('#permissions').select2();
+	});
+</script>
 @endsection
 
 

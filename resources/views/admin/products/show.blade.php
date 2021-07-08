@@ -1,43 +1,6 @@
 @extends('layouts.layout')
 
 @section('css')
-<!-- <style type="text/css">
-    .multi-item-carousel{
-  .carousel-inner{
-    > .item{
-      transition: 500ms ease-in-out left;
-    }
-    .active{
-      &.left{
-        left:-33%;
-      }
-      &.right{
-        left:33%;
-      }
-    }
-    .next{
-      left: 33%;
-    }
-    .prev{
-      left: -33%;
-    }
-    @media all and (transform-3d), (-webkit-transform-3d) {
-      > .item{
-        // use your favourite prefixer here
-        transition: 500ms ease-in-out left;
-        transition: 500ms ease-in-out all;
-        backface-visibility: visible;
-        transform: none!important;
-      }
-    }
-  }
-  .carouse-control{
-    &.left, &.right{
-      background-image: none;
-    }
-  }
-}
-</style> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.8.2/css/lightbox.min.css">
 
@@ -221,15 +184,20 @@
                                         <td>{{$productDescription->property_name}}</td>
                                         <td>{{$productDescription->property_value}}</td>
                                         <td>
-                                            <button data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('productDescription.show',$productDescription->id)}}">
-                                            <i class="fa fa-eye"></i>
-                                            </button>
-                                            <a class="btn btn-sm btn-outline-dark" href="{{route('productDescription.edit',$productDescription->id)}}">
-                                                <i class="fa fa-pencil"></i>
-                                            </a>
-                                            <a class="btn btn-sm btn-outline-dark">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <form action="{{ route('productDescription.destroy',$productDescription->id) }}" method="POST">
+                                                <button data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                                <a class="btn btn-sm btn-outline-dark" href="{{route('productDescription.edit',$productDescription->id)}}" >
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
+                                                
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </form>
                                         </td>
                                     </tr>
                                     @endif
@@ -255,15 +223,20 @@
                                         <td>{{$productDescription->property_name}}</td>
                                         <td>{{$productDescription->property_value}}</td>
                                         <td>
-                                            <button data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('productDescription.show',$productDescription->id)}}">
-                                            <i class="fa fa-eye"></i>
-                                            </button>
-                                            <a class="btn btn-sm btn-outline-dark" href="{{route('productDescription.edit',$productDescription->id)}}">
-                                                <i class="fa fa-pencil"></i>
-                                            </a>
-                                            <a class="btn btn-sm btn-outline-dark">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <form action="{{ route('productDescription.destroy',$productDescription->id) }}" method="POST">
+                                                <button data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                                <a class="btn btn-sm btn-outline-dark" href="{{route('productDescription.edit',$productDescription->id)}}" >
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
+                                                
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </form>
                                         </td>
                                     </tr>
                                     @endif
@@ -272,38 +245,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
-                    
-                    <!-- <div class="row">
-                        @foreach($productDescriptions as $productDescription)
-                        <div class="col form-group col-md-1">
-                            <div class="card-body">
-                                <label>{{$productDescription->property_name}}</label>
-                            </div>
-                        </div>
-                        <div class="col form-group col-md-2">
-                            <div class="card">
-                                <div class="card-body">
-                                    <p>{{$productDescription->property_value}}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col form-group col-md-3">
-                            <div class="card-body">
-                                <button data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('productDescription.show',$productDescription->id)}}">
-                                <i class="fa fa-eye"></i>
-                                </button>
-                                <a class="btn btn-sm btn-outline-dark" href="{{route('productDescription.edit',$productDescription->id)}}">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
-                                <a class="btn btn-sm btn-outline-dark">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div> -->
-                    
+                </div>                    
                 @else
                     <div class="text-center">
                         <h5>Desciption Not Available</h5>
@@ -399,15 +341,20 @@
                                 <td>{{$productVariable->sale_percentage}}</td>
                                 <td>{{$productVariable->quantity}}</td>
                                 <td>
-                                    <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.show',$productVariable->id)}}">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-                                    <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.edit',$productVariable->id)}}">
-                                        <i class="fa fa-pencil"></i>
-                                    </a>
-                                    <a class="btn btn-sm btn-outline-dark">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
+                                    <form action="{{ route('productVariable.destroy',$productVariable->id) }}" method="POST">
+                                        <button data-toggle="modal" onclick="openDetailsModal({{$productVariable->id}})"  class="btn btn-sm btn-outline-dark" >
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+                                        <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.edit',$productVariable->id)}}" >
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
+                                        
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

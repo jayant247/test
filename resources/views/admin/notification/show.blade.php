@@ -7,9 +7,9 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Category Details</h4>
+                <h4 class="card-title">GiftCard Details</h4>
                 <div class="row">
-                    <table  class="table table-striped table-bordered zero-configuration">
+                    <!-- <table  class="table table-striped table-bordered zero-configuration">
                         <thead>
                         <tr>
                             <th>Field</th>
@@ -25,6 +25,10 @@
                         <tr>
                             <td>Is Big Thumbnail Show</td>
                             <td>{{$category->is_bigthumbnail_show?'True':'False'}}</td>
+                        </tr>
+                        <tr>
+                            <td>Parent Category</td>
+                            <td><a href="{{route('category.show',$category->parentCategory->id)}}"> {{$category->parentCategory->category_name}} </a></td>
                         </tr>
                         <tr>
                             <td>Type</td>
@@ -62,26 +66,56 @@
                                 <a href="{{env('APP_URL').$category->new_page_thumbnail}}" target="_blank">
                                     <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$category->new_page_thumbnail}}">
                                 </a>
+
                             </td>
                         </tr>
                         </tbody>
-                    </table>
+                    </table> -->
+                    <table  class="table table-striped table-bordered zero-configuration">
+                       <thead>
+                       <tr>
+                           <th>Field</th>
+                           <th>Value</th>
+                       </tr>
+                       </thead>
+                       <tbody>
+
+                       <tr>
+                           <td>Title</td>
+                           <td>{{$giftcard->title}}</td>
+                       </tr>
+                       <tr>
+                           <td>Description</td>
+                           <td>{{$giftcard->description}}</td>
+                       </tr>
+                       <tr>
+                           <td>Purchase Amount</td>
+                           <td>{{$giftcard->purchase_amount}}</td>
+                       </tr>
+                       <tr>
+                           <td>Gift Amount</td>
+                           <td>{{$giftcard->gift_amount}}</td>
+                       </tr>
+                       <tr>
+                           <td>Validity</td>
+                           <td>{{$giftcard->validity_days_from_purchase_date}}</td>
+                       </tr>
+                       <tr>
+                           <td>Start Date</td>
+                           <td>{{$giftcard->start_from}}</td>
+                       </tr>
+                       <tr>
+                           <td>End Date</td>
+                           <td>{{$giftcard->end_on}}</td>
+                       </tr>
+                       <tr>
+                           <td>Is Active</td>
+                           <td>{{$giftcard->is_active}}</td>
+                       </tr>
+                       </tbody>
+                   </table>
                 </div>
-                <br>
-                <h4 class="card-title">Subcategory List ({{count($category->subCategory)}})</h4>
-                <hr>
-                <div class="card">
-                    <div class="row">
 
-
-                        @foreach($category->subCategory as $subCategory)
-                            <div class="col-md-4">
-                                <a href="{{route('subcategory.show',$subCategory->id)}}"><li style="list-style-type: circle">{{$subCategory->category_name}}</li></a>
-                            </div>
-                        @endforeach
-
-                    </div>
-                </div>
 
             </div>
         </div>

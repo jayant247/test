@@ -65,6 +65,15 @@
                                <td>{{$productVariable->type}}</td>
                            </tr>
                            <tr>
+                               <th>QR</th>
+                               <td>{{$image}} <button onclick="svg2img()">download</button></td>
+                           </tr>
+                           <!-- <tr>
+                               <th>QR</th>
+                               <td><a href="{{env('APP_URL').$productVariable->qr_image}}" target="_blank" data-lightbox="QR_Photo"><img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$productVariable->qr_image}}">
+                                </a></td>
+                           </tr> -->
+                           <tr>
                                <th>Image</th>
                                 <td><a href="{{env('APP_URL').$productVariable->primary_image}}" target="_blank" data-lightbox="Primary_Photo"><img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$productVariable->primary_image}}">
                                 </a>
@@ -108,6 +117,22 @@
       'resizeDuration': 200,
       'wrapAround': true
     })
+
+    function svg2img(){
+        console.log("few");
+    var svg = document.querySelector('svg');
+    var xml = new XMLSerializer().serializeToString(svg);
+    var svg64 = btoa(xml); //for utf8: btoa(unescape(encodeURIComponent(xml)))
+    var b64start = 'data:image/svg+xml;base64,';
+    var image64 = b64start + svg64;
+    // return image64;
+    var a = document.createElement("a"); //Create <a>
+    a.href = b64start + image64; //Image Base64 Goes here
+    a.download = "Image.svg"; //File name Here
+    a.click();
+    console.log("dwadwd");
+}
+// };svg2img()
   </script>
 @endsection
 

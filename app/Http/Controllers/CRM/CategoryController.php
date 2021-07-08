@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use QrCode;
 use Validator;
 use App\Http\Controllers\API\CategoryController as ApiCategorycontroller;
 
@@ -12,7 +13,8 @@ class CategoryController extends Controller{
 
     public function index(Request $request){
         $categories = Category::with(['subCategory'])->whereNull('parent_id')->get();
-        return view('admin.category.index',compact(['categories']));
+        $qr = QrCode::size(300)->generate('A basic example of Simple QR code!');
+        return view('admin.category.index',compact(['categories','qr']));
 
     }
 
@@ -35,12 +37,12 @@ class CategoryController extends Controller{
             //dd($request);
             $request->validate([
                 'category_name' => 'required|string',
-                'category_type'=>'string',
+                'category_type'=>'nullable|string',
                 'category_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'big_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'new_page_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'big_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'new_page_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'square_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'is_bigthumbnail_show'=>'boolean'
+                'is_bigthumbnail_show'=>'nullable|boolean'
             ]);
             $newCategory = new Category;
             $newCategory->category_name=$request->category_name;
@@ -52,8 +54,6 @@ class CategoryController extends Controller{
                 $newCategory->is_bigthumbnail_show = $request->has('is_bigthumbnail_show')?$request->is_bigthumbnail_show:false;
                 if($request->hasFile('big_thumbnail')){
                     $newCategory->big_thumbnail =$this->saveImage($request->big_thumbnail);
-                }else{
-                    return $this->sendError('Validation Error.', ['big_thumbnail'=>'Big Thumbnail Image Required']);
                 }
             }
 
@@ -93,13 +93,13 @@ class CategoryController extends Controller{
         //dd($request->category_thumbnail);
         try {
             $request->validate([
-                'category_name' => 'string',
-                'category_type'=>'string',
-                'category_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'big_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'new_page_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'square_thumbnail'=>'file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'is_bigthumbnail_show'=>'boolean|nullable'
+                'category_name' =>'nullable|string',
+                'category_type'=>'nullable|string',
+                'category_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'big_thumbnail'=>'vfile|max:2048|mimes:jpeg,bmp,png,jpg',
+                'new_page_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'square_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'is_bigthumbnail_show'=>'nullable|boolean'
             ]);
 
 
@@ -178,13 +178,6 @@ class CategoryController extends Controller{
         return $imageURL;
     }
 
-
-    public function destroy(Category $category){
-        $category->delete();
-        return redirect()->route('category.index')
-                        ->with('success','Product deleted successfully');
-    }
-
     public function getSubCategory(Request $request){
         try{
             $validator = Validator::make($request->all(), [
@@ -212,6 +205,13 @@ class CategoryController extends Controller{
         catch (Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
         }
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        Category::find($id)->delete();
+        return redirect()->route('category.index')
+                        ->with('success','Category deleted successfully');
     }
 
 }

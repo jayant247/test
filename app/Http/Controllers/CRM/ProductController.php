@@ -315,4 +315,10 @@ class ProductController extends Controller{
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
         }
     }
+    public function deleteProduct($id)
+    {
+        Products::find($id)->delete();
+        return redirect()->route('product.index')
+                        ->with('success','product Variable deleted successfully');
+    }
 }

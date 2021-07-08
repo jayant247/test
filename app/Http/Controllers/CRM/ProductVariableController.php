@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
 use Validator;
+use QrCode;
 
 
 class ProductVariableController extends Controller{
@@ -22,8 +23,9 @@ class ProductVariableController extends Controller{
     public function show(Request $request, $id){
 
         $productVariable = ProductVariables::find($id);
+        $image = QrCode::size(100)->generate($productVariable);
         $productImages = ProductImages::where('product_variable_id', '=', $id)->get();
-        return view('admin.productVariable.show',compact(['productVariable','productImages']));
+        return view('admin.productVariable.show',compact(['productVariable','productImages','image']));
 
     }
 
@@ -58,6 +60,7 @@ class ProductVariableController extends Controller{
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'required|numeric',
+                'shelf_no' => 'required',
                 'type' => 'nullable|string'
             ]);
 
@@ -67,6 +70,7 @@ class ProductVariableController extends Controller{
             $newProductVariable->price=$request->price;           
             $newProductVariable->mrp=$request->mrp;
             $newProductVariable->quantity=$request->quantity;
+            $newProductVariable->shelf_no=$request->shelf_no;
             $newProductVariable->primary_image =$this->saveImage($request->primary_image);
             $newProductVariable->sale_price=$request->has('sale_price')?$request->sale_price:null;
             $newProductVariable->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
@@ -87,7 +91,18 @@ class ProductVariableController extends Controller{
                     $productImages->product_variable_id = $newProductVariable->id;
                     $productImages->save();
                 }  
-            }
+            }            
+            //$productVariable = ProductVariables::find($newProductVariable->id);
+            $qrData = new ProductVariables;
+            $qrData->id = $newProductVariable->id;
+            $qrData->product_id = $newProductVariable->product_id;
+            $qrData->color = $newProductVariable->color;
+            $qrData->size = $newProductVariable->size;
+            $qrData->shelf_no = $newProductVariable->shelf_no;
+            $image = QrCode::size(90)
+                        ->generate($qrData);
+            $newProductVariable->qr_image = $this->saveImage($image);
+            $newProductVariable->save();
             if($newProductVariable->save()){
                 return redirect()->route('product.index')
                         ->with('success','Product Variable created successfully.');
@@ -183,5 +198,12 @@ class ProductVariableController extends Controller{
         $producImage->delete();
         return redirect()->route('product.index')
                         ->with('success','Product Image deleted successfully');
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        ProductVariables::find($id)->delete();
+        return redirect()->route('product.index')
+                        ->with('success','product Variable deleted successfully');
     }
 }

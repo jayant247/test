@@ -84,7 +84,7 @@ class ProductDescriptionController extends Controller{
                 $productDescription->property_name=$request->has('property_name')?$request->property_name:$productDescription->property_name;
                 $productDescription->property_value=$request->has('property_value')?$request->property_value:$productDescription->property_value;
                 if($productDescription->save()){
-                    return redirect()->route('productDescription.index')
+                    return redirect()->route('product.index')
                         ->with('success','Product Description updated successfully.');
                 }else{
                     return $this->sendError('Product Description Updation Failed',[], 422);
@@ -97,5 +97,12 @@ class ProductDescriptionController extends Controller{
         catch (Exception $e){
             return $this->sendError('Something Went Wrong', $e,413);
         }
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        productDescription::find($id)->delete();
+        return redirect()->route('product.index')
+                        ->with('success','product Description deleted successfully');
     }
 }

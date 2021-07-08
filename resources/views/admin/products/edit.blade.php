@@ -61,9 +61,13 @@
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is On Sale</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_on_sale" value="{{ $product->is_on_sale }}">
-	                                        	<option  value="{{$product->is_new}}">Choose... </option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($product->is_on_sale === 1)
+	                                            	<option value="{{ $product->is_on_sale}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($product->is_on_sale === 0)
+	                                            	<option value="{{ $product->is_on_sale}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_on_sale'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -97,9 +101,13 @@
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is New</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_new" value="{{ $product->is_new }}">
-	                                        	<option  value="{{$product->is_new}}">Choose... </option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                        	@if($product->is_new === 1)
+	                                            	<option value="{{ $product->is_new}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($product->is_new === 0)
+	                                            	<option value="{{ $product->is_new}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_new'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">

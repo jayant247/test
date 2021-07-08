@@ -38,9 +38,13 @@
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is Active</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_active" >
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="1">YES</option>
-	                                            <option value="0">NO</option>
+	                                            @if($pincode->is_active === 1)
+	                                            	<option value="{{ $pincode->is_active}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($pincode->is_active === 0)
+	                                            	<option value="{{ $pincode->is_active}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('is_active'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">

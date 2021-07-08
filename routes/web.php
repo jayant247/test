@@ -12,7 +12,8 @@ use App\Http\Controllers\CRM\PincodeController;
 use App\Http\Controllers\CRM\GiftCardController;
 use App\Http\Controllers\CRM\ProductDescriptionController;
 use App\Http\Controllers\CRM\ProductVariableController;
-use App\Http\Controllers\CRM\OrderController;
+use App\Http\Controllers\CRM\NotificationController;
+//use App\Http\Controllers\CRM\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -51,25 +52,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('promocode',PromocodeController::class);
     Route::resource('giftcard',GiftCardController::class);
     Route::resource('pincode',PincodeController::class);   
-    Route::resource('order',OrderController::class);    
+    //Route::resource('order',OrderController::class);    
     Route::resource('productDescription',ProductDescriptionController::class);
     Route::resource('productVariable',ProductVariableController::class);
-
+    Route::resource('notification',NotificationController::class);
 });
-
-
-
-
-
 
 //required api
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    //Product
     Route::get('getProductList',[ProductController::class,'getProductList'])->name('getProductList');
+    Route::get('deleteProduct/{id}',[ProductController::class,'deleteProduct'])->name('deleteProduct');
     //Customer
     Route::get('getCustomers',[UserController::class,'getCustomers'])->name('getCustomers');
     Route::get('showCustomer/{id}',[UserController::class,'showCustomer'])->name('showCustomer');
     //Orders
-    Route::get('getOrderList',[OrderController::class,'getOrderList'])->name('getOrderList');
+    //Route::get('getOrderList',[OrderController::class,'getOrderList'])->name('getOrderList');
     //Categories
     Route::get('getSubCategory',[CategoryController::class,'getSubCategory'])->name('getSubCategory');
     //Product Description
