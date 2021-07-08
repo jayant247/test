@@ -8,6 +8,7 @@ use App\Http\Controllers\API\GiftCardController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserDetailsController;
 use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\TicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'metadata.'], function () {
     //Create Password
     Route::post('createPassword',[AuthController::class,'createPassword']);
+
+    Route::post('updateProfile',[AuthController::class,'updateProfile']);
 
     //Roles & Permissions
     Route::post('createRole',[AuthController::class,'createRole']);
@@ -144,6 +147,11 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::get('getSingleOrder/{id}',[OrderController::class,'getSingleOrder']);
     Route::get('getMyPaidOrders',[OrderController::class,'getMyPaidOrders']);
 
+    //order cancellation
+    Route::post('cancelOrder',[OrderController::class,'cancelOrder']);
+    Route::post('fullOrderReturn',[OrderController::class,'fullOrderReturn']);
+    Route::post('fullOrderReplacement',[OrderController::class,'fullOrderReplacement']);
+
     Route::get('getGiftCards',[GiftCardController::class,'getGiftCards']);
     Route::post('buyGiftCard',[GiftCardController::class,'buyGiftCard']);
     Route::post('checkRazorpayPaymentStatus',[GiftCardController::class,'checkRazorpayPaymentStatus']);
@@ -152,5 +160,16 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::get('getGiftCardPurchasedByMe',[GiftCardController::class,'getGiftCardPurchasedByMe']);
     Route::post('sendGiftCardVerificationOTP',[GiftCardController::class,'sendGiftCardVerificationOTP']);
     Route::post('verifyCouponOtp',[GiftCardController::class,'verifyCouponOtp']);
+
+    Route::post('createTicket',[TicketController::class,'addTicket']);
+
+    Route::post('createCustomTicket',[TicketController::class,'createCustomTicket']);
+
+    Route::post('addTicketMessage',[TicketController::class,'addMessage']);
+
+    Route::get('getAllTickets',[TicketController::class,'getAllTickets']);
+
+    Route::get('getAllTicketMessage',[TicketController::class,'getAllTicketMessage']);
+
 
 });

@@ -36,7 +36,7 @@ class OrderController extends BaseController{
                 return $this->sendError('Validation Error.', $validator->errors());
             }
             $response = [];
-            if($request->has('products_list') && count($request->products_list)>0){
+            if($request->has('products_list') && count($request->products_list)>=0){
                 $productsList = $request->products_list;
                 $cartDelete = Cart::where('user_id',Auth::user()->id)->delete();
                 $cart_records = [];
@@ -138,10 +138,13 @@ class OrderController extends BaseController{
                 if(count($orders)>0){
                     return $this->sendError('Promo code Already Used', [], 220);
                 }
-                $orders = Order::where('user_id',Auth::user()->id)->get();
-                if(count($orders)>1){
-                    return $this->sendError('Promo code is for new user only', [], 221);
+                if($promocode->is_for_new_user){
+                    $orders = Order::where('user_id',Auth::user()->id)->get();
+                    if(count($orders)>0){
+                        return $this->sendError('Promo code is for new user only', [], 221);
+                    }
                 }
+
             }
             if($request->has('gift_card_code')){
                 $now = Carbon::now();
@@ -197,9 +200,11 @@ class OrderController extends BaseController{
                         }
                     }
                 }
+                Cart::insert($cart_records);
                 if(count($outOfStockItemId)>0){
                     return $this->sendError('Some Items Are Out Of Stock', ["outOfStockItemIds"=>$outOfStockItemId], 217);
                 }
+
                 $tempSubTotal = $subTotal;
                 $remainingAmountToBePaid = $subTotal;
                 $giftCardAmountUtilized = 0;
@@ -225,20 +230,23 @@ class OrderController extends BaseController{
                             if($response['walletBalance']<$remainingAmountToBePaid){
                                 $response['walletBalanceUsed'] = $response['walletBalance'];
                                 $remainingAmountToBePaid = $remainingAmountToBePaid - $response['walletBalance'];
+                                $response['walletBalanceRemaining'] = 0;
                             }else{
-                                $response['tem']="Dv";
-                                $response['walletBalanceUsed'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceRemaining'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceUsed'] = $remainingAmountToBePaid;
                                 $remainingAmountToBePaid = 0;
+
                             }
                         }
                     }
                     if(!is_null($promocode)){
-                        $isPromoCodeAllowedOrNot= false;
+                        $isPromoCodeAllowedOrNot= true;
                         if($promocode['is_for_new_user']){
                             $orders = Order::where('user_id',Auth::user()->id)->get();
-                           if(count($orders)<1){
-                               $isPromoCodeAllowedOrNot = true;
-                           }
+
+                            if(count($orders)>=1){
+                                $isPromoCodeAllowedOrNot = false;
+                            }
                         }
                         if($isPromoCodeAllowedOrNot){
                             if($remainingAmountToBePaid>=$promocode['minimal_cart_total']){
@@ -256,12 +264,12 @@ class OrderController extends BaseController{
                                 }
                             }else{
                                 $msg = 'Minimum Cart Amount Should Be '.$promocode['minimal_cart_total'];
+                                return $this->sendError($msg, [], 222);
                             }
                         }
-
                     }
                 }
-                Cart::insert($cart_records);
+
                 $response['shippingCharges']=10;
                 $shippingCharges = $response['shippingCharges'];
                 $response['discountAmount'] = (float)$discountAmount;
@@ -277,6 +285,7 @@ class OrderController extends BaseController{
                 $response['totalGiftCardValue']=$totalGiftCardValue;
                 $response['total']= (float)($remainingAmountToBePaid+$shippingCharges - $discountAmount);
                 $response['pointsEarned']=round($response['total']*0.1,0);
+                $response['giftCardBalanceUsed'] = $totalGiftCardValue - $giftCardAmountRemaining;
             }
             return $this->sendResponse($response,$msg==''?'Data Updated Successfully':$msg, true);
         }catch (\Exception $e){
@@ -327,9 +336,11 @@ class OrderController extends BaseController{
                 if(count($orders)>0){
                     return $this->sendError('Promo code Already Used', [], 220);
                 }
-                $orders = Order::where('user_id',Auth::user()->id)->get();
-                if(count($orders)>0){
-                    return $this->sendError('Promo code is for new user only', [], 221);
+                if($promocode->is_for_new_user){
+                    $orders = Order::where('user_id',Auth::user()->id)->get();
+                    if(count($orders)>0){
+                        return $this->sendError('Promo code is for new user only', [], 221);
+                    }
                 }
             }
             if($request->has('gift_card_code')){
@@ -409,24 +420,24 @@ class OrderController extends BaseController{
                     if($request->has("use_wallet_balance") && $request->use_wallet_balance){
                         if($remainingAmountToBePaid>0){
                             if($response['walletBalance']<$remainingAmountToBePaid){
-
                                 $response['walletBalanceUsed'] = $response['walletBalance'];
                                 $remainingAmountToBePaid = $remainingAmountToBePaid - $response['walletBalance'];
-
+                                $response['walletBalanceRemaining'] = 0;
                             }else{
-                                $response['tem']="Dv";
-                                $response['walletBalanceUsed'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceRemaining'] = $response['walletBalance'] - $remainingAmountToBePaid;
+                                $response['walletBalanceUsed'] = $remainingAmountToBePaid;
                                 $remainingAmountToBePaid = 0;
                             }
                             $is_wallet_applied = true;
                         }
                     }
                     if(!is_null($promocode)){
-                        $isPromoCodeAllowedOrNot= false;
+                        $isPromoCodeAllowedOrNot= true;
                         if($promocode['is_for_new_user']){
                             $orders = Order::where('user_id',Auth::user()->id)->get();
-                            if(count($orders)<1){
-                                $isPromoCodeAllowedOrNot = true;
+
+                            if(count($orders)>=1){
+                                $isPromoCodeAllowedOrNot = false;
                             }
                         }
                         if($isPromoCodeAllowedOrNot){
@@ -448,6 +459,7 @@ class OrderController extends BaseController{
                                 }
                             }else{
                                 $msg = 'Minimum Cart Amount Should Be '.$promocode['minimal_cart_total'];
+                                return $this->sendError($msg, [], 222);
                             }
                         }
                     }
@@ -467,6 +479,8 @@ class OrderController extends BaseController{
                 $response['totalGiftCardValue']=$totalGiftCardValue;
                 $response['total']= (float)($remainingAmountToBePaid+$shippingCharges - $discountAmount);
                 $response['pointsEarned']=round($response['total']*0.1,0);
+                $response['giftCardBalanceUsed'] = $totalGiftCardValue - $giftCardAmountRemaining;
+                $response['isFullPaymentDone']=false;
                 $newOrder = new Order;
                 $newOrder->user_id = $user->id;
                 $newOrder->address_id = $request->address_id;
@@ -502,6 +516,10 @@ class OrderController extends BaseController{
                 }
                 $newOrder->order_status = 1;
                 $newOrder->payment_status = 1;
+                if($response['total']<=0){
+                    $newOrder->payment_status = 2;
+                    $response['isFullPaymentDone']=true;
+                }
                 if($newOrder->save()){
                     if($is_gift_coupon_applied){
                         $userGiftCardCode->use_status = 1;
@@ -686,7 +704,7 @@ class OrderController extends BaseController{
                 $response = ['items'=>$items,'cartTotal'=>$subTotal];
                 return $this->sendResponse($response,'Data Fetched Successfully', true);
             }else{
-                return $this->sendResponse([],'No Orders Available available', false);
+                return $this->sendResponse([],'No Orders Available', false);
             }
 
         }catch (\Exception $e){
@@ -702,7 +720,7 @@ class OrderController extends BaseController{
             "mid"           => env("PAYTM_MERCHANT_ID"),
             "websiteName"   => "WEBSTAGING",
             "orderId"       => 'order_'.$orderId,
-            "callbackUrl"   => route('payment.paytmOrderPaymentWebhookCallback'),
+            "callbackUrl"   => "https://securegw-stage.paytm.in/theia/paytmCallback?ORDER_ID=order_".$orderId,
             "txnAmount"     => array(
                 "value"     => $amount,
                 "currency"  => "INR",
@@ -1015,20 +1033,159 @@ class OrderController extends BaseController{
     public function getMyPaidOrders(Request $request){
         try{
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'pageNo'=>'required|numeric',
-                'limit'=>'required|numeric',
+
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
             }
-            $limit = (int)$request->limit;
-            $pageNo = $request->pageNo;
-            $skip = $limit*$pageNo;
-            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('payment_status',2)->whereUserId(Auth::user()->id)->skip($skip)->limit($limit)->orderBy('id','DESC')->get()->toArray();
+//            $limit = (int)$request->limit;
+//            $pageNo = $request->pageNo;
+//            $skip = $limit*$pageNo;
+            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('payment_status',2)->whereUserId(Auth::user()->id)->orderBy('id','DESC')->get()->toArray();
             if(count($orders)>0){
                 return $this->sendResponse($orders,'Data Fetched Successfully', true);
             }else{
                 return $this->sendResponse([],'No Orders Available available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function cancelOrder(Request  $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'order_id'=>'required|numeric',
+                'cancellation_reason'=>'required|string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 1 ){
+                    $order->order_status = 4;
+                    $order->cancellation_reason = $request->cancellation_reason;
+                    $order->cancellation_time = Carbon::now();
+
+                    if($order->save()){
+                        $this->initiateRefund($order);
+                        return $this->sendResponse($order,'Order Cancelled Successfully And Refund Initiated.', true);
+                    }else{
+                        return $this->sendResponse($order,'Order Cancellation failed.', true);
+                    }
+                }else if($order->order_status == 2){
+                    $order->order_status = 4;
+                    $order->cancellation_reason = $request->cancellation_reason;
+                    $order->cancellation_time = Carbon::now();
+                    if($order->save()){
+                        $this->initiateRefund($order);
+                        return $this->sendResponse($order,'Order Cancelled Successfully And Refund Initiated.', true);
+                    }else{
+                        return $this->sendResponse($order,'Order Cancellation failed.', true);
+                    }
+                }
+
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+
+    function  initiateRefund($order){
+        $order->payment_status = 4;
+//        dd($order);
+        foreach ($order["orderItems"] as $orderItem){
+            $prodcutVariable = ProductVariables::where('id',$orderItem['product_variable_id'])->increment('quantity',$orderItem['quantity']);
+        }
+        if($order->is_gift_coupon_used){
+            $userGiftCard = UserGiftCards::find($order->gift_card_id );
+            $userGiftCard->use_status = 0;
+            $userGiftCard->save();
+        }
+        if($order->is_wallet_balance_used){
+            $user = User::find($order->user_id);
+            $data = ['type'  =>  'credit',
+                'amount' => $order->wallet_balance_used,
+                'description' =>  "Wallet Balance Used Refund For Order With Reference No. ".$order->orderRefNo,
+                'status' => 1,
+            ];
+            $wallet = $user->transactions()
+                ->create($data);
+
+        }
+        $order->save();
+    }
+
+    function fullOrderReturn(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'order_id'=>'required|numeric',
+                'return_reason'=>'required|string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 3 ){
+
+                    if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
+                        $order->order_status = 7;
+                        $order->return_replacement_reason = $request->return_reason;
+                        $order->return_replacement_requested_at = Carbon::now();
+                        if($order->save()){
+                            return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
+                        }else{
+                            return $this->sendResponse($order,'Order Cancellation failed.', false);
+                        }
+                    }else{
+                        return $this->sendResponse($order,'Order Return Can Not Be Proceed as it\'s more than 3 days from delivery', false);
+                    }
+                }else {
+                    return $this->sendResponse($order,'Order Return Can Not Be Proceed ', false);
+                }
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    function fullOrderReplacement(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'order_id'=>'required|numeric',
+                'replacement_reason'=>'required|string',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 3 ){
+
+                    if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
+                        $order->order_status = 8;
+                        $order->return_replacement_reason = $request->return_reason;
+                        $order->return_replacement_requested_at = Carbon::now();
+                        if($order->save()){
+                            return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
+                        }else{
+                            return $this->sendResponse($order,'Order Cancellation failed.', false);
+                        }
+                    }else{
+                        return $this->sendResponse($order,'Order Return Can Not Be Proceed as it\'s more than 3 days from delivery', false);
+                    }
+                }else {
+                    return $this->sendResponse($order,'Order Return Can Not Be Proceed ', false);
+                }
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
             }
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);

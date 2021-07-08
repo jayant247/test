@@ -28,7 +28,7 @@ class CreateOrdersTable extends Migration
             $table->decimal('total',15,2);
             $table->decimal('shipping_charge',15,2);
             $table->string('paymentMode');
-            $table->date('delivery_date')->nullable();
+            $table->timestamp('delivery_date')->nullable();
             $table->timestamps();
         });
     }

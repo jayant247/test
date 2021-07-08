@@ -22,7 +22,8 @@
         "milon/barcode": "^8.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^4.0",
-        "tymon/jwt-auth": "^1.0"
+        "tymon/jwt-auth": "^1.0",
+        "kyslik/column-sortable": "^6.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
