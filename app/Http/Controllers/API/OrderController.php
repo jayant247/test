@@ -24,6 +24,7 @@ use paytm\paytmchecksum\PaytmChecksum;
 use Razorpay\Api\Api;
 use Validator;
 use Auth;
+use function PHPUnit\Framework\isNan;
 
 class OrderController extends BaseController{
 
@@ -1135,6 +1136,7 @@ class OrderController extends BaseController{
 
                     if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
                         $order->order_status = 7;
+                        $order->return_replacemnet_type='full';
                         $order->return_replacement_reason = $request->return_reason;
                         $order->return_replacement_requested_at = Carbon::now();
                         if($order->save()){
@@ -1171,9 +1173,139 @@ class OrderController extends BaseController{
 
                     if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
                         $order->order_status = 8;
+                        $order->return_replacemnet_type='full';
                         $order->return_replacement_reason = $request->return_reason;
                         $order->return_replacement_requested_at = Carbon::now();
                         if($order->save()){
+                            return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
+                        }else{
+                            return $this->sendResponse($order,'Order Cancellation failed.', false);
+                        }
+                    }else{
+                        return $this->sendResponse($order,'Order Return Can Not Be Proceed as it\'s more than 3 days from delivery', false);
+                    }
+                }else {
+                    return $this->sendResponse($order,'Order Return Can Not Be Proceed ', false);
+                }
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function partialOrderReplacement(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+                'order_items_list'=>'required',
+                'order_id'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 3 ){
+
+                    if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
+                        $order->order_status = 8;
+                        $order->return_replacemnet_type='partial';
+
+                        $order->return_replacement_requested_at = Carbon::now();
+                        if($order->save()){
+                            if($request->has('order_items_list') && count($request->order_items_list)>=0){
+                                $productsList = $request->order_items_list;
+                                foreach ($productsList as $order_item){
+                                    if($order_item['item_id'] && $order_item['replacement_reason']!=''){
+
+                                    }else{
+                                        return $this->sendError('Validation Error.',['order_items_list'=>'Please Enter All Required Field. replacement_reason, item_id ']);
+                                    }
+
+                                }
+                                foreach ($productsList as $order_item){
+                                    if($order_item['item_id'] && $order_item['replacement_reason']!=''){
+                                        $temp_order_item = OrderItems::find($order_item['item_id']);
+                                        if(!is_null($temp_order_item)){
+                                            $temp_order_item->return_replacement_reason=$order_item['replacement_reason'];
+                                            $temp_order_item->return_replacement_requested_at=Carbon::now();
+                                            $temp_order_item->replacement_return_status = 'requested';
+                                            $temp_order_item->save();
+                                        }
+                                    }else{
+                                        return $this->sendError('Validation Error.',['order_items_list'=>'Please Enter All Required Field. replacement_reason, item_id ']);
+                                    }
+
+                                }
+
+
+                            }
+                            return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
+                        }else{
+                            return $this->sendResponse($order,'Order Cancellation failed.', false);
+                        }
+                    }else{
+                        return $this->sendResponse($order,'Order Return Can Not Be Proceed as it\'s more than 3 days from delivery', false);
+                    }
+                }else {
+                    return $this->sendResponse($order,'Order Return Can Not Be Proceed ', false);
+                }
+            }else{
+                return $this->sendResponse([],'No Order Available', false);
+            }
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+    public function partialOrderReturn(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+
+                'order_items_list'=>'required',
+                'order_id'=>'required|numeric',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
+            if(!is_null($order)){
+                if($order->order_status == 3 ){
+
+                    if(Carbon::parse($order->delivery_date)->diffInDays(Carbon::now())<=3){
+                        $order->order_status = 7;
+                        $order->return_replacemnet_type='partial';
+
+                        $order->return_replacement_requested_at = Carbon::now();
+                        if($order->save()){
+                            if($request->has('order_items_list') && count($request->order_items_list)>=0){
+                                $productsList = $request->order_items_list;
+                                foreach ($productsList as $order_item){
+                                    if($order_item['item_id'] && $order_item['replacement_reason']!=''){
+
+                                    }else{
+                                        return $this->sendError('Validation Error.',['order_items_list'=>'Please Enter All Required Field. replacement_reason, item_id ']);
+                                    }
+
+                                }
+                                foreach ($productsList as $order_item){
+                                    if($order_item['item_id'] && $order_item['replacement_reason']!=''){
+                                        $temp_order_item = OrderItems::find($order_item['item_id']);
+                                        if(!is_null($temp_order_item)){
+                                            $temp_order_item->return_replacement_reason=$order_item['replacement_reason'];
+                                            $temp_order_item->return_replacement_requested_at=Carbon::now();
+                                            $temp_order_item->replacement_return_status = 'requested';
+                                            $temp_order_item->save();
+                                        }
+                                    }else{
+                                        return $this->sendError('Validation Error.',['order_items_list'=>'Please Enter All Required Field. replacement_reason, item_id ']);
+                                    }
+
+                                }
+
+
+                            }
                             return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
                         }else{
                             return $this->sendResponse($order,'Order Cancellation failed.', false);

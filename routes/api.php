@@ -151,6 +151,8 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::post('cancelOrder',[OrderController::class,'cancelOrder']);
     Route::post('fullOrderReturn',[OrderController::class,'fullOrderReturn']);
     Route::post('fullOrderReplacement',[OrderController::class,'fullOrderReplacement']);
+    Route::post('partialOrderReplacement',[OrderController::class,'partialOrderReplacement']);
+    Route::post('partialOrderReturn',[OrderController::class,'partialOrderReturn']);
 
     Route::get('getGiftCards',[GiftCardController::class,'getGiftCards']);
     Route::post('buyGiftCard',[GiftCardController::class,'buyGiftCard']);
