@@ -32,6 +32,7 @@ class ProductController extends BaseController{
                 'sortByPrice'=>'boolean',
                 'sortBySalePercentage'=>'boolean',
                 'isOnSale'=>'boolean',
+                'sortByNew'=>'boolean',
                 'bestSelling'=>'boolean',
                 'priceRangeHigh'=>'numeric',
                 'priceRangeLow'=>'numeric',
@@ -89,6 +90,14 @@ class ProductController extends BaseController{
                     $query =$query->orderBy('price','DESC');
                 }else{
                     $query =$query->orderBy('price','ASC');
+                }
+
+            }
+            if($request->has('sortByNew')){
+                if($request->sortByNew){
+                    $query =$query->orderBy('is_new','DESC');
+                }else{
+                    $query =$query->orderBy('is_new','ASC');
                 }
 
             }

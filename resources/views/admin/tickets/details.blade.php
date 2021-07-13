@@ -119,30 +119,7 @@
                     </div>
                 </div>
                 @endif
-                @if($ticket->assigned_to==Auth::User()->id && $ticket->ticket_status_id==2)
-                    <div>
-                        <div class="timeline-item">
-                            <form  class="p-2" action="{{ route("tickets.addMessage") }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="form-group {{ $errors->has('message') ? 'has-error' : '' }}">
-                                    <label for="message">Message</label>
-                                    <input hidden name="ticket_id" id="tickt_id" value="{{$ticket->id}}">
-                                    <input type="text" id="message" name="message" class="form-control" >
-                                    @if($errors->has('message'))
-                                        <p class="help-block">
-                                            {{ $errors->first('message') }}
-                                        </p>
-                                    @endif
 
-                                </div>
-
-                                <div>
-                                    <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                @endif
 
             </div>
         </div>
