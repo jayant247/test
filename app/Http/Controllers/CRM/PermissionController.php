@@ -84,4 +84,11 @@ class PermissionController extends Controller{
             return $this->sendError('Something Went Wrong', $e,413);
         }
     }
+
+    public function destroy(Request $request, $id)
+    {
+        Permission::find($id)->delete();
+        return redirect()->route('permission.index')
+                        ->with('success','Permission deleted successfully');
+    }
 }

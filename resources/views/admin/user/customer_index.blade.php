@@ -45,13 +45,17 @@
                                           @endforeach
                                         </td>
                                         <td>
-                                            <button data-toggle="modal" onclick="openDetailsModal(
-                                            {{$customer->id}})" class="btn btn-sm btn-outline-dark" href="{{route('showCustomer',$customer->id)}}">
-                                                <i class="fa fa-eye"></i>
-                                            </button>
-                                            <a class="btn btn-sm btn-outline-dark">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <form action="{{ route('user.destroy',$customer->id) }}" method="POST">
+                                                <button data-toggle="modal" onclick="openDetailsModal({{$customer->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
+                                                
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </form>
                                         </td>
                                     </tr>
                                   @endforeach

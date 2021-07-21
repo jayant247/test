@@ -13,6 +13,7 @@ use App\Http\Controllers\CRM\GiftCardController;
 use App\Http\Controllers\CRM\ProductDescriptionController;
 use App\Http\Controllers\CRM\ProductVariableController;
 use App\Http\Controllers\CRM\NotificationController;
+use App\Http\Controllers\CRM\DashboardController;
 //use App\Http\Controllers\CRM\OrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,10 +53,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('promocode',PromocodeController::class);
     Route::resource('giftcard',GiftCardController::class);
     Route::resource('pincode',PincodeController::class);   
-    //Route::resource('order',OrderController::class);    
+    // Route::resource('order',OrderController::class);    
     Route::resource('productDescription',ProductDescriptionController::class);
     Route::resource('productVariable',ProductVariableController::class);
     Route::resource('notification',NotificationController::class);
+    Route::resource('dashboard',DashboardController::class);
 });
 
 //required api
