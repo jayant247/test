@@ -58,7 +58,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('productDescription',ProductDescriptionController::class);
     Route::resource('productVariable',ProductVariableController::class);
     Route::resource('notification',NotificationController::class);
-
+    Route::get('orders/{id}',[OrderController::class,'orderindex'])->name('orderindex');
+    Route::post('confirmOrder/{id}',[OrderController::class,'confirmOrder'])->name('confirmOrder');
     //order
     Route::resource('order',OrderController::class);
     //tickets
@@ -89,5 +90,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //Product Variable
     Route::get('productVariable/create/{id}',[ProductVariableController::class,'createNewProductVariable'])->name('productVariable.create');
     Route::get('productVariable/destroyImage/{id}',[ProductVariableController::class,'destroyImage'])->name('productVariable.destroyImage');
-
+    Route::get('getOrders',[OrderController::class,'getOrders'])->name('getOrders');
 });

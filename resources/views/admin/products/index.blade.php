@@ -67,11 +67,9 @@
                                             <th>Actions</th>
                                         </tr>
                                         </thead>
-                                        <tbody id="tbody">                                         
-
+                                        <tbody id="tbody">
                                         </tbody>
                                     </table>
-
                                 </div>
                             </div>
 

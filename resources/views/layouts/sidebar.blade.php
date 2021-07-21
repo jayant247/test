@@ -44,7 +44,16 @@
                     <i class="icon-globe-alt menu-icon"></i><span class="nav-text">Orders</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="{{route('order.index')}}">New Orders</a></li>
+                    <li><a href="{{route('orderindex',1)}}">New Orders</a></li>
+                    <li><a href="{{route('orderindex',6)}}">Confirmed Orders</a></li>
+                    <li><a href="{{route('orderindex',2)}}">Shipped Orders</a></li>
+                    <li><a href="{{route('orderindex',3)}}">Delivered Orders</a></li>
+                    <li><a href="{{route('orderindex',4)}}">Cancelled</a></li>
+                    <li><a href="{{route('orderindex',7)}}">Return Requested</a></li>
+                    <li><a href="{{route('orderindex',9)}}">Returned</a></li>
+                    <li><a href="{{route('orderindex',8)}}">Replacement Requested Orders</a></li>
+                    <li><a href="{{route('orderindex',10)}}">Replacement In Progress</a></li>
+
                 </ul>
             </li>
             <li class="nav-label">Product Info</li>
@@ -73,7 +82,7 @@
             <li class="nav-label">Offer Section</li>
             <li class="mega-menu mega-menu-sm">
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                    <i class="icon-globe-alt menu-icon"></i><span class="nav-text">Orders</span>
+                    <i class="icon-globe-alt menu-icon"></i><span class="nav-text">Offer Zone</span>
                 </a>
                 <ul aria-expanded="false">
                     <li>

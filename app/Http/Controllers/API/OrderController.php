@@ -1242,6 +1242,7 @@ class OrderController extends BaseController{
 
 
                             }
+                            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
                             return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
                         }else{
                             return $this->sendResponse($order,'Order Cancellation failed.', false);
@@ -1306,6 +1307,7 @@ class OrderController extends BaseController{
 
 
                             }
+                            $order = Order::with(['orderStatus','paymentStatus','orderItems'])->where('id',$request->order_id)->where('payment_status',2)->whereUserId(Auth::user()->id)->first();
                             return $this->sendResponse($order,'Order Return Requested  Initiated.', true);
                         }else{
                             return $this->sendResponse($order,'Order Cancellation failed.', false);

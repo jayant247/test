@@ -48,7 +48,7 @@ function ajaxCall(doAjax_params) {
             if (typeof errorCallBackFunction === "function") {
                 errorCallBackFunction(errorThrown);
             }else{
-
+                showToast('error','Error',jqXHR.responseJSON['message']);
             }
 
         },
