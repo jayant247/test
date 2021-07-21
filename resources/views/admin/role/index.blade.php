@@ -39,9 +39,9 @@
                                         <td>{{$role->guard_name}}</td>
                                         <td>
                                             <form action="{{ route('role.destroy',$role->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$role->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$role->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('role.edit',$role->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>

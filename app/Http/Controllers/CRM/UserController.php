@@ -18,8 +18,9 @@ class UserController extends Controller
 
     {
         $users = User::whereHas('roles', function ($query) {
-            return $query->where('name','!=', 'Customer');
+            return $query->where('name','!=','Customer');
         })->get();
+        //dd($users);
         
         return view('admin.user.index',compact('users'));
 

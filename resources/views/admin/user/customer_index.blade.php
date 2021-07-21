@@ -46,9 +46,9 @@
                                         </td>
                                         <td>
                                             <form action="{{ route('user.destroy',$customer->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$customer->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$customer->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">

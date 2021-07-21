@@ -38,9 +38,9 @@
                                         <td>{{$pincode->is_active}}</td>
                                         <td>
                                             <form action="{{ route('pincode.destroy',$pincode->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$pincode->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$pincode->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('pincode.edit',$pincode->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>

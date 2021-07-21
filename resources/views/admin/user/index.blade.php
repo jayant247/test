@@ -49,9 +49,9 @@
                                         </td>
                                         <td>
                                             <form action="{{ route('user.destroy',$user->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$user->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$user->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('user.edit',$user->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>

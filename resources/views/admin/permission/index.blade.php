@@ -39,9 +39,9 @@
                                         <td>{{$permission->guard_name}}</td>
                                         <td>
                                             <form action="{{ route('permission.destroy',$permission->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$permission->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$permission->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('permission.edit',$permission->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
