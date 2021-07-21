@@ -38,15 +38,20 @@
                                         <td>{{$role->name}}</td>
                                         <td>{{$role->guard_name}}</td>
                                         <td>
-                                            <button data-toggle="modal" onclick="openDetailsModal({{$role->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('role.show',$role->id)}}">
-                                                <i class="fa fa-eye"></i>
-                                            </button>
-                                            <a class="btn btn-sm btn-outline-dark" href="{{route('role.edit',$role->id)}}">
-                                                <i class="fa fa-pencil"></i>
-                                            </a>
-                                            <a class="btn btn-sm btn-outline-dark">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <form action="{{ route('role.destroy',$role->id) }}" method="POST">
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$role->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-outline-dark" href="{{route('role.edit',$role->id)}}" >
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
+                                                
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach

@@ -38,9 +38,9 @@
                                         <td>{{$notification->heading}}</td>
                                         <td>
                                             <form action="{{ route('notification.destroy',$notification->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$notification->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$notification->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('notification.edit',$notification->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>

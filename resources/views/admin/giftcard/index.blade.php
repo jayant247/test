@@ -40,9 +40,9 @@
                                         <td>{{$giftcard->validity_days_from_purchase_date}}</td>
                                         <td>
                                             <form action="{{ route('giftcard.destroy',$giftcard->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$giftcard->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$giftcard->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('giftcard.edit',$giftcard->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>

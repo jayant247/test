@@ -117,10 +117,10 @@ class ProductVariableController extends Controller{
     }
 
     function saveImage($image){
-        $image_name = 'product'.time().'.'.$image->getClientOriginalExtension();
-        $destinationPath = public_path('images/product/');
+        $image_name = 'product_variable'.time().'.'.$image->getClientOriginalExtension();
+        $destinationPath = public_path('images/product_variable/');
         $image->move($destinationPath, $image_name);
-        $imageURL='/images/product/'.$image_name;
+        $imageURL='/images/product_variable/'.$image_name;
         return $imageURL;
     }
 

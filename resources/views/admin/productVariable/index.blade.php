@@ -37,9 +37,9 @@
                                         <td>{{$pincode->pincode}}</td>
                                         <td>{{$pincode->is_active}}</td>
                                         <td>
-                                            <button data-toggle="modal" onclick="openDetailsModal({{$pincode->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('pincode.show',$pincode->id)}}">
+                                            <a data-toggle="modal" onclick="openDetailsModal({{$pincode->id}})"  class="btn btn-sm btn-outline-dark" href="{{route('pincode.show',$pincode->id)}}">
                                                 <i class="fa fa-eye"></i>
-                                            </button>
+                                            </a>
                                             <a class="btn btn-sm btn-outline-dark" href="{{route('pincode.edit',$pincode->id)}}">
                                                 <i class="fa fa-pencil"></i>
                                             </a>

@@ -28,10 +28,19 @@
 		                        		<div class="col-md-4">
 	                                        <label class="mr-sm-2">User Type*</label>
 	                                        <select class="form-control mr-sm-2" id="specific_users" name="user_type" >
-	                                            <option selected="selected">Choose...</option>
-	                                            <option value="New">New</option>
-	                                            <option value="All">All</option>
-	                                            <option value="Specific">Specific</option>
+	                                            @if($notification->user_type === "New")
+	                                            	<option value="{{ $notification->user_type}}" selected="selected">New</option>
+	                                            	<option value="0">All</option>
+	                                            	<option value="0">Specific</option>
+	                                            @elseif($notification->user_type === "All")
+	                                            	<option value="{{ $notification->user_type}}" selected="selected">All</option>
+	                                            	<option value="0">New</option>
+	                                            	<option value="0">Specific</option>
+	                                            @elseif($notification->user_type === "Specific")
+	                                            	<option value="{{ $notification->user_type}}" selected="selected">Specific</option>
+	                                            	<option value="0">New</option>
+	                                            	<option value="0">All</option>
+	                                            @endif
 	                                        </select>
 	                                        @if($errors->has('user_type'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
@@ -42,7 +51,7 @@
 
 	                                	<div class="form-group col-md-4" id="registered_from">
 						                    <label>Registerd From*</label>
-						                    <input type="date" id="registered_from" name="registered_from" class="form-control input-default" value="{{ $notification->registered_from }}">
+						                    <input type="date" id="registered_from" name="registered_from" class="form-control input-default" value="{{ $notification->registered_from->format('Y-m-d') }}">
 						                    @if($errors->has('registered_from'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('registered_from') }}
@@ -52,7 +61,7 @@
 
 						                <div class="form-group col-md-4" id="registered_till">
 						                    <label>Registered Till*</label>
-						                    <input type="date" id="registered_till" name="registered_till" class="form-control input-default" value="{{ $notification->registered_till }}">
+						                    <input type="date" id="registered_till" name="registered_till" class="form-control input-default" value="{{ $notification->registered_till->format('Y-m-d') }}">
 						                    @if($errors->has('registered_till'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('registered_till') }}
@@ -78,7 +87,7 @@
 
 	                                	<div class="form-group col-md-4">
 			                            	<label>Notification Heading*</label>
-			                                <input type="text" name="heading" class="form-control input-default" placeholder="Enter Notification Heading">
+			                                <input type="text" name="heading" class="form-control input-default" placeholder="Enter Notification Heading" value="{{$notification->heading}}">
 			                                @if($errors->has('heading'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('heading') }}
@@ -88,7 +97,7 @@
 
 			                            <div class="form-group col-md-4" id="mobile_body">
 			                            	<label>Mobile Body</label>
-			                                <input type="text" name="mobile_body" class="form-control input-default" placeholder="Enter Mobile Body">
+			                                <input type="text" name="mobile_body" class="form-control input-default" placeholder="Enter Mobile Body" value="{{$notification->mobile_body}}">
 			                                @if($errors->has('mobile_body'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('mobile_body') }}
@@ -110,7 +119,7 @@
 
 			                            <div class="form-group col-md-4" id="mail_body">
 			                            	<label>Mail Body</label>
-			                                <input type="text" name="mail_body" class="form-control input-default" placeholder="Enter Mail Body">
+			                                <input type="text" name="mail_body" class="form-control input-default" placeholder="Enter Mail Body" value="{{$notification->mail_body}}">
 			                                @if($errors->has('mail_body'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('mail_body') }}
@@ -120,7 +129,7 @@
 
 			                            <div class="form-group col-md-4" id="sms_body">
 			                            	<label>SMS Body</label>
-			                                <input type="text" name="sms_body" class="form-control input-default" placeholder="Enter SMS Body">
+			                                <input type="text" name="sms_body" class="form-control input-default" placeholder="Enter SMS Body" value="{{$notification->sms_body}}">
 			                                @if($errors->has('sms_body'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('sms_body') }}
@@ -147,9 +156,9 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js">
 </script>
 <script type="text/javascript">
-    $('#registered_from').hide();
-    $('#registered_till').hide();  
-	$('#specific_users').change(function(){	
+	$('#registered_from').hide();
+    $('#registered_till').hide();
+    $('#specific_users').change(function(){	
 		if( $(this).val()=== "Specific"){
         $("#registered_from").show();
         $("#registered_till").show();
@@ -159,12 +168,11 @@
         $("#registered_till").hide();
         }   	
 	});
-
-		$('#mobile_body').hide();
-		$('#mail_body').hide();
-	    $('#sms_body').hide(); 
-	    $('#mobile_image').hide();
-	function mobile_fields(checkbox) {
+    $('#mobile_body').hide();
+	$('#mail_body').hide();
+    $('#sms_body').hide(); 
+    $('#mobile_image').hide();
+    function mobile_fields(checkbox) {
 	    if(checkbox.checked == true){
 	        $('#mobile_body').show(); 
 	        $('#mobile_image').show();
@@ -187,36 +195,32 @@
 		    $('#sms_body').hide();
 	   }
 	}
-
 	$(document).ready(function() {
-		$('#registered_from').hide();
-	    $('#registered_till').hide();  
-	    $('#mobile_body').hide();
-		$('#mail_body').hide();
-	    $('#sms_body').hide(); 
-	    $('#mobile_image').hide();
 		let user_type = {!! json_encode($notification->user_type)!!}
 		let is_mobile = {!! json_encode($notification->is_mobile)!!}
 		let is_mail = {!! json_encode($notification->is_mail)!!}
 		let is_sms = {!! json_encode($notification->is_sms)!!}
 		if (user_type === "Specific") {
-			$("#registered_from").show();
+	        $("#registered_from").show();
 	        $("#registered_till").show();
-		}
-		if (is_mobile) {
+        }
+        if (is_mobile){
+        	$("#for_mobile").prop("checked", true);
 	        $('#mobile_body').show(); 
 	        $('#mobile_image').show();
-	        $('.for_mobile').prop('checked', true);
-		}
-		if (is_mail) {
+	    }
+	    if (is_mail){
+	    	$("#for_mail").prop("checked", true);
 	        $('#mail_body').show();
-	        $('.for_mail').prop('checked', true);
-		}
-		if (is_sms) {
+	    }
+	    if (is_sms){
+	    	$("#for_sms").prop("checked", true);
 	        $('#sms_body').show();
-	        $('.for_sms').prop('checked', true);
-		}
+	    }
+	});
+
 </script>
+
 @endsection
 
 

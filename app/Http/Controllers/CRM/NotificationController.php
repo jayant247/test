@@ -88,6 +88,7 @@ class NotificationController extends Controller{
     }
 
     public function update(Request $request, $id){
+        dd($request->all());
         try {
             $request->validate([
                 'user_type' => 'nullable|string',
