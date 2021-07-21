@@ -132,6 +132,40 @@
         var totalordersCount = 0;
         var currentPageNo = 0;
         var totalPageCount = 0;
+        var payment_status = 2;
+
+        switch (order_status){
+            case 1:
+                payment_status = 2;
+                break;
+            case 2:
+                payment_status = 2;
+                break;
+            case 3:
+                payment_status = 2;
+                break;
+            case 4:
+                payment_status = 4;
+                break;
+            case 5:
+                payment_status = 2;
+                break;
+            case 6:
+                payment_status = 2;
+                break;
+            case 7:
+                payment_status = 2;
+                break;
+            case 8:
+                payment_status = 2;
+                break;
+            case 9:
+                payment_status = 2;
+                break;
+            case 10:
+                payment_status = 2;
+                break;
+        }
 
 
         function showHideFilter() {
@@ -218,7 +252,7 @@
         }
         function getData() {
             let dataToSend = {}
-            dataToSend['url']= "{!! route('getOrders') !!}"+"?pageNo="+currentPageNo+"&limit="+pageLimit+"&payment_status=2&order_status="+order_status+query;
+            dataToSend['url']= "{!! route('getOrders') !!}"+"?pageNo="+currentPageNo+"&limit="+pageLimit+"&payment_status="+payment_status+"&order_status="+order_status+query;
             dataToSend['requestType']='GET';
             dataToSend['data']={
 

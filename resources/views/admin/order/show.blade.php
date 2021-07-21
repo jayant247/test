@@ -16,6 +16,25 @@
             </div>
             <div class="card-body">
                 <div class="row">
+                    @if($order->order_status==1)
+                        <div class="col-md-12">
+                            <button type="button"  data-toggle="modal" data-target="#confirmModal" class="btn btn-primary">Confirm Order</button>
+                        </div>
+                    @endif
+                    @if($order->order_status==4)
+                        <div class="col-md-12">
+                            <h5>Cancellation Reason</h5>
+                            <p>{{$order->cancellation_reason}}</p>
+                        </div>
+                    @endif
+                    @if($order->order_status==7 || $order->order_status==8 || $order->order_status==9 || $order->order_status==10)
+                        <div class="col-md-12">
+                            <h5>Return/Replacement Type : {{$order->return_replacemnet_type}}</h5>
+                        </div>
+                    @endif
+                </div>
+                <hr>
+                <div class="row">
                     <div class="col-12">
                         <h5 class="mb-sm-0">Address Details</h5>
                         <br>
@@ -163,7 +182,12 @@
                             <button type="button"  data-toggle="modal" data-target="#confirmModal" class="btn btn-primary">Confirm Order</button>
                         </div>
                     @endif
-
+                    @if($order->order_status==4)
+                        <div class="col-md-12">
+                            <p>Cancellation Reason</p>
+                            <p>{{$order->cancellation_reason}}</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
