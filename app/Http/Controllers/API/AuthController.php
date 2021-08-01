@@ -742,10 +742,13 @@ class AuthController extends BaseController
             $validator = Validator::make($request->all(), [
                 'mobile_no'=>'required|digits:10',
                 'imei_number'=>'string|required',
+                'referal_code'=>'string'
             ]);
             if($validator->fails()){
                 return $this->sendError('Validation Error.', $validator->errors());
             }
+
+            $add_referal_bonus = false;
             $response=[];
             if(!is_null(User::where('mobile_no',$request->mobile_no)->first())){
                 $newUser = User::where('mobile_no',$request->mobile_no)->first();
@@ -759,19 +762,55 @@ class AuthController extends BaseController
                     $newUser->mobile_no=$request->mobile_no;
                     $newUser->imei_number = '';
                     $newUser->name = '';
+                    $newUser->my_referal_code=$this->generateRandomString(8);
 //                    $newUser->email = '';
                     $newUser->mobile_otp = rand(100000,999999);
                     $newUser->mobile_otp_time = Carbon::now();
+                    if($request->has('referal_code')){
+                     $referredBy = User::where('my_referal_code',$request->referal_code)->first();
+                     if(!is_null($referredBy)){
+                         $newUser->refer_by_id = $referredBy->id;
+                         $add_referal_bonus = true;
+                     }else{
+                         return $this->sendError( 'Invalid Referral Code',[],202);
+                     }
+                    }
                     $newUser->save();
+                    if($add_referal_bonus){
+                        $data = ['type'  =>  'credit',
+                            'amount' => 100,
+                            'description' =>  "Referral Bonus. Referral Code Used : ".$request->referal_code,
+                            'status' => 1,
+                        ];
+                        $wallet = $newUser->transactions()
+                            ->create($data);
+                    }
                 }else{
                     $newUser = new User;
                     $newUser->mobile_no=$request->mobile_no;
                     $newUser->mobile_otp = rand(100000,999999);
                     $newUser->mobile_otp_time = Carbon::now();
+                    $newUser->my_referal_code=$this->generateRandomString(8);
+                    if($request->has('referal_code')){
+                        $referredBy = User::where('my_referal_code',$request->referal_code)->first();
+                        if(!is_null($referredBy)){
+                            $newUser->refer_by_id = $referredBy->id;
+                            $add_referal_bonus = true;
+                        }else{
+                            return $this->sendError( 'Invalid Referral Code',[],202);
+                        }
+                    }
                     $newUser->save();
+                    if($add_referal_bonus){
+                        $data = ['type'  =>  'credit',
+                            'amount' => 100,
+                            'description' =>  "Referral Bonus. Referral Code Used : ".$request->referal_code,
+                            'status' => 1,
+                        ];
+                        $wallet = $newUser->transactions()
+                            ->create($data);
+                    }
                 }
-
-
             }
 
 
@@ -782,8 +821,46 @@ class AuthController extends BaseController
                 return $this->sendResponse([], 'OTP Send Failed',false);
             }
 
-        }catch (Exception $e){
-            return $this->sendError('Something Went Wrong', $e,413);
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e->getMessage(),413);
+        }
+    }
+
+    public function generateRandomString($length = 8)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        if(User::where('my_referal_code',$randomString)->first()){
+            return $this->generateRandomString($length);
+        }
+        return $randomString;
+    }
+
+    public function getReferralDetails(Request $request){
+        try {
+            $validator = Validator::make($request->all(), [
+
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $response = [];
+            $response['referredByAmount'] = 100;
+            $response['referredToAmount'] = 100;
+            $response['minimumOrderAmount'] = 500;
+            $response['referralCode'] = Auth::user()->my_referal_code;
+            if(!is_null(Auth::user()->my_referal_code)){
+                return $this->sendResponse($response, 'Referral Details Fetched Successfully');
+            }else{
+                return $this->sendResponse([], 'Referral Details Not Available Successfully',false);
+            }
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e->getMessage(),413);
         }
     }
 

@@ -175,3 +175,6 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
 
 
 });
+Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'user','as' => 'user.'], function () {
+    Route::get('getReferralDetails',[AuthController::class,'getReferralDetails']);
+});
