@@ -61,6 +61,7 @@ class ProductController extends Controller{
                 'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_new'=>'required|boolean',
+                'is_live'=>'required|boolean',
                 'description'=>'nullable|string'
             ]);
 
@@ -74,6 +75,7 @@ class ProductController extends Controller{
             $newProduct->available_colors="NA";
             $newProduct->description=$request->has('description')?$request->description:null;
             $newProduct->is_new=$request->is_new;
+            $newProduct->is_live=$request->is_live;
             $newProduct->is_on_sale=$request->is_on_sale;
             $newProduct->sale_price=$request->has('sale_price')?$request->sale_price:null;
             $newProduct->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
@@ -127,6 +129,7 @@ class ProductController extends Controller{
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_new'=>'nullable|boolean',
+                'is_live'=>'nullable|boolean',
                 'description'=>'nullable|string'
             ]);
             //dd($request->all());
@@ -136,6 +139,7 @@ class ProductController extends Controller{
             $product->price=$request->has('price')?$request->price:null;
             $product->description=$request->has('description')?$request->description:null;
             $product->is_new = $request->has('is_new')? $request->is_new:$product->is_new;
+            $product->is_live = $request->has('is_live')? $request->is_live:$product->is_live;
             $product->is_on_sale = $request->has('is_on_sale')? $request->is_on_sale:$product->is_on_sale;
             $product->sale_price=$request->has('sale_price')?$request->sale_price:null;
             $product->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;

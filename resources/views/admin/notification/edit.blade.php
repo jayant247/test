@@ -95,6 +95,16 @@
 							                @endif
 			                            </div>
 
+			                            <div class="form-group col-md-4" id="topic">
+			                            	<label>Notification Topic</label>
+			                                <input type="text" name="topic" class="form-control input-default" placeholder="Enter Notification Topic" value="{{$notification->topic}}">
+			                                @if($errors->has('topic'))
+							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+							                        {{ $errors->first('topic') }}
+							                    </p>
+							                @endif
+			                            </div>
+
 			                            <div class="form-group col-md-4" id="mobile_body">
 			                            	<label>Mobile Body</label>
 			                                <input type="text" name="mobile_body" class="form-control input-default" placeholder="Enter Mobile Body" value="{{$notification->mobile_body}}">
@@ -168,15 +178,18 @@
         $("#registered_till").hide();
         }   	
 	});
+	$('#topic').hide();
     $('#mobile_body').hide();
 	$('#mail_body').hide();
     $('#sms_body').hide(); 
     $('#mobile_image').hide();
     function mobile_fields(checkbox) {
 	    if(checkbox.checked == true){
+	    	$('#topic').show();
 	        $('#mobile_body').show(); 
 	        $('#mobile_image').show();
 	    }else{
+	    	$('#topic').hide();
 	        $('#mobile_body').hide();
 		    $('#mobile_image').hide();
 	   }
@@ -206,6 +219,7 @@
         }
         if (is_mobile){
         	$("#for_mobile").prop("checked", true);
+        	$('#topic').show();
 	        $('#mobile_body').show(); 
 	        $('#mobile_image').show();
 	    }
