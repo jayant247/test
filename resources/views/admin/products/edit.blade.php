@@ -116,6 +116,24 @@
 							                @endif
 	                                	</div>
 
+	                                	<div class="col-md-4">
+	                                        <label class="mr-sm-2">Is Live</label>
+	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_live" value="{{ $product->is_live }}">
+	                                        	@if($product->is_live === 1)
+	                                            	<option value="{{ $product->is_live}}" selected="selected">Yes</option>
+	                                            	<option value="0">NO</option>
+	                                            @elseif($product->is_live === 0)
+	                                            	<option value="{{ $product->is_live}}" selected="selected">NO</option>
+	                                            	<option value="1">YES</option>
+	                                            @endif
+	                                        </select>
+	                                        @if($errors->has('is_live'))
+							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+							                        {{ $errors->first('is_live') }}
+							                    </p>
+							                @endif
+	                                	</div>
+
 	                                	<div class="form-group col-md-4">
 			                            	<label><br>Primary Image</label>
 		                                	<div class="form-group">

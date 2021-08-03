@@ -43,6 +43,7 @@ class NotificationController extends Controller{
                 'is_mail'=>'nullable',
                 'is_sms'=>'nullable',   
                 'mobile_body' => 'required_if:is_mobile,==,1|string', 
+                'topic' => 'nullable|string',
                 'mail_body' => 'nullable|string',       
                 'sms_body' => 'nullable|string',
                 'mobile_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
@@ -55,6 +56,7 @@ class NotificationController extends Controller{
             $newNotification->heading=$request->heading;
             $newNotification->is_mobile=$request->has('is_mobile')?$request->is_mobile:null;
             $newNotification->mobile_body=$request->has('mobile_body')?$request->mobile_body:null;
+            $newNotification->topic=$request->has('topic')?$request->mobile_body:null;
             $newNotification->is_mail=$request->has('is_mail')?$request->is_mail:null;
             $newNotification->mail_body=$request->has('mail_body')?$request->mail_body:null;
             $newNotification->is_sms=$request->has('is_sms')?$request->is_sms:null;
@@ -97,6 +99,7 @@ class NotificationController extends Controller{
                 'is_mail'=>'nullable',
                 'is_sms'=>'nullable',   
                 'mobile_body' => 'nullable|string', 
+                'topic' => 'nullable|string',
                 'mail_body' => 'nullable|string',       
                 'sms_body' => 'nullable|string',
                 'mobile_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
@@ -110,6 +113,7 @@ class NotificationController extends Controller{
                 $notification->is_mobile=$request->has('is_mobile')?$request->is_mobile:$$notification->is_mobile;
                 $notification->is_mail=$request->has('is_mail')?$request->is_mail:$$notification->is_mail;
                 $notification->is_sms=$request->has('is_sms')?$request->is_sms:$$notification->is_sms;
+                $notification->topic=$request->has('topic')?$request->topic:$$notification->topic;
                 $notification->mobile_body=$request->has('mobile_body')?$request->mobile_body:$$notification->mobile_body;
                 $notification->mail_body=$request->has('mail_body')?$request->mail_body:$$notification->mail_body;
                 $notification->sms_body=$request->has('sms_body')?$request->sms_body:$$notification->sms_body;

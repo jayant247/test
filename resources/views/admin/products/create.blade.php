@@ -107,6 +107,20 @@
 							                @endif
 	                                	</div>
 
+	                                	<div class="col-md-4">
+	                                        <label class="mr-sm-2">Is Live*</label>
+	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_live" >
+	                                            <option selected="selected">Choose...</option>
+	                                            <option value="1">YES</option>
+	                                            <option value="0">NO</option>
+	                                        </select>
+	                                        @if($errors->has('is_live'))
+							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
+							                        {{ $errors->first('is_live') }}
+							                    </p>
+							                @endif
+	                                	</div>
+
 	                                	<div class="form-group col-md-4">
 			                            	<label><br>Primary Image</label>
 		                                	<div class="form-group">

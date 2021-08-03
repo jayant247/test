@@ -16,6 +16,7 @@ use App\Http\Controllers\CRM\ProductDescriptionController;
 use App\Http\Controllers\CRM\ProductVariableController;
 use App\Http\Controllers\CRM\NotificationController;
 use App\Http\Controllers\CRM\DashboardController;
+use App\Http\Controllers\CRM\ReportController;
 //use App\Http\Controllers\CRM\OrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -60,6 +61,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('productVariable',ProductVariableController::class);
     Route::resource('notification',NotificationController::class);
     Route::resource('dashboard',DashboardController::class);
+    Route::resource('report',ReportController::class);
     Route::get('orders/{id}',[OrderController::class,'orderindex'])->name('orderindex');
     Route::post('confirmOrder/{id}',[OrderController::class,'confirmOrder'])->name('confirmOrder');
     //order
@@ -93,4 +95,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('productVariable/create/{id}',[ProductVariableController::class,'createNewProductVariable'])->name('productVariable.create');
     Route::get('productVariable/destroyImage/{id}',[ProductVariableController::class,'destroyImage'])->name('productVariable.destroyImage');
     Route::get('getOrders',[OrderController::class,'getOrders'])->name('getOrders');
+    //Dashboard
+    Route::post('dashboardForDate',[DashboardController::class,'dashboardForDate'])->name('dashboardForDate');
+    // Reports
+    Route::post('exportOrders',[ReportController::class,'exportOrders'])->name('exportOrders');
+    Route::post('exportSoldProducts',[ReportController::class,'exportSoldProducts'])->name('exportSoldProducts');
 });

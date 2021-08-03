@@ -115,7 +115,11 @@
                     <i class="icon-badge menu-icon"></i><span class="nav-text">Support</span>
                 </a>
             </li>
-
+            <li>
+                <a href="{{route('report.index')}}" aria-expanded="false">
+                    <i class="icon-badge menu-icon"></i><span class="nav-text">Reports</span>
+                </a>
+            </li>
         </ul>
     </div>
 </div>

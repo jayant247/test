@@ -117,6 +117,12 @@
                             </tbody>
                             <tbody>                                   
                                 <tr>
+                                    <td>Is Live? :</td>
+                                    <td>{{$product->is_live}}</td>
+                                </tr>
+                            </tbody>
+                            <tbody>                                   
+                                <tr>
                                     <td>Product Image :</td>
                                     <td>
                                         <a href="{{env('APP_URL').$product->primary_image}}" target="_blank" data-lightbox="primary_photo">
