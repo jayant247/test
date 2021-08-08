@@ -750,6 +750,9 @@ class AuthController extends BaseController
 
             $add_referal_bonus = false;
             $response=[];
+            if(!is_null(User::where('mobile_no',$request->mobile_no)->onlyTrashed()->first())){
+                return $this->sendError('Your Account Is Blocked By Admin', [],201);
+            }
             if(!is_null(User::where('mobile_no',$request->mobile_no)->first())){
                 $newUser = User::where('mobile_no',$request->mobile_no)->first();
                 $newUser->mobile_otp = rand(100000,999999);
@@ -763,7 +766,7 @@ class AuthController extends BaseController
                     $newUser->imei_number = '';
                     $newUser->name = '';
                     $newUser->my_referal_code=$this->generateRandomString(8);
-//                    $newUser->email = '';
+                    $newUser->email = '';
                     $newUser->mobile_otp = rand(100000,999999);
                     $newUser->mobile_otp_time = Carbon::now();
                     if($request->has('referal_code')){

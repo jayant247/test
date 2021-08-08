@@ -87,6 +87,8 @@ Route::group(['middleware' => ['jwt.verify'],'prefix' => 'metadata','as' => 'met
     Route::get('getWalletTransaction',[UserDetailsController::class,'getWalletTransaction']);
     Route::get('getWalletBalance',[UserDetailsController::class,'getWalletBalance']);
     Route::get('addWalletBalance',[UserDetailsController::class,'addWalletBalance']);
+    //feedback
+    Route::post('createFeedback',[UserDetailsController::class,'createFeedback']);
 
     //delivery available pincode
     Route::post('create',[DeliveryPincodeController::class,'create']);
@@ -173,10 +175,12 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
 
     Route::get('getAllTicketMessage',[TicketController::class,'getAllTicketMessage']);
 
+    //feedback api
+
 
 });
 Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'user','as' => 'user.'], function () {
     Route::get('getReferralDetails',[AuthController::class,'getReferralDetails']);
 });
 
-Route::get('login',[\App\Http\Controllers\Helper\ShiprocketController::class,'getAuthToken']);
+Route::get('login',[\App\Http\Controllers\Helper\ShiprocketController::class,'placeOrder']);

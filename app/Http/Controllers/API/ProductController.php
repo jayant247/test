@@ -32,7 +32,7 @@ class ProductController extends BaseController{
                 'sortByPrice'=>'boolean',
                 'sortBySalePercentage'=>'boolean',
                 'isOnSale'=>'boolean',
-                'sortByNew'=>'boolean',
+                'is_new'=>'boolean',
                 'bestSelling'=>'boolean',
                 'priceRangeHigh'=>'numeric',
                 'priceRangeLow'=>'numeric',
@@ -86,14 +86,14 @@ class ProductController extends BaseController{
             }
 
             if($request->has('sortByPrice')){
-                if($request->sortByPrice){
+                if($request->is_new){
                     $query =$query->orderBy('price','DESC');
                 }else{
                     $query =$query->orderBy('price','ASC');
                 }
 
             }
-            if($request->has('sortByNew')){
+            if($request->has('is_new')){
                 if($request->sortByNew){
                     $query =$query->orderBy('is_new','DESC');
                 }else{
@@ -1164,8 +1164,14 @@ class ProductController extends BaseController{
                 if(is_null($order)){
                     $productData['canGiveReview']=false;
                 }else{
-                    $productData['canGiveReview']=true;
+                    $review = ProductReview::where('product_id',$productData->id)->where('user_id',Auth::user()->id)->first();
+                    if(is_null($review)){
+                        $productData['canGiveReview']=true;
+                    }else{
+                        $productData['canGiveReview']=false;
+                    }
                 }
+
                 if(!is_null(UserWhishlist::whereUserId(Auth::user()->id)->whereProductId($id)->first())){
                     $productData['isInUserWishList']=true;
                 }else{

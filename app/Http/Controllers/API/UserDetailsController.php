@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Models\Category;
+use App\Models\Feedback;
 use App\Models\Products;
 use App\Models\ProductVariables;
 use App\Models\User;
@@ -444,6 +445,31 @@ class UserDetailsController extends BaseController{
 
 
             return $this->sendResponse(['walletBalance'=>$walletBalance],'Data Added Successfully', true);
+
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e->getMessage(),413);
+        }
+    }
+
+    public function createFeedback(Request $request){
+        try{
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'feedback'=>'required|string'
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $user = Auth::user();
+            $newfeedback = new Feedback;
+            $newfeedback->feedback = $request->feedback;
+            $newfeedback->user_id = $user->id;
+
+            if($newfeedback->save()){
+                return $this->sendResponse([],'Feedback Added Successfully', true);
+            }else{
+                return $this->sendResponse([],'Feedback Not Added', false);
+            }
+
 
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', $e->getMessage(),413);

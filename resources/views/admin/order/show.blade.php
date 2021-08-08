@@ -214,8 +214,8 @@
                                 <input required class="form-control input-default" name="length" id="length" type="number">
                             </div>
                             <div class="col-md-4">
-                                <label>Width</label>
-                                <input required class="form-control input-default" name="width" id="width" type="number">
+                                <label>Breadth</label>
+                                <input required class="form-control input-default" name="breadth" id="breadth" type="number">
                             </div>
                             <div class="col-md-4">
                                 <label>Weight</label>
@@ -243,4 +243,7 @@
 @endsection
 
 @section('js')
+    <script>
+
+    </script>
 @endsection

@@ -101,6 +101,10 @@ class OrderController extends Controller{
     public function confirmOrder(Request $request, $id){
         $order = Order::find($id);
         $order->order_status=6;
+        $order->height=$request->height;
+        $order->breadth=$request->breadth;
+        $order->length=$request->length;
+        $order->weight=$request->weight;
         $order->save();
         return Redirect::back();
     }

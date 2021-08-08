@@ -126,6 +126,7 @@
 
     <script>
         let order_status =  {!! json_encode($id) !!};
+        order_status = parseInt(order_status);
         var orders = [];
         var query = '';
         var pageLimit = 10;

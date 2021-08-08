@@ -44,12 +44,12 @@ class ProductController extends Controller{
     }
 
     public function create(Request $request){
-        $categories = Category::all();
+        $categories = Category::whereNull('parent_id')->get();
 
         return view('admin.products.create',compact(['categories']));
     }
 
-    public function store(Request $request){        
+    public function store(Request $request){
         try {
             $request->validate([
                 'product_name'=>'required|string',
@@ -77,8 +77,13 @@ class ProductController extends Controller{
             $newProduct->is_new=$request->is_new;
             $newProduct->is_live=$request->is_live;
             $newProduct->is_on_sale=$request->is_on_sale;
-            $newProduct->sale_price=$request->has('sale_price')?$request->sale_price:null;
-            $newProduct->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
+            if($request->is_on_sale){
+                $newProduct->sale_price=$request->has('sale_price')?$request->sale_price:0;
+                $newProduct->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:0;
+            }else{
+                $newProduct->sale_price=0;
+                $newProduct->sale_percentage=0;
+            }
             $newProduct->primary_image =$this->saveImage($request->primary_image);
             $newProduct->save();
 
@@ -88,7 +93,7 @@ class ProductController extends Controller{
                     $productImages->product_id = $newProduct->id;
                     $productImages->imagePath = $this->saveImage($image);
                     $productImages->save();
-                }  
+                }
             }
 
             foreach ($request->subCategories as $key=>$subCategory){
@@ -108,7 +113,7 @@ class ProductController extends Controller{
             if($newProduct->save()){
                 return redirect()->route('product.index')
                         ->with('success','Product created successfully.');
-            }else{        
+            }else{
                 return $this->sendError('Product Creation Failed',[], 422);
             }
         }
@@ -117,7 +122,7 @@ class ProductController extends Controller{
         }
     }
 
-    public function update(Request $request, $id){        
+    public function update(Request $request, $id){
         try {
             $request->validate([
                 'product_name'=>'nullable|string',
@@ -156,7 +161,7 @@ class ProductController extends Controller{
                     $productImages->product_id = $product->id;
                     $productImages->imagePath = $this->saveImage($image);
                     $productImages->save();
-                }  
+                }
             }
 
             foreach ($request->subCategories as $key=>$subCategory){
@@ -175,7 +180,7 @@ class ProductController extends Controller{
             if($product->save()){
                 return redirect()->route('product.index')
                         ->with('success','Product Updated successfully.');
-            }else{        
+            }else{
                 return $this->sendError('Product Updation Failed',[], 422);
             }
         }

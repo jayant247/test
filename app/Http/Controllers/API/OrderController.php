@@ -1042,7 +1042,7 @@ class OrderController extends BaseController{
 //            $limit = (int)$request->limit;
 //            $pageNo = $request->pageNo;
 //            $skip = $limit*$pageNo;
-            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('payment_status',2)->whereUserId(Auth::user()->id)->orderBy('id','DESC')->get()->toArray();
+            $orders = Order::with(['orderStatus','paymentStatus','orderItems','orderItems.productVariable','orderItems.productVariable.productDetails','addressDetails'])->where('payment_status',2)->orWhere('payment_status',4)->whereUserId(Auth::user()->id)->orderBy('id','DESC')->get()->toArray();
             if(count($orders)>0){
                 return $this->sendResponse($orders,'Data Fetched Successfully', true);
             }else{
