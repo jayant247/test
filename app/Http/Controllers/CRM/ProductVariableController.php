@@ -72,14 +72,21 @@ class ProductVariableController extends Controller{
             $newProductVariable->quantity=$request->quantity;
             $newProductVariable->shelf_no=$request->shelf_no;
             $newProductVariable->primary_image =$this->saveImage($request->primary_image);
-            $newProductVariable->sale_price=$request->has('sale_price')?$request->sale_price:null;
-            $newProductVariable->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:null;
-            $newProductVariable->type=$request->has('type')?$request->type:null;
-            if($request->is_on_sale == 1){
+            if($request->is_on_sale){
+                $newProductVariable->sale_price=$request->has('sale_price')?$request->sale_price:0;
+                $newProductVariable->sale_percentage=$request->has('sale_percentage')?$request->sale_percentage:0;
                 $newProductVariable->is_on_sale = true;
-            }elseif ($request->is_on_sale == 0) {
+            }else{
+                $newProductVariable->sale_price=0;
+                $newProductVariable->sale_percentage=0;
                 $newProductVariable->is_on_sale = false;
             }
+            $newProductVariable->type=$request->has('type')?$request->type:null;
+            // if($request->is_on_sale == 1){
+            //     $newProductVariable->is_on_sale = true;
+            // }elseif ($request->is_on_sale == 0) {
+            //     $newProductVariable->is_on_sale = false;
+            // }
             $newProductVariable->product_id=$request->product_id;
             $newProductVariable->save();
 
@@ -92,7 +99,7 @@ class ProductVariableController extends Controller{
                     $productImages->save();
                 }  
             }            
-            //$productVariable = ProductVariables::find($newProductVariable->id);
+            $productVariable = ProductVariables::find($newProductVariable->id);
             $qrData = new ProductVariables;
             $qrData->id = $newProductVariable->id;
             $qrData->product_id = $newProductVariable->product_id;
@@ -101,7 +108,9 @@ class ProductVariableController extends Controller{
             $qrData->shelf_no = $newProductVariable->shelf_no;
             $image = QrCode::size(90)
                         ->generate($qrData);
-            $newProductVariable->qr_image = $this->saveImage($image);
+            //dd($image);
+            $newProductVariable->qr_image = $image;
+            //$newProductVariable->qr_image = $this->saveImage($image);
             $newProductVariable->save();
             if($newProductVariable->save()){
                 return redirect()->route('product.index')
