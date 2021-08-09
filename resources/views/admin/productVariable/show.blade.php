@@ -66,7 +66,7 @@
                            </tr>
                            <tr>
                                <th>QR</th>
-                               <td>{{$image}} <button onclick="svg2img()">download</button></td>
+                               <td><img src="{{env('APP_URL').$productVariable->qr_image}}"> <a href="{{env('APP_URL').$productVariable->qr_image}}" class="btn btn-outlined-primary" download>Download</a></td>
                            </tr>
                            <!-- <tr>
                                <th>QR</th>
@@ -78,7 +78,7 @@
                                 <td><a href="{{env('APP_URL').$productVariable->primary_image}}" target="_blank" data-lightbox="Primary_Photo"><img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$productVariable->primary_image}}">
                                 </a>
                             </td>
-                           </tr>   
+                           </tr>
                            <tr>
                                <th>Other Image</th>
                                 <td>
@@ -99,7 +99,7 @@
                                     @endforeach
                                     </div>
                                 </td>
-                           </tr>                                               
+                           </tr>
                        </tbody>
                     </table>
                 </div>

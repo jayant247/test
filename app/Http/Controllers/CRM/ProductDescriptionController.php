@@ -58,9 +58,9 @@ class ProductDescriptionController extends Controller{
             $newProdcutDescription->property_value=$request->property_value;
             $newProdcutDescription->product_id=$request->product_id;
             if($newProdcutDescription->save()){
-                return redirect()->route('product.index')
+                return redirect()->route('product.show',$newProdcutDescription->product_id)
                         ->with('success','Product Description created successfully.');
-            }else{        
+            }else{
                 return $this->sendError('Product Description Creation Failed',[], 422);
             }
 
@@ -84,7 +84,7 @@ class ProductDescriptionController extends Controller{
                 $productDescription->property_name=$request->has('property_name')?$request->property_name:$productDescription->property_name;
                 $productDescription->property_value=$request->has('property_value')?$request->property_value:$productDescription->property_value;
                 if($productDescription->save()){
-                    return redirect()->route('product.index')
+                    return redirect()->route('product.show',$productDescription->product_id)
                         ->with('success','Product Description updated successfully.');
                 }else{
                     return $this->sendError('Product Description Updation Failed',[], 422);

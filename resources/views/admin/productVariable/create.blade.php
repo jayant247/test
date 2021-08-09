@@ -33,7 +33,7 @@
 							                        {{ $errors->first('color') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Size*</label>
@@ -43,7 +43,7 @@
 							                        {{ $errors->first('size') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Price*</label>
@@ -53,7 +53,7 @@
 							                        {{ $errors->first('price') }}
 							                    </p>
 							                @endif
-			                            </div>	 
+			                            </div>
 			                        </div>
 
 			                        <div class="row">
@@ -65,7 +65,7 @@
 							                        {{ $errors->first('mrp') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Quantity*</label>
@@ -75,7 +75,7 @@
 							                        {{ $errors->first('quantity') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Type</label>
@@ -85,7 +85,7 @@
 							                        {{ $errors->first('type') }}
 							                    </p>
 							                @endif
-			                            </div>	 
+			                            </div>
 			                        </div>
 
 			                        <div class="row">
@@ -155,14 +155,11 @@
 							                        {{ $errors->first('shelf_no') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
-		                                <div class="form-group col-md-4">
-							                <label>Product</label>
-							                <select class="form-control" name="product_id" id="product_id">
-							                    <option  value="{{$product->id}}">{{$product->product_name}} </option>
-							                </select>
-							            </div>
+                                        <select class="form-control" name="product_id" id="product_id" hidden>
+                                            <option  value="{{$product->id}}">{{$product->product_name}} </option>
+                                        </select>
 							        </div>
 		                            <div class="col-xs-12 col-sm-12 col-md-12 ">
 						            	<button type="submit" class="btn btn-primary">Add New Product Variable</button>
@@ -185,8 +182,8 @@
 </script>
 <script type="text/javascript">
     $('#sale_price').hide();
-    $('#sale_percentage').hide();  
-	$('#is_on_sale').change(function(){	
+    $('#sale_percentage').hide();
+	$('#is_on_sale').change(function(){
 		if( $(this).val()=== "1"){
         $("#sale_price").show();
         $("#sale_percentage").show();
@@ -194,7 +191,7 @@
         else{
         $("#sale_price").hide();
         $("#sale_percentage").hide();
-        }   	
+        }
 	});
 </script>
 @endsection

@@ -23,7 +23,7 @@
 		                    <div class="basic-form">
 		                        <form enctype="multipart/form-data" action="{{ route('productDescription.store') }}" method="POST">
 		                        	@csrf
-		                        	
+
 		                        	<div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Property Name*</label>
@@ -33,7 +33,7 @@
 							                        {{ $errors->first('property_name') }}
 							                    </p>
 							                @endif
-			                            </div>			                            
+			                            </div>
 
 			                        	<div class="form-group col-md-4">
 			                            	<label>Property Value*</label>
@@ -43,15 +43,15 @@
 							                        {{ $errors->first('property_value') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 
-			                            <div class="form-group col-md-4">
-							                <label>Product</label>
-							                <select class="form-control" name="product_id" id="product_id">
+
+
+							                <select class="form-control" name="product_id" id="product_id" hidden>
 							                    <option  value="{{$product->id}}">{{$product->product_name}} </option>
 							                </select>
-							            </div>
+
 							        </div>
 
 

@@ -24,9 +24,8 @@ class ProductVariableController extends Controller{
     public function show(Request $request, $id){
 
         $productVariable = ProductVariables::find($id);
-        $image = QrCode::size(100)->generate($productVariable);
         $productImages = ProductImages::where('product_variable_id', '=', $id)->get();
-        return view('admin.productVariable.show',compact(['productVariable','productImages','image']));
+        return view('admin.productVariable.show',compact(['productVariable','productImages']));
 
     }
 
@@ -89,6 +88,7 @@ class ProductVariableController extends Controller{
             //     $newProductVariable->is_on_sale = false;
             // }
             $newProductVariable->product_id=$request->product_id;
+            $newProductVariable->qr_image = 'none';
             $newProductVariable->save();
 
             if($request->has('other_images')){
@@ -106,11 +106,12 @@ class ProductVariableController extends Controller{
             $qrData->product_id = $newProductVariable->product_id;
             $qrData->color = $newProductVariable->color;
             $qrData->size = $newProductVariable->size;
-            $qrData->shelf_no = $newProductVariable->shelf_no;
-            $image = QrCode::size(90)
-                        ->generate($qrData);
-            //dd($image);
-            $newProductVariable->qr_image = $image;
+            $image = QrCode::format('png')->size(90)
+                ->generate($qrData);
+            $image_name = 'product_variable'.time().'-'.$newProductVariable->id.'.png';
+            $destinationPath = public_path('images/product_variable/').$image_name;
+            $success = file_put_contents($destinationPath, $image);
+            $newProductVariable->qr_image = '/images/product_variable/'.$image_name;
             //$newProductVariable->qr_image = $this->saveImage($image);
             $newProductVariable->save();
             if($newProductVariable->save()){
@@ -213,8 +214,10 @@ class ProductVariableController extends Controller{
 
     public function destroy(Request $request, $id)
     {
+        $productVariable = ProductVariables::find($id);
         ProductVariables::find($id)->delete();
-        return redirect()->route('product.index')
+
+        return redirect()->route('product.show',$productVariable->product_id)
                         ->with('success','product Variable deleted successfully');
     }
 }
