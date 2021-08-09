@@ -78,7 +78,7 @@
 
 	                                	<div class="form-group col-md-4">
 			                            	<label>Product Sale Price</label>
-			                                <input type="number" name="sale_price" class="form-control input-default" placeholder="Enter Product Sale Price" value="{{$product->sale_price}}">
+			                                <input type="number" name="sale_price" min="0" class="form-control input-default" placeholder="Enter Product Sale Price" value="{{$product->sale_price}}">
 			                                @if($errors->has('sale_price'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('sale_price') }}
@@ -88,7 +88,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Sale Percentage</label>
-			                                <input type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Sale Percentage" value="{{$product->sale_percentage}}">
+			                                <input type="number" name="sale_percentage" min="0" class="form-control input-default" placeholder="Enter Sale Percentage" value="{{$product->sale_percentage}}">
 			                                @if($errors->has('sale_percentage'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('sale_percentage') }}

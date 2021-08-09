@@ -149,7 +149,7 @@ class ProductVariableController extends Controller{
                 'sale_percentage' => 'required_if:is_on_sale,"1"|numeric|min:0|max:100',
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'quantity' => 'nullable|numeric',
+                'quantity' => 'nullable|numeric|min:0',
                 'type' => 'nullable|string'
             ]);
 
@@ -206,9 +206,11 @@ class ProductVariableController extends Controller{
         }
     }
 
-    public function destroyImage(ProductImages $producImage){
-        $producImage->delete();
-        return redirect()->route('product.index')
+    public function destroyImage(Request $request, $id){
+        $productImage = ProductImages::find($id);
+        $productId = $productImage->product_id;
+        $productImage->delete();
+        return redirect()->route('product.show',$productId)
                         ->with('success','Product Image deleted successfully');
     }
 

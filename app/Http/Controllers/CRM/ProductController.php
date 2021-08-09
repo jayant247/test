@@ -26,7 +26,7 @@ class ProductController extends Controller{
         // dd('show');
         $product = Products::find($id);
         $productDescriptions = ProductDescription::where("product_id", "=", $product->id)->get();
-        $productImages = ProductImages::where("product_id", "=", '146')->get();
+        $productImages = ProductImages::where("product_id", "=", $product->id)->get();
         //dd($productImages);
         $productVariables = ProductVariables::where("product_id", "=", $product->id)->get();
         //$productImages = ProductImages::where('product_id', '=', $id)->get();
