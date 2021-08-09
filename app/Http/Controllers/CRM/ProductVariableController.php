@@ -7,6 +7,7 @@ use App\Models\ProductImages;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Support\Facades\Redirect;
 use Validator;
 use QrCode;
 
@@ -56,8 +57,8 @@ class ProductVariableController extends Controller{
                 'mrp' => 'required|numeric',
                 'is_on_sale' => 'required|boolean',
                 'sale_price' => 'nullable|numeric',
-                'sale_percentage' => 'nullable|numeric',                
-                'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'sale_percentage' => 'nullable|numeric',
+                'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'required|numeric',
                 'shelf_no' => 'required',
@@ -67,7 +68,7 @@ class ProductVariableController extends Controller{
             $newProductVariable = new ProductVariables;
             $newProductVariable->color=$request->color;
             $newProductVariable->size=$request->size;
-            $newProductVariable->price=$request->price;           
+            $newProductVariable->price=$request->price;
             $newProductVariable->mrp=$request->mrp;
             $newProductVariable->quantity=$request->quantity;
             $newProductVariable->shelf_no=$request->shelf_no;
@@ -97,8 +98,8 @@ class ProductVariableController extends Controller{
                     $productImages->imagePath = $this->saveImage($image);
                     $productImages->product_variable_id = $newProductVariable->id;
                     $productImages->save();
-                }  
-            }            
+                }
+            }
             $productVariable = ProductVariables::find($newProductVariable->id);
             $qrData = new ProductVariables;
             $qrData->id = $newProductVariable->id;
@@ -113,9 +114,10 @@ class ProductVariableController extends Controller{
             //$newProductVariable->qr_image = $this->saveImage($image);
             $newProductVariable->save();
             if($newProductVariable->save()){
+                return Redirect::back();
                 return redirect()->route('product.index')
                         ->with('success','Product Variable created successfully.');
-            }else{        
+            }else{
                 return $this->sendError('Product Variable Creation Failed',[], 422);
             }
 
@@ -143,7 +145,7 @@ class ProductVariableController extends Controller{
                 'mrp' => 'nullable|numeric',
                 'is_on_sale' => 'nullable|boolean',
                 'sale_price' => 'nullable|numeric',
-                'sale_percentage' => 'nullable|numeric',                
+                'sale_percentage' => 'nullable|numeric',
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'nullable|numeric',
@@ -185,7 +187,7 @@ class ProductVariableController extends Controller{
                         $productImages->imagePath = $this->saveImage($image);
                         $productImages->product_variable_id = $productVariable->id;
                         $productImages->save();
-                    }  
+                    }
                 }
                 if($productVariable->save()){
                     return redirect()->route('product.index')

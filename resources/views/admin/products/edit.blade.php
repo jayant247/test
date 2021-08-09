@@ -34,7 +34,7 @@
 							                        {{ $errors->first('product_name') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Price</label>
@@ -55,16 +55,16 @@
 							                    </p>
 							                @endif
 			                            </div>
-			                        </div>			                        
+			                        </div>
 
 			                        <div class="row">
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is On Sale</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_on_sale" value="{{ $product->is_on_sale }}">
-	                                        	@if($product->is_on_sale === 1)
+	                                        	@if($product->is_on_sale == 1)
 	                                            	<option value="{{ $product->is_on_sale}}" selected="selected">Yes</option>
 	                                            	<option value="0">NO</option>
-	                                            @elseif($product->is_on_sale === 0)
+	                                            @elseif($product->is_on_sale == 0)
 	                                            	<option value="{{ $product->is_on_sale}}" selected="selected">NO</option>
 	                                            	<option value="1">YES</option>
 	                                            @endif
@@ -97,14 +97,14 @@
 			                            </div>
 							        </div>
 
-							        <div class="row">                         
+							        <div class="row">
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is New</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_new" value="{{ $product->is_new }}">
-	                                        	@if($product->is_new === 1)
+	                                        	@if($product->is_new == 1)
 	                                            	<option value="{{ $product->is_new}}" selected="selected">Yes</option>
 	                                            	<option value="0">NO</option>
-	                                            @elseif($product->is_new === 0)
+	                                            @elseif($product->is_new == 0)
 	                                            	<option value="{{ $product->is_new}}" selected="selected">NO</option>
 	                                            	<option value="1">YES</option>
 	                                            @endif
@@ -119,10 +119,10 @@
 	                                	<div class="col-md-4">
 	                                        <label class="mr-sm-2">Is Live</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_live" value="{{ $product->is_live }}">
-	                                        	@if($product->is_live === 1)
+	                                        	@if($product->is_live == 1)
 	                                            	<option value="{{ $product->is_live}}" selected="selected">Yes</option>
 	                                            	<option value="0">NO</option>
-	                                            @elseif($product->is_live === 0)
+	                                            @elseif($product->is_live == 0)
 	                                            	<option value="{{ $product->is_live}}" selected="selected">NO</option>
 	                                            	<option value="1">YES</option>
 	                                            @endif
@@ -198,7 +198,7 @@
 		        </div>
 	        </div>
         </div>
-	
+
 @endsection
 
 @section('js')
@@ -211,7 +211,7 @@
 	$(document).ready(function() {
 		$('#categories').select2();
 	});
-	
+
 	$(document).ready(function() {
 	    $('#subCategories').select2();
 	});
@@ -223,7 +223,7 @@
     	var storeOptions = [];
     	console.log(orgCategory)
     	$('#categories').select2().val(orgCategory);
-    	
+
     	$('#categories').select2().trigger({
 		    type: 'select2:select',
 		    params: {
@@ -235,7 +235,7 @@
 		  //console.log("shubham")
 		});
         function getData(parent_ids) {
-    	
+
         let dataToSend = {}
         //$("#subCategories").empty();
         dataToSend['url']= "{!! route('getSubCategory') !!}"+"/?parent_id="+parent_ids
@@ -250,17 +250,17 @@
                 for(let item of data['data']){
                 	if(!storeOptions.includes(item["id"])){
                 	$("#subCategories").append('<option value=' + item["id"] + '>' + item["category_name"] + '</option>');
-         
+
                 	storeOptions.push(item["id"]);
-                	
+
                 	}
-                	
+
                 }
                 if(firstLoad){
                 	$('#subCategories').val(orgSubCategory).trigger('change');
                 	firstLoad = false;
                 }
-                
+
             }else{
                 showToast('error','Error',/*data['message']*/'Select Category First');
             }
