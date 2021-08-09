@@ -35,6 +35,7 @@ class ProductController extends Controller{
 
     public function edit(Request $request, $id){
         $product = Products::find($id);
+        //dd($product);
         $categories = Category::all();
         $product_categories = ProductHasCategory::
         where("product_id", "=", $product->id)->select('category_id')->distinct()->pluck('category_id');
@@ -53,10 +54,10 @@ class ProductController extends Controller{
         try {
             $request->validate([
                 'product_name'=>'required|string',
-                'price'=>'required|numeric',
-                'mrp' => 'required|numeric',
-                'sale_price'=>'nullable|numeric',
-                'sale_percentage'=>'nullable|numeric',
+                'price'=>'required|numeric|min:0',
+                'mrp' => 'required|numeric|min:0',
+                'sale_price'=>'nullable|numeric|min:0',
+                'sale_percentage'=>'nullable|numeric|min:0|max:100',
                 'is_on_sale'=>'required|boolean',
                 'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
@@ -126,10 +127,10 @@ class ProductController extends Controller{
         try {
             $request->validate([
                 'product_name'=>'nullable|string',
-                'price'=>'nullable|numeric',
-                'mrp' => 'nullable|numeric',
-                'sale_price'=>'nullable|numeric',
-                'sale_percentage'=>'nullable|numeric',
+                'price'=>'nullable|numeric|min:0',
+                'mrp' => 'nullable|numeric|min:0',
+                'sale_price'=>'nullable|numeric|min:0',
+                'sale_percentage'=>'nullable|numeric|min:0|max:100',
                 'is_on_sale'=>'nullable|boolean',
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
