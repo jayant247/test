@@ -27,17 +27,17 @@
 		                        	<div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Product Name*</label>
-			                                <input type="text" name="product_name" class="form-control input-default" placeholder="Enter Product Name">
+			                                <input value="{{old('product_name')}}" type="text" name="product_name" class="form-control input-default" placeholder="Enter Product Name">
 			                                @if($errors->has('product_name'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('product_name') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Price*</label>
-			                                <input type="number" name="price" class="form-control input-default" placeholder="Enter Product Price">
+			                                <input value="{{old('price')}}" type="number" name="price" class="form-control input-default" placeholder="Enter Product Price">
 			                                @if($errors->has('price'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('price') }}
@@ -47,14 +47,14 @@
 
 			                        	<div class="form-group col-md-4">
 			                            	<label>Product MRP*</label>
-			                                <input type="number" name="mrp" class="form-control input-default" placeholder="Enter Product MRP">
+			                                <input value="{{old('mrp')}}" type="number" name="mrp" class="form-control input-default" placeholder="Enter Product MRP">
 			                                @if($errors->has('mrp'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('mrp') }}
 							                    </p>
 							                @endif
 			                            </div>
-			                        </div>			                        
+			                        </div>
 
 			                        <div class="row">
 			                            <div class="col-md-4">
@@ -73,7 +73,7 @@
 
 	                                	<div class="form-group col-md-4">
 			                            	<label>Product Sale Price</label>
-			                                <input type="number" name="sale_price" class="form-control input-default" placeholder="Enter Product Sale Price">
+			                                <input value="{{old('sale_price')}}" type="number" name="sale_price" class="form-control input-default" placeholder="Enter Product Sale Price">
 			                                @if($errors->has('sale_price'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('sale_price') }}
@@ -83,7 +83,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Sale Percentage</label>
-			                                <input type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
+			                                <input value="{{old('sale_percentage')}}" type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
 			                                @if($errors->has('sale_percentage'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('sale_percentage') }}
@@ -124,7 +124,7 @@
 	                                	<div class="form-group col-md-4">
 			                            	<label><br>Primary Image</label>
 		                                	<div class="form-group">
-		                                        <input type="file" accept=".png, .jpg, .jpeg" name="primary_image" class="form-control-file">
+		                                        <input value="{{old('primary_image')}}" type="file" accept=".png, .jpg, .jpeg" name="primary_image" class="form-control-file">
 		                                        @if($errors->has('primary_image'))
 								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 								                        {{ $errors->first('primary_image') }}
@@ -136,7 +136,7 @@
 		                                <div class="form-group col-md-4">
 		                                	<label><br>Other Images</label>
 		                                	<div class="form-group">
-		                                        <input type="file" accept=".png, .jpg, .jpeg" name="other_images[]" class="form-control-file" multiple>
+		                                        <input value="{{old('other_images')}}" type="file" accept=".png, .jpg, .jpeg" name="other_images[]" class="form-control-file" multiple>
 		                                        @if($errors->has('other_images'))
 								                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 								                        {{ $errors->first('other_images') }}
@@ -151,7 +151,7 @@
 
 		                                <div class="form-group col-md-6">
 							                <label>Category*</label>
-			                                <select class="form-control 
+			                                <select class="form-control
 			                                " id="categories" name="categories[]" multiple="true">
 							                	@foreach($categories as $category)
 							                    	<option  value="{{$category->id}}">{{$category->category_name}} </option>
@@ -165,12 +165,12 @@
 											</select>
 										</div>
 
-							        </div>							  
+							        </div>
 
 							        <div class="row">
 	                                	<div class="form-group col-md-12">
 			                            	<label>Product Description</label>
-			                                <textarea name="description" class="form-control input-default" placeholder="Enter Product Description"></textarea>
+			                                <textarea name="description" class="form-control input-default" placeholder="Enter Product Description">{{old('description')}}</textarea>
 			                                @if($errors->has('description'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('description') }}
@@ -214,9 +214,9 @@
                 for(let item of data['data']){
                 	if(!storeOptions.includes(item["id"])){
                 	$("#subCategories").append('<option value=' + item["id"] + '>' + item["category_name"] + '</option>');
-         
+
                 	storeOptions.push(item["id"]);
-                	
+
                 	}
                 	}
             }else{

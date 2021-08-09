@@ -27,7 +27,7 @@
 		                        	<div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Property Name*</label>
-			                                <input type="text" name="property_name" class="form-control input-default" placeholder="Enter Property Name">
+			                                <input type="text" name="property_name" class="form-control input-default" placeholder="Enter Property Name" value="{{old('property_name')}}">
 			                                @if($errors->has('property_name'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('property_name') }}
@@ -37,7 +37,7 @@
 
 			                        	<div class="form-group col-md-4">
 			                            	<label>Property Value*</label>
-			                                <input type="text" name="property_value" class="form-control input-default" placeholder="Enter Property Value">
+			                                <input type="text" name="property_value" class="form-control input-default" placeholder="Enter Property Value" value="{{old('property_value')}}">
 			                                @if($errors->has('property_value'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('property_value') }}

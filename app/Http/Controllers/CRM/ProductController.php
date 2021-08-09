@@ -56,9 +56,11 @@ class ProductController extends Controller{
                 'product_name'=>'required|string',
                 'price'=>'required|numeric|min:0',
                 'mrp' => 'required|numeric|min:0',
-                'sale_price'=>'nullable|numeric|min:0',
-                'sale_percentage'=>'nullable|numeric|min:0|max:100',
+
+                'sale_price'=>'required_if:is_on_sale,"1"|numeric|min:0',
+                'sale_percentage'=>'required_if:is_on_sale,"1"|numeric|min:0|max:100',
                 'is_on_sale'=>'required|boolean',
+
                 'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_new'=>'required|boolean',

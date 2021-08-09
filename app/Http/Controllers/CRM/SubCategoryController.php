@@ -11,7 +11,8 @@ class SubCategoryController extends Controller{
 
     public function index(Request $request){
 
-        $categories = Category::with(['parentCategory'])->whereNotNull('parent_id')->get();
+        $categories = Category::with(['parentCategory'])->has('parentCategory')->whereNotNull('parent_id')->get();
+//        dd($categories);
         return view('admin.subcategory.index',compact(['categories']));
 
     }
@@ -151,7 +152,7 @@ class SubCategoryController extends Controller{
                         $category->is_bigthumbnail_show = false;
                     }
                 }
-                
+
                 //$category->is_bigthumbnail_show = $request->has('is_bigthumbnail_show')?$request->is_bigthumbnail_show:false;
 
                 if($category->save()){
@@ -175,7 +176,7 @@ class SubCategoryController extends Controller{
     }
 
     public function saveImage($image){
-        
+
         $image_name = 'category'.time().'.'.$image->getClientOriginalExtension();
         $destinationPath = public_path('images/category/');
         $image->move($destinationPath, $image_name);

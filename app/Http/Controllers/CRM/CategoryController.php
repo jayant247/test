@@ -39,7 +39,7 @@ class CategoryController extends Controller{
                 'category_name' => 'required|string',
                 'category_type'=>'nullable|string',
                 'category_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'big_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'big_thumbnail'=>'required_if:is_bigthumbnail_show,"1"|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'new_page_thumbnail'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'square_thumbnail'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_bigthumbnail_show'=>'nullable|boolean'
@@ -145,7 +145,7 @@ class CategoryController extends Controller{
                         $category->is_bigthumbnail_show = false;
                     }
                 }
-                
+
                 //$category->is_bigthumbnail_show = $request->has('is_bigthumbnail_show')?$request->is_bigthumbnail_show:false;
 
                 if($category->save()){
@@ -169,7 +169,7 @@ class CategoryController extends Controller{
     }
 
     public function saveImage($image){
-        
+
         $image_name = 'category'.time().'.'.$image->getClientOriginalExtension();
         $destinationPath = public_path('images/category/');
         $image->move($destinationPath, $image_name);
@@ -187,11 +187,11 @@ class CategoryController extends Controller{
                 return $this->sendError('Validation Error.', $validator->errors());
             }
             $query = Category::query();
-            
+
             $parent_idArray=[];
             if($request->has('parent_id')){
                 $parent_idArray = array_map('intval',explode(',',$request->parent_id));
-                
+
             }
             $query=$query->whereIn('parent_id',$parent_idArray)->whereNotNull('parent_id');
             $data= $query->orderBy('id','ASC')->get();

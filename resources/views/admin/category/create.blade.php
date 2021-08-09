@@ -26,7 +26,7 @@
 		                        	<div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Name*</label>
-			                                <input type="text" name="category_name" class="form-control input-default" placeholder="Enter Category Name">
+			                                <input value="{{old('category_name')}}" type="text" name="category_name" class="form-control input-default" placeholder="Enter Category Name">
 			                                @if($errors->has('category_name'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('category_name') }}
@@ -36,7 +36,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Type</label>
-			                                <input type="text" name="type" class="form-control input-default" placeholder="Enter Category Type">
+			                                <input value="{{old('type')}}" type="text" name="type" class="form-control input-default" placeholder="Enter Category Type">
 			                                @if($errors->has('type'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('type') }}
@@ -56,10 +56,10 @@
 							                        {{ $errors->first('is_bigthumbnail_show') }}
 							                    </p>
 							                @endif
-	                                	</div>	
+	                                	</div>
 		                        	</div>
-		                            
-		                        	<div class="row">	                            
+
+		                        	<div class="row">
 		                                <div class="form-group col-md-3">
 			                            	<label><br>Thumbnail*</label>
 		                                	<div class="form-group">
