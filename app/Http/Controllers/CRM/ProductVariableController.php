@@ -52,14 +52,14 @@ class ProductVariableController extends Controller{
             $request->validate([
                 'color' => 'required|string',
                 'size'=>'required|string',
-                'price' => 'required|numeric',
-                'mrp' => 'required|numeric',
+                'price' => 'required|numeric|min:0',
+                'mrp' => 'required|numeric|min:0',
                 'is_on_sale' => 'required|boolean',
-                'sale_price' => 'nullable|numeric',
-                'sale_percentage' => 'nullable|numeric',                
+                'sale_price' => 'nullable|numeric|min:0',
+                'sale_percentage' => 'nullable|numeric|min:0|max:100',                
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'quantity' => 'required|numeric',
+                'quantity' => 'required|numeric|min:0',
                 'shelf_no' => 'required',
                 'type' => 'nullable|string'
             ]);
@@ -139,14 +139,14 @@ class ProductVariableController extends Controller{
             $request->validate([
                 'color' => 'nullable|string',
                 'size'=>'nullable|string',
-                'price' => 'nullable|numeric',
-                'mrp' => 'nullable|numeric',
+                'price' => 'nullable|numeric|min:0',
+                'mrp' => 'nullable|numeric|min:0',
                 'is_on_sale' => 'nullable|boolean',
                 'sale_price' => 'nullable|numeric',
-                'sale_percentage' => 'nullable|numeric',                
+                'sale_percentage' => 'nullable|numeric|min:0|max:100',                
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'quantity' => 'nullable|numeric',
+                'quantity' => 'nullable|numeric|min:0',
                 'type' => 'nullable|string'
             ]);
 

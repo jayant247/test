@@ -191,9 +191,9 @@
                                         <td>{{$productDescription->property_value}}</td>
                                         <td>
                                             <form action="{{ route('productDescription.destroy',$productDescription->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('productDescription.edit',$productDescription->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
@@ -202,7 +202,7 @@
                                                 <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
                                                 
                                                     <i class="fa fa-trash"></i>
-                                                </a>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>
@@ -230,9 +230,9 @@
                                         <td>{{$productDescription->property_value}}</td>
                                         <td>
                                             <form action="{{ route('productDescription.destroy',$productDescription->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$productDescription->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('productDescription.edit',$productDescription->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
@@ -241,7 +241,7 @@
                                                 <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
                                                 
                                                     <i class="fa fa-trash"></i>
-                                                </a>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>
@@ -348,9 +348,9 @@
                                 <td>{{$productVariable->quantity}}</td>
                                 <td>
                                     <form action="{{ route('productVariable.destroy',$productVariable->id) }}" method="POST">
-                                        <button data-toggle="modal" onclick="openDetailsModal({{$productVariable->id}})"  class="btn btn-sm btn-outline-dark" >
+                                        <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.show',$productVariable->id)}}" >
                                             <i class="fa fa-eye"></i>
-                                        </button>
+                                        </a>
                                         <a class="btn btn-sm btn-outline-dark" href="{{route('productVariable.edit',$productVariable->id)}}" >
                                             <i class="fa fa-pencil"></i>
                                         </a>
@@ -359,7 +359,7 @@
                                         <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
                                         
                                             <i class="fa fa-trash"></i>
-                                        </a>
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
