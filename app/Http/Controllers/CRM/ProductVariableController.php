@@ -52,11 +52,11 @@ class ProductVariableController extends Controller{
             $request->validate([
                 'color' => 'required|string',
                 'size'=>'required|string',
-                'price' => 'required|numeric',
-                'mrp' => 'required|numeric',
+                'price' => 'required|numeric|min:0',
+                'mrp' => 'required|numeric|min:0',
                 'is_on_sale' => 'required|boolean',
-                'sale_price' => 'nullable|numeric',
-                'sale_percentage' => 'nullable|numeric',
+                'sale_price' => 'required_if:is_on_sale,"1"|numeric|min:0',
+                'sale_percentage' => 'required_if:is_on_sale,"1"|numeric|min:0|max:100',
                 'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'required|numeric',
@@ -115,8 +115,8 @@ class ProductVariableController extends Controller{
             //$newProductVariable->qr_image = $this->saveImage($image);
             $newProductVariable->save();
             if($newProductVariable->save()){
-                return Redirect::back();
-                return redirect()->route('product.index')
+
+                return redirect()->route('product.show',$newProductVariable->product_id)
                         ->with('success','Product Variable created successfully.');
             }else{
                 return $this->sendError('Product Variable Creation Failed',[], 422);
@@ -142,11 +142,11 @@ class ProductVariableController extends Controller{
             $request->validate([
                 'color' => 'nullable|string',
                 'size'=>'nullable|string',
-                'price' => 'nullable|numeric',
-                'mrp' => 'nullable|numeric',
+                'price' => 'nullable|numeric|min:0',
+                'mrp' => 'nullable|numeric|min:0',
                 'is_on_sale' => 'nullable|boolean',
-                'sale_price' => 'nullable|numeric',
-                'sale_percentage' => 'nullable|numeric',
+                'sale_price' => 'required_if:is_on_sale,"1"|numeric|min:0',
+                'sale_percentage' => 'required_if:is_on_sale,"1"|numeric|min:0|max:100',
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'nullable|numeric',

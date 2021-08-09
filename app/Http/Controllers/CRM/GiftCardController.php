@@ -39,9 +39,9 @@ class GiftCardController extends Controller{
             $request->validate([
                 'title' => 'required|string',
                 'description'=>'nullable|string',
-                'purchase_amount' => 'required|numeric',
-                'gift_amount' => 'required|numeric',
-                'validity_days_from_purchase_date' => 'required|numeric',
+                'purchase_amount' => 'required|numeric|min:0',
+                'gift_amount' => 'required|numeric|min:0',
+                'validity_days_from_purchase_date' => 'required|numeric|min:0',
                 'start_from' => 'required|date|after:today',
                 'end_on' => 'required|after:start_from',
                 'is_active' => 'required|'
@@ -63,7 +63,7 @@ class GiftCardController extends Controller{
             if($newGiftcard->save()){
                 return redirect()->route('giftcard.index')
                         ->with('success','Giftcard created successfully.');
-            }else{        
+            }else{
                 return $this->sendError('Giftcard Creation Failed',[], 422);
             }
 
@@ -79,9 +79,9 @@ class GiftCardController extends Controller{
             $request->validate([
                 'title' => 'nullable|string',
                 'description'=>'nullable|string',
-                'purchase_amount' => 'nullable|numeric',
-                'gift_amount' => 'nullable|numeric',
-                'validity_days_from_purchase_date' => 'nullable|numeric',
+                'purchase_amount' => 'nullable|numeric|min:0',
+                'gift_amount' => 'nullable|numeric|min:0',
+                'validity_days_from_purchase_date' => 'nullable|numeric|min:0',
                 'start_from' => 'nullable|date|after:today',
                 'end_on' => 'nullable|after:start_from',
                 'is_active' => 'nullable'
@@ -97,10 +97,10 @@ class GiftCardController extends Controller{
                 $giftcard->gift_amount=$request->has('gift_amount')?$request->gift_amount:$giftcard->gift_amount;
                 $giftcard->validity_days_from_purchase_date=$request->has('validity_days_from_purchase_date')?$request->validity_days_from_purchase_date:$giftcard->validity_days_from_purchase_date;
                 if($request->has('start_from')){
-                    $giftcard->start_from = Carbon::parse($request->start_from)->format('Y-m-d H:i:s'); 
+                    $giftcard->start_from = Carbon::parse($request->start_from)->format('Y-m-d H:i:s');
                 }
                 if($request->has('end_on')){
-                    $giftcard->end_on = Carbon::parse($request->end_on)->format('Y-m-d H:i:s'); 
+                    $giftcard->end_on = Carbon::parse($request->end_on)->format('Y-m-d H:i:s');
                 }
                 if($request->has('is_active')){
                     if($request->is_active == 1){
@@ -108,7 +108,7 @@ class GiftCardController extends Controller{
                     }
                     elseif ($request->is_active == 0){
                         $giftcard->is_active = false;
-                    } 
+                    }
                 }
                 if($giftcard->save()){
                     return redirect()->route('giftcard.index')
