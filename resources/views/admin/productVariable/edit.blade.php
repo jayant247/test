@@ -33,7 +33,7 @@
 							                        {{ $errors->first('color') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Size</label>
@@ -43,7 +43,7 @@
 							                        {{ $errors->first('size') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Price</label>
@@ -53,7 +53,7 @@
 							                        {{ $errors->first('price') }}
 							                    </p>
 							                @endif
-			                            </div>	 
+			                            </div>
 			                        </div>
 
 			                        <div class="row">
@@ -65,7 +65,7 @@
 							                        {{ $errors->first('mrp') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Quantity</label>
@@ -75,7 +75,7 @@
 							                        {{ $errors->first('quantity') }}
 							                    </p>
 							                @endif
-			                            </div>	
+			                            </div>
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Product Type</label>
@@ -85,17 +85,17 @@
 							                        {{ $errors->first('type') }}
 							                    </p>
 							                @endif
-			                            </div>	 
+			                            </div>
 			                        </div>
 
 			                        <div class="row">
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is On Sale</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_on_sale" >
-	                                        	@if($productVariable->is_on_sale === 1)
+	                                        	@if($productVariable->is_on_sale == 1)
 	                                            	<option value="{{ $productVariable->is_on_sale}}" selected="selected">Yes</option>
 	                                            	<option value="0">NO</option>
-	                                            @elseif($productVariable->is_on_sale === 0)
+	                                            @elseif($productVariable->is_on_sale == 0)
 	                                            	<option value="{{ $productVariable->is_on_sale}}" selected="selected">NO</option>
 	                                            	<option value="1">YES</option>
 	                                            @endif
@@ -151,7 +151,7 @@
 								                @endif
 		                                    </div>
 		                                </div>
-		                                
+
 							        </div>
 		                            <div class="col-xs-12 col-sm-12 col-md-12 ">
 						            	<button type="submit" class="btn btn-primary">Update</button>
@@ -163,7 +163,7 @@
 		        </div>
 	        </div>
         </div>
-	
+
 @endsection
 
 @section('js')

@@ -184,7 +184,7 @@
     $('#sale_price').hide();
     $('#sale_percentage').hide();
 	$('#is_on_sale').change(function(){
-		if( $(this).val()=== "1"){
+		if( $(this).val()== "1"){
         $("#sale_price").show();
         $("#sale_percentage").show();
         }
