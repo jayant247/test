@@ -51,7 +51,7 @@
                                                 <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
                                                 
                                                     <i class="fa fa-trash"></i>
-                                                </a>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>

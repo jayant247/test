@@ -50,7 +50,7 @@
             <div class="col-lg-3 col-sm-6">
                 <div class="card gradient-1">
                     <div class="card-body">
-                        <h3 class="card-title text-white">Total Orders Today</h3>
+                        <h3 class="card-title text-white">Total Orders </h3>
                         <div class="d-inline-block">
                             <h2 class="text-white">{{$totalOrders}}</h2>
                             @if($is_specific_date)

@@ -26,7 +26,7 @@
 		                        	<div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Title*</label>
-			                                <input type="text" name="title" class="form-control input-default" placeholder="Enter Giftcard Title">
+			                                <input value="{{old('title')}}" type="text" name="title" class="form-control input-default" placeholder="Enter Giftcard Title">
 			                                @if($errors->has('title'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('title') }}
@@ -36,7 +36,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Purchase Amount*</label>
-			                                <input type="number" name="purchase_amount" class="form-control input-default" placeholder="Enter Purchase Amount">
+			                                <input value="{{old('purchase_amount')}}" type="number" name="purchase_amount" class="form-control input-default" placeholder="Enter Purchase Amount">
 			                                @if($errors->has('purchase_amount'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('purchase_amount') }}
@@ -46,7 +46,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Gift Card Amount*</label>
-			                                <input type="number" name="gift_amount" class="form-control input-default" placeholder="Enter Gift Card Amount">
+			                                <input value="{{old('gift_amount')}}" type="number" name="gift_amount" class="form-control input-default" placeholder="Enter Gift Card Amount">
 			                                @if($errors->has('gift_amount'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('gift_amount') }}
@@ -58,7 +58,7 @@
 							        <div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Validity*</label>
-			                                <input type="number" name="validity_days_from_purchase_date" class="form-control input-default" placeholder="Enter Validity in Days">
+			                                <input value="{{old('validity_days_from_purchase_date')}}" type="number" name="validity_days_from_purchase_date" class="form-control input-default" placeholder="Enter Validity in Days">
 			                                @if($errors->has('validity_days_from_purchase_date'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('validity_days_from_purchase_date') }}
@@ -68,7 +68,7 @@
 
 		                        		<div class="form-group col-md-4">
 						                    <label>Starts From*</label>
-						                    <input type="date" id="start_from" name="start_from" class="form-control input-default">
+						                    <input value="{{old('start_from')}}" type="date" id="start_from" name="start_from" class="form-control input-default">
 						                    @if($errors->has('start_from'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('start_from') }}
@@ -78,7 +78,7 @@
 
 						                <div class="form-group col-md-4">
 						                    <label>Ends On*</label>
-						                    <input type="date" id="end_on" name="end_on" class="form-control input-default">
+						                    <input value="{{old('end_on')}}" type="date" id="end_on" name="end_on" class="form-control input-default">
 						                    @if($errors->has('end_on'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('end_on') }}
@@ -90,7 +90,7 @@
 			                        <div class="row">
 			                            <div class="form-group col-md-8">
 			                            	<label>Description</label>
-			                                <input type="text" name="description" class="form-control input-default" placeholder="Enter Giftcard Description">
+			                                <input value="{{old('description')}}" type="text" name="description" class="form-control input-default" placeholder="Enter Giftcard Description">
 			                                @if($errors->has('description'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('description') }}

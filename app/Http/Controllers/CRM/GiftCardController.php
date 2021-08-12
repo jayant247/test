@@ -39,12 +39,12 @@ class GiftCardController extends Controller{
             $request->validate([
                 'title' => 'required|string',
                 'description'=>'nullable|string',
-                'purchase_amount' => 'required|numeric',
-                'gift_amount' => 'required|numeric',
-                'validity_days_from_purchase_date' => 'required|numeric',
+                'purchase_amount' => 'required|numeric|min:0',
+                'gift_amount' => 'required|numeric|min:0',
+                'validity_days_from_purchase_date' => 'required|numeric|min:0',
                 'start_from' => 'required|date|after:today',
                 'end_on' => 'required|after:start_from',
-                'is_active' => 'required|'
+                'is_active' => 'required|boolean'
             ]);
 
             $newGiftcard = new GiftCard;
@@ -79,9 +79,9 @@ class GiftCardController extends Controller{
             $request->validate([
                 'title' => 'nullable|string',
                 'description'=>'nullable|string',
-                'purchase_amount' => 'nullable|numeric',
-                'gift_amount' => 'nullable|numeric',
-                'validity_days_from_purchase_date' => 'nullable|numeric',
+                'purchase_amount' => 'nullable|numeric|min:0|min:0',
+                'gift_amount' => 'nullable|numeric|min:0',
+                'validity_days_from_purchase_date' => 'nullable|numeric|min:0',
                 'start_from' => 'nullable|date|after:today',
                 'end_on' => 'nullable|after:start_from',
                 'is_active' => 'nullable'
