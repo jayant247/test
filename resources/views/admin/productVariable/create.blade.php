@@ -103,25 +103,25 @@
 							                @endif
 	                                	</div>
 
-	                                	<div class="form-group col-md-4" id="sale_price">
-			                            	<label>Product Sale Price</label>
-			                                <input value="{{old('sale_price')}}" type="number" name="sale_price" class="form-control input-default" placeholder="Enter Product Sale Price">
-			                                @if($errors->has('sale_price'))
-							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
-							                        {{ $errors->first('sale_price') }}
-							                    </p>
-							                @endif
-			                            </div>
+                                        <div class="form-group col-md-4" id="sale_price">
+                                            <label>Product Sale Price</label>
+                                            <input value="{{old('sale_price')?old('sale_price'):0}}" min="0" type="number" name="sale_price" class="form-control input-default" placeholder="Enter Product Sale Price">
+                                            @if($errors->has('sale_price'))
+                                                <p class="d-block invalid-feedback animated fadeInDown" style="">
+                                                    {{ $errors->first('sale_price') }}
+                                                </p>
+                                            @endif
+                                        </div>
 
-			                            <div class="form-group col-md-4" id="sale_percentage">
-			                            	<label>Product Sale Percentage</label>
-			                                <input value="{{old('sale_percentage')}}" type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
-			                                @if($errors->has('sale_percentage'))
-							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
-							                        {{ $errors->first('sale_percentage') }}
-							                    </p>
-							                @endif
-			                            </div>
+                                        <div class="form-group col-md-4" id="sale_percentage">
+                                            <label>Product Sale Percentage</label>
+                                            <input value="{{old('sale_percentage')?old('sale_percentage'):0}}" min="0" type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
+                                            @if($errors->has('sale_percentage'))
+                                                <p class="d-block invalid-feedback animated fadeInDown" style="">
+                                                    {{ $errors->first('sale_percentage') }}
+                                                </p>
+                                            @endif
+                                        </div>
 
 							        	<div class="form-group col-md-4">
 			                            	<label><br>Primary Image</label>
@@ -184,7 +184,7 @@
     $('#sale_price').hide();
     $('#sale_percentage').hide();
 	$('#is_on_sale').change(function(){
-		if( $(this).val()=== "1"){
+		if( $(this).val()== "1"){
         $("#sale_price").show();
         $("#sale_percentage").show();
         }

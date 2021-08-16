@@ -26,7 +26,11 @@ class ProductController extends Controller{
         // dd('show');
         $product = Products::find($id);
         $productDescriptions = ProductDescription::where("product_id", "=", $product->id)->get();
+<<<<<<< HEAD
         $productImages = ProductImages::where("product_id", "=", $product->id)->whereNull('product_variable_id')->get();
+=======
+        $productImages = ProductImages::where("product_id", "=", $product->id)->get();
+>>>>>>> af19738178a64261139eb97a6aabe2630164d5a1
         //dd($productImages);
         $productVariables = ProductVariables::where("product_id", "=", $product->id)->get();
         //$productImages = ProductImages::where('product_id', '=', $id)->get();

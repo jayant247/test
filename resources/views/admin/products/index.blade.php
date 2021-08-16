@@ -24,15 +24,7 @@
 
                         <div id="filtersOption">
                             <div class="row">
-                                <div class="col-md-4">
-                                    <h2>dcds</h2>
-                                </div>
-                                <div class="col-md-4">
-                                    <h2>dcds</h2>
-                                </div>
-                                <div class="col-md-4">
-                                    <h2>dcds</h2>
-                                </div>
+                                <div>Coming Soon</div>
                             </div>
                             <div class="row d-flex justify-content-end">
                                 <button class="btn btn-primary m-2" onclick="showHideFilter()">Hide</button>

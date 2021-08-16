@@ -23,13 +23,14 @@ class ReportController extends Controller
     public function exportOrders(Request $request)
     {
 
+        //dd($request->all());
+
         return Excel::download(new OrdersExport, 'orders.xlsx');
 
     }
 
     public function exportSoldProducts(Request $request)
     {
-
         return Excel::download(new OrdersExport, 'orders.xlsx');
 
     }

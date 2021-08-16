@@ -59,7 +59,7 @@
 			                        <div class="row">
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is On Sale*</label>
-	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_on_sale" >
+	                                        <select class="form-control mr-sm-2" id="is_on_sale" name="is_on_sale" >
 	                                            <option selected="selected">Choose...</option>
 	                                            <option value="1">YES</option>
 	                                            <option value="0">NO</option>
@@ -71,28 +71,26 @@
 							                @endif
 	                                	</div>
 
-	                                	<div class="form-group col-md-4">
-			                            	<label>Product Sale Price</label>
-			                                <input value="{{old('sale_price')}}" type="number" name="sale_price" class="form-control input-default" placeholder="Enter Product Sale Price">
-			                                @if($errors->has('sale_price'))
-							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
-							                        {{ $errors->first('sale_price') }}
-							                    </p>
-							                @endif
-			                            </div>
+                                        <div class="form-group col-md-4" id="sale_price">
+                                            <label>Product Sale Price</label>
+                                            <input value="{{old('sale_price')?old('sale_price'):0}}"  min="0" type="number" name="sale_price"  class="form-control input-default" placeholder="Enter Product Sale Price">
+                                            @if($errors->has('sale_price'))
+                                                <p class="d-block invalid-feedback animated fadeInDown" style="">
+                                                    {{ $errors->first('sale_price') }}
+                                                </p>
+                                            @endif
+                                        </div>
 
-			                            <div class="form-group col-md-4">
-			                            	<label>Product Sale Percentage</label>
-			                                <input value="{{old('sale_percentage')}}" type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
-			                                @if($errors->has('sale_percentage'))
-							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
-							                        {{ $errors->first('sale_percentage') }}
-							                    </p>
-							                @endif
-			                            </div>
-							        </div>
+                                        <div class="form-group col-md-4" id="sale_percentage">
+                                            <label>Product Sale Percentage</label>
+                                            <input value="{{old('sale_percentage')?old('sale_percentage'):0}}" min="0"  type="number" name="sale_percentage" class="form-control input-default" placeholder="Enter Product Sale Percentage">
+                                            @if($errors->has('sale_percentage'))
+                                                <p class="d-block invalid-feedback animated fadeInDown" style="">
+                                                    {{ $errors->first('sale_percentage') }}
+                                                </p>
+                                            @endif
+                                        </div>
 
-							        <div class="row">
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Is New*</label>
 	                                        <select class="form-control mr-sm-2" id="inlineFormCustomSelect" name="is_new" >
@@ -198,6 +196,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        $('#sale_price').hide();
+        $('#sale_percentage').hide();
+        $('#is_on_sale').change(function(){
+            if( $(this).val()=== "1"){
+                $("#sale_price").show();
+                $("#sale_percentage").show();
+            }
+            else{
+                $("#sale_price").hide();
+                $("#sale_percentage").hide();
+            }
+        });
     	var storeOptions = [];
 	    function getData(parent_ids) {
         let dataToSend = {}

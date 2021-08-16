@@ -102,7 +102,6 @@ class ProductDescriptionController extends Controller{
     public function destroy(Request $request, $id)
     {
         productDescription::find($id)->delete();
-        return redirect()->route('product.index')
-                        ->with('success','product Description deleted successfully');
+        return redirect()->back();
     }
 }
