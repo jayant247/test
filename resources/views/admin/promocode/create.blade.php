@@ -27,23 +27,13 @@
 		                        	<div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Promocode*</label>
-			                                <input type="text" name="promocode" class="form-control input-default" placeholder="Enter Promocode">
+			                                <input value="{{old('promocode')}}" type="text" name="promocode" class="form-control input-default" placeholder="Enter Promocode">
 			                                @if($errors->has('promocode'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('promocode') }}
 							                    </p>
 							                @endif
 			                            </div>
-
-			                            <!-- <div class="form-group col-md-4">
-			                            	<label>Type*</label>
-			                                <input type="text" name="type" class="form-control input-default" placeholder="Enter Prmocode Type">
-			                                @if($errors->has('type'))
-							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
-							                        {{ $errors->first('type') }}
-							                    </p>
-							                @endif
-			                            </div> -->
 
 			                            <div class="col-md-4">
 	                                        <label class="mr-sm-2">Type*</label>
@@ -77,7 +67,7 @@
 		                        	<div class="row">
 			                        	<div class="form-group col-md-4">
 			                            	<label>Discount*</label>
-			                                <input type="number" name="discount" class="form-control input-default" placeholder="Enter Discount Value">
+			                                <input value="{{old('discount')}}" type="number" name="discount" class="form-control input-default" placeholder="Enter Discount Value">
 			                                @if($errors->has('discount'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('discount') }}
@@ -87,7 +77,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Minimum Cart Value*</label>
-			                                <input type="number" name="minimal_cart_total" class="form-control input-default" placeholder="Enter Minimum Cart Value">
+			                                <input value="{{old('minimal_cart_total')}}" type="number" name="minimal_cart_total" class="form-control input-default" placeholder="Enter Minimum Cart Value">
 			                                @if($errors->has('minimal_cart_total'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('minimal_cart_total') }}
@@ -97,7 +87,7 @@
 
 			                            <div class="form-group col-md-4">
 			                            	<label>Maximum Discount*</label>
-			                                <input type="number" name="max_discount" class="form-control input-default" placeholder="Enter Max Discount Value">
+			                                <input value="{{old('max_discount')}}" type="number" name="max_discount" class="form-control input-default" placeholder="Enter Max Discount Value">
 			                                @if($errors->has('max_discount'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('max_discount') }}
@@ -109,7 +99,7 @@
 		                        	<div class="row">
 		                        		<div class="form-group col-md-4">
 						                    <label>Starts From*</label>
-						                    <input type="date" id="start_from" name="start_from" class="form-control input-default">
+						                    <input value="{{old('start_from')}}" type="date" id="start_from" name="start_from" class="form-control input-default">
 						                    @if($errors->has('start_from'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('start_from') }}
@@ -119,7 +109,7 @@
 
 						                <div class="form-group col-md-4">
 						                    <label>Ends On*</label>
-						                    <input type="date" id="end_on" name="end_on" class="form-control input-default">
+						                    <input value="{{old('end_on')}}" type="date" id="end_on" name="end_on" class="form-control input-default">
 						                    @if($errors->has('end_on'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('end_on') }}
@@ -159,7 +149,7 @@
 
 		                        		<div class="form-group col-md-4" id="registered_from">
 						                    <label>Registerd From*</label>
-						                    <input type="date" id="registered_from" name="registered_from" class="form-control input-default">
+						                    <input value="{{old('registered_from')}}" type="date" id="registered_from" name="registered_from" class="form-control input-default">
 						                    @if($errors->has('registered_from'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('registered_from') }}
@@ -169,7 +159,7 @@
 
 						                <div class="form-group col-md-4" id="registered_till">
 						                    <label>Registered Till*</label>
-						                    <input type="date" id="registered_till" name="registered_till" class="form-control input-default">
+						                    <input value="{{old('registered_till')}}" type="date" id="registered_till" name="registered_till" class="form-control input-default">
 						                    @if($errors->has('registered_till'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('registered_till') }}
@@ -205,7 +195,7 @@
 			                            <div class="form-group col-md-12">
 			                            	<br>
 			                            	<label>Description</label>
-			                                <input type="text" name="description" class="form-control input-default" placeholder="Enter Prmocode Description">
+			                                <input value="{{old('description')}}" type="text" name="description" class="form-control input-default" placeholder="Enter Prmocode Description">
 			                                @if($errors->has('description'))
 							                    <p class="d-block invalid-feedback animated fadeInDown" style="">
 							                        {{ $errors->first('description') }}

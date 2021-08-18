@@ -26,7 +26,11 @@ class ProductController extends Controller{
         // dd('show');
         $product = Products::find($id);
         $productDescriptions = ProductDescription::where("product_id", "=", $product->id)->get();
+<<<<<<< HEAD
+        $productImages = ProductImages::where("product_id", "=", $product->id)->whereNull('product_variable_id')->get();
+=======
         $productImages = ProductImages::where("product_id", "=", $product->id)->get();
+>>>>>>> af19738178a64261139eb97a6aabe2630164d5a1
         //dd($productImages);
         $productVariables = ProductVariables::where("product_id", "=", $product->id)->get();
         //$productImages = ProductImages::where('product_id', '=', $id)->get();
@@ -56,11 +60,9 @@ class ProductController extends Controller{
                 'product_name'=>'required|string',
                 'price'=>'required|numeric|min:0',
                 'mrp' => 'required|numeric|min:0',
-
                 'sale_price'=>'required_if:is_on_sale,"1"|numeric|min:0',
                 'sale_percentage'=>'required_if:is_on_sale,"1"|numeric|min:0|max:100',
                 'is_on_sale'=>'required|boolean',
-
                 'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'is_new'=>'required|boolean',

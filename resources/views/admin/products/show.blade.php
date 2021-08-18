@@ -340,7 +340,7 @@
                                         <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$productVariable->primary_image}}">
                                     </a>
                                 </td>
-                                <td>{{$productVariable->size}}</td>                           
+                                <td>{{$productVariable->size}}</td>             
                                 <td>{{$productVariable->price}}</td>
                                 <td>{{$productVariable->is_on_sale}}</td>
                                 <td>{{$productVariable->sale_price}}</td>
@@ -402,28 +402,6 @@
             $("#"+id).modal()
         }
     </script>
-
-    // Instantiate the Bootstrap carousel
-<!--     <script>
-        $('.multi-item-carousel').carousel({
-          interval: false
-        });
-
-        $('.multi-item-carousel .item').each(function(){
-          var next = $(this).next();
-          if (!next.length) {
-            next = $(this).siblings(':first');
-          }
-          next.children(':first-child').clone().appendTo($(this));
-          
-          if (next.next().length>0) {
-            next.next().children(':first-child').clone().appendTo($(this));
-          } else {
-            $(this).siblings(':first').children(':first-child').clone().appendTo($(this));
-          }
-        });        
-    </script> -->
-
 
 @endsection
 

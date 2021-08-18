@@ -19,7 +19,7 @@
                             <button class="btn btn-primary" style='margin-right:160px'  id="productReport" onclick="showProductReportForm()"> Get Product Report </button>
                             <button id="hideButton" class="btn btn-primary" onclick="hideForm()"> Hide Dates</button>
                         </div>
-                        <form id="dateForm">
+                        <form id="dateForm" enctype="multipart/form-data" action="{{ route('exportOrders') }}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="form-group col-md-4">
@@ -43,8 +43,8 @@
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-12 col-md-12 ">
-                                <button type="submit" id="getOrdersReport" class="btn btn-primary" href="{{route('exportOrders')}}">Download Report</button>
-                                <button type="submit" id="getProductsReport" class="btn btn-primary" href="{{route('exportSoldProducts')}}">Download Report</button>
+                                <button  id="getOrdersReport" class="btn btn-primary" href="{{route('exportOrders')}}">Download Report</button>
+                                <button id="getProductsReport" class="btn btn-primary" formaction="{{route('exportSoldProducts')}}">Download Report</button>
                             </div>
                         </form>
                     </div>

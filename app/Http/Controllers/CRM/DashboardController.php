@@ -74,7 +74,7 @@ class DashboardController extends Controller
         // }
         //dd($result);
 
-        $ordersByCategory = DB::table('orders')->join('order_statuses', 'orders.order_status', '=', 'order_statuses.id')->select('orders.order_status as status', DB::raw('count(orders.id) as count'))->groupBy(DB::raw('order_status'))->get();
+        $ordersByCategory = DB::table('orders')->join('order_statuses', 'orders.order_status', '=', 'order_statuses.id')->select('orders.order_status as status', DB::raw('count(orders.id) as count'))->where('orders.created_at', '>=', $tempDate)->groupBy(DB::raw('order_status'))->get();
         //dd($ordersByCategory);
 
         foreach($ordersByCategory as $orderByCategory){
@@ -141,7 +141,7 @@ class DashboardController extends Controller
             $result[++$key] = [$chartOrder->date, (int)$chartOrder->count];
         }
 
-        $ordersByCategory = DB::table('orders')->join('order_statuses', 'orders.order_status', '=', 'order_statuses.id')->select('orders.order_status as status', DB::raw('count(orders.id) as count'))->groupBy(DB::raw('order_status'))->get();
+        $ordersByCategory = DB::table('orders')->join('order_statuses', 'orders.order_status', '=', 'order_statuses.id')->select('orders.order_status as status', DB::raw('count(orders.id) as count'))->whereBetween(DB::raw('date(orders.created_at)'), [$start_date, $end_date])->groupBy(DB::raw('order_status'))->get();
         //dd($ordersByCategory);
 
         foreach($ordersByCategory as $orderByCategory){

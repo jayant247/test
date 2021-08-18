@@ -55,11 +55,16 @@ class ProductVariableController extends Controller{
                 'price' => 'required|numeric|min:0',
                 'mrp' => 'required|numeric|min:0',
                 'is_on_sale' => 'required|boolean',
+<<<<<<< HEAD
+                'sale_price' => 'nullable|numeric|min:0',
+                'sale_percentage' => 'nullable|numeric|min:0|max:100',
+=======
                 'sale_price' => 'required_if:is_on_sale,"1"|numeric|min:0',
                 'sale_percentage' => 'required_if:is_on_sale,"1"|numeric|min:0|max:100',
+>>>>>>> af19738178a64261139eb97a6aabe2630164d5a1
                 'primary_image'=>'required|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
-                'quantity' => 'required|numeric',
+                'quantity' => 'required|numeric|min:0',
                 'shelf_no' => 'required',
                 'type' => 'nullable|string'
             ]);
@@ -145,8 +150,13 @@ class ProductVariableController extends Controller{
                 'price' => 'nullable|numeric|min:0',
                 'mrp' => 'nullable|numeric|min:0',
                 'is_on_sale' => 'nullable|boolean',
+<<<<<<< HEAD
+                'sale_price' => 'nullable|numeric|min:0',
+                'sale_percentage' => 'nullable|numeric|min:0|max:100',
+=======
                 'sale_price' => 'required_if:is_on_sale,"1"|numeric|min:0',
                 'sale_percentage' => 'required_if:is_on_sale,"1"|numeric|min:0|max:100',
+>>>>>>> af19738178a64261139eb97a6aabe2630164d5a1
                 'primary_image'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'other_images.*'=>'nullable|file|max:2048|mimes:jpeg,bmp,png,jpg',
                 'quantity' => 'nullable|numeric|min:0',
@@ -206,11 +216,17 @@ class ProductVariableController extends Controller{
         }
     }
 
+<<<<<<< HEAD
+    public function destroyImage(ProductImages $producImage){
+        $productImage->delete();
+        return redirect()->route('product.index')
+=======
     public function destroyImage(Request $request, $id){
         $productImage = ProductImages::find($id);
         $productId = $productImage->product_id;
         $productImage->delete();
         return redirect()->route('product.show',$productId)
+>>>>>>> af19738178a64261139eb97a6aabe2630164d5a1
                         ->with('success','Product Image deleted successfully');
     }
 

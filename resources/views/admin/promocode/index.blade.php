@@ -45,9 +45,9 @@
                                         <td>{{$promocode->is_active}}</td>
                                         <td>
                                             <form action="{{ route('promocode.destroy',$promocode->id) }}" method="POST">
-                                                <button data-toggle="modal" onclick="openDetailsModal({{$promocode->id}})"  class="btn btn-sm btn-outline-dark" >
+                                                <a data-toggle="modal" onclick="openDetailsModal({{$promocode->id}})"  class="btn btn-sm btn-outline-dark" >
                                                     <i class="fa fa-eye"></i>
-                                                </button>
+                                                </a>
                                                 <a class="btn btn-sm btn-outline-dark" href="{{route('promocode.edit',$promocode->id)}}" >
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
@@ -56,7 +56,7 @@
                                                 <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
                                                 
                                                     <i class="fa fa-trash"></i>
-                                                </a>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>

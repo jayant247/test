@@ -17,10 +17,11 @@ class UserController extends Controller
     public function index(Request $request)
 
     {
-        $users = User::whereHas('roles', function ($query) {
-            return $query->where('name','!=','Customer');
-        })->get();
-        //dd($users);
+        // $users = User::whereHas('roles', function ($query) {
+        //     return $query->where('name','!=','Customer');
+        // })->get();
+        $users = User::first();
+        dd($users);
         
         return view('admin.user.index',compact('users'));
 

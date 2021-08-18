@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-
-
 use App\Models\Cart;
 use App\Models\Category;
 use App\Models\DeliveryPincode;
