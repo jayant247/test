@@ -129,7 +129,7 @@ class ProductVariableController extends Controller{
     }
 
     function saveImage($image){
-        $image_name = 'product_variable'.time().'.'.$image->getClientOriginalExtension();
+        $image_name = 'product_variable'.time().'-'.rand(10,1000).'.'.$image->getClientOriginalExtension();
         $destinationPath = public_path('images/product_variable/');
         $image->move($destinationPath, $image_name);
         $imageURL='/images/product_variable/'.$image_name;
