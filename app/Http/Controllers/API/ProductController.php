@@ -1243,6 +1243,7 @@ class ProductController extends BaseController{
                 }
 
                 $productRatingBySizeCount = ProductReview::where('product_id',$id)
+                    ->whereNotNull('size_feedback')
                     ->selectRaw('size_feedback, count(*) as total')
                     ->groupBy('size_feedback')
                     ->pluck('total','size_feedback')->all();
