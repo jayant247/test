@@ -9,9 +9,11 @@ use App\Models\ProductImages;
 use App\Models\ProductReview;
 use App\Models\Products;
 use App\Models\ProductVariables;
+use App\Models\ReviewImages;
 use App\Models\UserActivity;
 use App\Models\UserWhishlist;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use Auth;
@@ -864,9 +866,10 @@ class ProductController extends BaseController{
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'product_id' => 'required|numeric',
-                'image' => 'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'image.*' => 'max:2048|mimes:jpeg,bmp,png,jpg',
                 'comment'=>'string|required',
-                'rating'=>'numeric|max:5'
+                'rating'=>'numeric|max:5',
+                'feedback_option'=>'numeric|max:3'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -886,13 +889,48 @@ class ProductController extends BaseController{
                 $newProductVariable->comment =$request->comment ;
                 $newProductVariable->rating = $request->rating;
                 $newProductVariable->user_id = Auth::user()->id;
-                if($request->hasFile('image')){
-                    $oldImage = $newProductVariable->imagePath;
-                    $newProductVariable->imagePath = $this->saveReviewImage($request->image);
+
+                if($request->has('feedback_option')){
+                    switch ($request->feedback_option){
+                        case 1:
+                            $newProductVariable->size_feedback='fit_to_size';
+                            break;
+                        case 2:
+                            $newProductVariable->size_feedback='small_to_size';
+                            break;
+                        case 3:
+                            $newProductVariable->size_feedback='large_to_size';
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                $newProductVariable->save();
+                if($request->has('image')){
+                    $allowedfileExtension=['bmp','jpg','png','jpeg'];
+                    $check= false;
+
+                    foreach ($request->image as $mediaFiles){
+                        $extension = $mediaFiles->getClientOriginalExtension();
+
+                        $check = in_array($extension,$allowedfileExtension);
+                        if(!$check){
+                            return $this->sendError('Only jpeg,png and bmp images are allowed.', $validator->errors());
+                        }
+                    }
+
+                    foreach($request->image as $mediaFiles) {
+                        $newReviewImage  = new ReviewImages;
+                        $newReviewImage->product_id = $request->product_id;
+                        $newReviewImage->product_review_id=$newProductVariable->id;
+                        $newReviewImage->imagePath = $this->saveReviewImage($mediaFiles);
+                        $newReviewImage->save();
+                    }
                     $newProductVariable->is_pic_available = true;
+                    $newProductVariable->save();
 
                 }
-                $newProductVariable->save();
                 $avg = ProductReview::whereProductId($request->product_id)->avg('rating');
                 $product->avg_rating = $avg;
                 $product->save();
@@ -923,9 +961,11 @@ class ProductController extends BaseController{
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
 
-                'image' => 'file|max:2048|mimes:jpeg,bmp,png,jpg',
+                'image.*' => 'max:2048|mimes:jpeg,bmp,png,jpg',
                 'comment'=>'string',
-                'rating'=>'numeric|max:5'
+                'rating'=>'numeric|max:5',
+                'feedback_option'=>'numeric|max:3'
+
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -934,17 +974,47 @@ class ProductController extends BaseController{
             $newProductVariable = ProductReview::find($id);
 
             if(!is_null($newProductVariable)){
-                if($request->hasFile('image')){
-                    $oldImage = $newProductVariable->imagePath;
-                    $newProductVariable->imagePath = $this->saveReviewImage($request->image);
-                    $newProductVariable->is_pic_available = true;
-                    if(file_exists(public_path().$oldImage)){
-                        unlink(public_path().$oldImage);
-                    }
-                }
+                if($request->has('image')){
+                    $delete = ReviewImages::where('product_review_id',$newProductVariable->id)->delete();
+                    $allowedfileExtension=['bmp','jpg','png','jpeg'];
+                    $check= false;
 
+                    foreach ($request->image as $mediaFiles){
+                        $extension = $mediaFiles->getClientOriginalExtension();
+
+                        $check = in_array($extension,$allowedfileExtension);
+                        if(!$check){
+                            return $this->sendError('Only jpeg,png and bmp images are allowed.', $validator->errors());
+                        }
+                    }
+
+                    foreach($request->image as $mediaFiles) {
+                        $newReviewImage  = new ReviewImages;
+                        $newReviewImage->product_id = $request->product_id;
+                        $newReviewImage->product_review_id=$newProductVariable->id;
+                        $newReviewImage->imagePath = $this->saveReviewImage($mediaFiles);
+                        $newReviewImage->save();
+                    }
+                    $newProductVariable->is_pic_available = true;
+                    $newProductVariable->save();
+                }
                 $newProductVariable->comment = $request->has('comment')?$request->comment:$newProductVariable->comment;
                 $newProductVariable->rating = $request->has('rating')?$request->rating:$newProductVariable->rating;
+                if($request->has('feedback_option')){
+                    switch ($request->feedback_option){
+                        case 1:
+                            $newProductVariable->size_feedback='fit_to_size';
+                            break;
+                        case 2:
+                            $newProductVariable->size_feedback='small_to_size';
+                            break;
+                        case 3:
+                            $newProductVariable->size_feedback='large_to_size';
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 $newProductVariable->save();
                 $product = Products::find($newProductVariable->product_id);
                 $avg = ProductReview::whereProductId($newProductVariable->product_id)->avg('rating');
@@ -1013,7 +1083,7 @@ class ProductController extends BaseController{
     }
 
     function saveReviewImage($image){
-        $image_name = 'productReview'.time().'.'.$image->getClientOriginalExtension();
+        $image_name = 'productReview'.time().'-'.rand(100,1000).'.'.$image->getClientOriginalExtension();
         $destinationPath = public_path('images/productReview/');
         $image->move($destinationPath, $image_name);
         $imageURL='/images/productReview/'.$image_name;
@@ -1156,7 +1226,7 @@ class ProductController extends BaseController{
                         $query->where('quantity','>','0');
                 })
                     ->with(['productDescriptions','productImages','productVariables.productVariablesImages'])
-                    ->with(['bestReviews','bestReviews.userInfo'])
+                    ->with(['bestReviews','bestReviews.userInfo','bestReviews.review_images'])
                     ->first();
                 $order = Order::where('user_id',Auth::user()->id)->whereHas('orderItems', function ($query) use($id){
                     $query->where('product_id', $id);
@@ -1172,6 +1242,11 @@ class ProductController extends BaseController{
                     }
                 }
 
+                $productRatingBySizeCount = ProductReview::where('product_id',$id)
+                    ->selectRaw('size_feedback, count(*) as total')
+                    ->groupBy('size_feedback')
+                    ->pluck('total','size_feedback')->all();
+                $productData['sizeFeedbackCount']=$productRatingBySizeCount;
                 if(!is_null(UserWhishlist::whereUserId(Auth::user()->id)->whereProductId($id)->first())){
                     $productData['isInUserWishList']=true;
                 }else{

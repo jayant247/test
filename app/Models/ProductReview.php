@@ -13,4 +13,8 @@ class ProductReview extends Model
     public function userInfo(){
         return $this->belongsTo(User::class,'user_id','id')->select('name','id');
     }
+
+    public function review_images(){
+        return $this->hasMany(ReviewImages::class,'product_review_id','id');
+    }
 }

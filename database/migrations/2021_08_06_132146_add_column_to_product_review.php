@@ -14,6 +14,7 @@ class AddColumnToProductReview extends Migration
     public function up()
     {
         Schema::table('product_reviews', function (Blueprint $table) {
+            $table->string('size_feedback')->nullable();
             $table->boolean('is_verified')->default(false);
         });
     }
@@ -27,6 +28,8 @@ class AddColumnToProductReview extends Migration
     {
         Schema::table('product_reviews', function (Blueprint $table) {
             //
+            $table->removeColumn('size_feedback');
+            $table->removeColumn('is_verified');
         });
     }
 }
