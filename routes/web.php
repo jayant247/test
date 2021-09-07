@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CRM\OrderController;
+use App\Http\Controllers\CRM\RemoteConfigController;
 use App\Http\Controllers\CRM\TicketsController;
 use App\Http\Controllers\CRM\AuthController;
 use App\Http\Controllers\CRM\CategoryController;
@@ -66,6 +67,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('confirmOrder/{id}',[OrderController::class,'confirmOrder'])->name('confirmOrder');
     //order
     Route::resource('order',OrderController::class);
+    Route::resource('remote-config',RemoteConfigController::class);
     //tickets
     Route::get('tickets',[TicketsController::class,'index'])->name('tickets.index');
     Route::get('tickets/assignToMe/{id}',[TicketsController::class,'assignToMe'])->name('tickets.assign');

@@ -80,8 +80,10 @@ class AuthController extends BaseController
 
     public function logout (Request $request) {
         try{
+            User::where('id',Auth::guard('api')->user()->id)->updated(['firebase_token',null]);
             $token = $request->user()->token();
             $token->revoke();
+
             return $this->sendResponse([], 'User Logout successfully.');
         }
         catch (Exception $e){
@@ -742,7 +744,8 @@ class AuthController extends BaseController
             $validator = Validator::make($request->all(), [
                 'mobile_no'=>'required|digits:10',
                 'imei_number'=>'string|required',
-                'referal_code'=>'string'
+                'referal_code'=>'string',
+                'firebase_token'=>'required|string',
             ]);
             if($validator->fails()){
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -757,6 +760,7 @@ class AuthController extends BaseController
                 $newUser = User::where('mobile_no',$request->mobile_no)->first();
                 $newUser->mobile_otp = rand(100000,999999);
                 $newUser->mobile_otp_time = Carbon::now();
+                $newUser->firebase_token = $request->has('firebase_token')?$request->firebase_token: null ;
                 $newUser->save();
 
             }else{
@@ -767,6 +771,7 @@ class AuthController extends BaseController
                     $newUser->name = '';
                     $newUser->my_referal_code=$this->generateRandomString(8);
                     $newUser->email = '';
+                    $newUser->firebase_token = $request->has('firebase_token')?$request->firebase_token: null ;
                     $newUser->mobile_otp = rand(100000,999999);
                     $newUser->mobile_otp_time = Carbon::now();
                     if($request->has('referal_code')){
@@ -793,6 +798,7 @@ class AuthController extends BaseController
                     $newUser->mobile_no=$request->mobile_no;
                     $newUser->mobile_otp = rand(100000,999999);
                     $newUser->mobile_otp_time = Carbon::now();
+                    $newUser->firebase_token = $request->has('firebase_token')?$request->firebase_token: null ;
                     $newUser->my_referal_code=$this->generateRandomString(8);
                     if($request->has('referal_code')){
                         $referredBy = User::where('my_referal_code',$request->referal_code)->first();
@@ -862,6 +868,25 @@ class AuthController extends BaseController
                 return $this->sendResponse([], 'Referral Details Not Available Successfully',false);
             }
 
+        }catch (\Exception $e){
+            return $this->sendError('Something Went Wrong', $e->getMessage(),413);
+        }
+    }
+
+    public function refreshToken(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+
+            ]);
+            if($validator->fails()){
+                return $this->sendError('Validation Error.', $validator->errors());
+            }
+            $response=[];
+            $newToken = JWTAuth::refresh(JWTAuth::getToken());
+            $user = JWTAuth::setToken($newToken)->toUser();
+//            $newToken = auth()->refresh(false, true);
+            $response['newToken']=$newToken;
+            return $this->sendResponse($response,'Auth Token Refreshed');
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', $e->getMessage(),413);
         }

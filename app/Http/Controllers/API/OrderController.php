@@ -6,6 +6,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Cart;
 use App\Models\Category;
 use App\Models\DeliveryPincode;
+use App\Models\Metadata;
 use App\Models\Order;
 use App\Models\OrderItems;
 use App\Models\Products;
@@ -20,6 +21,8 @@ use App\Models\UserWhishlist;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
+use Illuminate\Support\Facades\Cache;
+use Kreait\Firebase\Messaging\CloudMessage;
 use paytm\paytmchecksum\PaytmChecksum;
 use Razorpay\Api\Api;
 use Validator;
@@ -171,6 +174,8 @@ class OrderController extends BaseController{
 
             }
 
+
+
             if($request->has('products_list') && count($request->products_list)>0){
                 $productsList = $request->products_list;
                 $cartDelete = Cart::where('user_id',Auth::user()->id)->delete();
@@ -217,14 +222,16 @@ class OrderController extends BaseController{
                         $totalGiftCardValue = $userGiftCardCode['gift_amount'];
                         if($remainingAmountToBePaid<$userGiftCardCode['gift_amount']){
 
-                            $giftCardAmountUtilized = $userGiftCardCode['gift_amount'] - $remainingAmountToBePaid;
-                            $giftCardAmountRemaining = $userGiftCardCode['gift_amount'] - $giftCardAmountUtilized;
+                            $giftCardAmountRemaining = $userGiftCardCode['gift_amount'] - $remainingAmountToBePaid;
+                            $giftCardAmountUtilized = $userGiftCardCode['gift_amount'] - $giftCardAmountUtilized;
                             $remainingAmountToBePaid = 0;
 
                         }else{
                             $remainingAmountToBePaid = $remainingAmountToBePaid - $userGiftCardCode['gift_amount'] ;
                         }
                     }
+
+
 
                     if($request->has("use_wallet_balance") && $request->use_wallet_balance){
                         if($remainingAmountToBePaid>0){
@@ -271,20 +278,25 @@ class OrderController extends BaseController{
                     }
                 }
 
-                $response['shippingCharges']=10;
-                $shippingCharges = $response['shippingCharges'];
+
+
                 $response['discountAmount'] = (float)$discountAmount;
                 $response['subtotal']=(float)$subTotal;
-                if($shippingCharges<$giftCardAmountRemaining){
-                    $giftCardAmountRemaining = $giftCardAmountRemaining -$shippingCharges;
-                    $shippingCharges=0;
-                }else{
-                    $giftCardAmountRemaining = 0;
-                    $shippingCharges = $shippingCharges -$giftCardAmountRemaining;
+                if(!Cache::has('shipping_charge')){
+                    $data=Metadata::where('key','shipping_charge')->select('int_value')->first();
+                    Cache::put('shipping_charge',$data['int_value'],120);
+                }
+                $response['shippingCharges']=Cache::get('shipping_charge');
+                if(!Cache::has('free_shipping_cart_value')){
+                    $data=Metadata::where('key','free_shipping_cart_value')->select('int_value')->first();
+                    Cache::put('free_shipping_cart_value',$data['int_value'],120);
+                }
+                if($subTotal>=Cache::get('free_shipping_cart_value')){
+                    $response['shippingCharges']=0;
                 }
                 $response['giftCardAmountRemaining']= $giftCardAmountRemaining;
                 $response['totalGiftCardValue']=$totalGiftCardValue;
-                $response['total']= (float)($remainingAmountToBePaid+$shippingCharges - $discountAmount);
+                $response['total']= (float)($remainingAmountToBePaid+$response['shippingCharges'] - $discountAmount);
                 $response['pointsEarned']=round($response['total']*0.1,0);
                 $response['giftCardBalanceUsed'] = $totalGiftCardValue - $giftCardAmountRemaining;
             }
@@ -408,8 +420,8 @@ class OrderController extends BaseController{
 
                         if($remainingAmountToBePaid<$userGiftCardCode['gift_amount']){
 
-                            $giftCardAmountUtilized = $userGiftCardCode['gift_amount'] - $remainingAmountToBePaid;
-                            $giftCardAmountRemaining = $userGiftCardCode['gift_amount'] - $giftCardAmountUtilized;
+                            $giftCardAmountRemaining = $userGiftCardCode['gift_amount'] - $remainingAmountToBePaid;
+                            $giftCardAmountUtilized  = $userGiftCardCode['gift_amount'] - $giftCardAmountUtilized;
                             $remainingAmountToBePaid = 0;
                             $is_gift_coupon_applied = true;
                         }else{
@@ -465,23 +477,31 @@ class OrderController extends BaseController{
                         }
                     }
                 }
-                $response['shippingCharges']=10;
-                $shippingCharges = $response['shippingCharges'];
+
+                if(!Cache::has('shipping_charge')){
+                    $data=Metadata::where('key','shipping_charge')->select('int_value')->first();
+                    Cache::put('shipping_charge',$data['int_value'],120);
+                }
+                $response['shippingCharges']=Cache::get('shipping_charge');
+                if(!Cache::has('free_shipping_cart_value')){
+                    $data=Metadata::where('key','free_shipping_cart_value')->select('int_value')->first();
+                    Cache::put('free_shipping_cart_value',$data['int_value'],120);
+                }
+                if($subTotal>=Cache::get('free_shipping_cart_value')){
+                    $response['shippingCharges']=0;
+                }
                 $response['discountAmount'] = (float)$discountAmount;
                 $response['subtotal']=(float)$subTotal;
-                if($shippingCharges<$giftCardAmountRemaining){
-                    $giftCardAmountRemaining = $giftCardAmountRemaining -$shippingCharges;
-                    $shippingCharges=0;
-                }else{
-                    $giftCardAmountRemaining = 0;
-                    $shippingCharges = $shippingCharges -$giftCardAmountRemaining;
-                }
+
                 $response['giftCardAmountRemaining']= $giftCardAmountRemaining;
                 $response['totalGiftCardValue']=$totalGiftCardValue;
-                $response['total']= (float)($remainingAmountToBePaid+$shippingCharges - $discountAmount);
+                $response['total']= (float)($remainingAmountToBePaid+$response['shippingCharges'] - $discountAmount);
                 $response['pointsEarned']=round($response['total']*0.1,0);
                 $response['giftCardBalanceUsed'] = $totalGiftCardValue - $giftCardAmountRemaining;
                 $response['isFullPaymentDone']=false;
+                if($response['total']<=0){
+                    $response['isFullPaymentDone']=true;
+                }
                 $newOrder = new Order;
                 $newOrder->user_id = $user->id;
                 $newOrder->address_id = $request->address_id;
@@ -537,19 +557,24 @@ class OrderController extends BaseController{
                             ->create($data);
                     }
                     $payment_mode_details = [];
-                    if($newOrder->paymentMode=='Paytm'){
-                        $payment_mode_details = $this->generateOrderPaytm($newOrder->total,$newOrder->id);
-                    }
-                    if($newOrder->paymentMode=='Razorpay'){
-                        $payment_mode_details = $this->generateOrderRazorpay($newOrder->total,$newOrder->id);
-                    }
-                    if(count($payment_mode_details)<=0){
-                        return $this->sendError('Payment Gateway Error', [],219);
+                    if($response['isFullPaymentDone']==false){
+                        if($newOrder->paymentMode=='Paytm'){
+                            $payment_mode_details = $this->generateOrderPaytm($newOrder->total,$newOrder->id);
+                        }
+                        if($newOrder->paymentMode=='Razorpay'){
+                            $payment_mode_details = $this->generateOrderRazorpay($newOrder->total,$newOrder->id);
+                        }
+                        if(count($payment_mode_details)<=0){
+                            return $this->sendError('Payment Gateway Error', [],219);
+                        }else{
+                            $response['payment_gatway_details'] = $payment_mode_details;
+                            $newOrder->gateway_transaction_id = $payment_mode_details['txnToken'];
+                            $newOrder->save();
+                        }
                     }else{
                         $response['payment_gatway_details'] = $payment_mode_details;
-                        $newOrder->gateway_transaction_id = $payment_mode_details['txnToken'];
-                        $newOrder->save();
                     }
+
 
 
                     foreach ($productsList as $productVariable){
@@ -849,6 +874,15 @@ class OrderController extends BaseController{
                 $response = [];
                 $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems','addressDetails'])->find($order->id);
                 $response['payment_status']=true;
+
+                $dataForNotification = [
+                    'channel'=>'order_channel',
+                    'api_paramerter'=>$order->id,
+                    'intent'=>'SingleOrderActivity',
+                    'intent_value'=>12
+                ];
+                $this->sendMobileNotification($user->firebase_token,$dataForNotification,$order->id);
+
                 return  $this->sendResponse($response,'Payment Successful');
             }
             else{
@@ -972,6 +1006,13 @@ class OrderController extends BaseController{
                 $response = [];
                 $response['orderDetails'] = Order::with(['orderStatus','paymentStatus','orderItems','addressDetails'])->find($order->id);
                 $response['payment_status']=true;
+                $dataForNotification = [
+                    'channel'=>'order_channel',
+                    'api_paramerter'=>$order->id,
+                    'intent'=>'SingleOrderActivity',
+                    'intent_value'=>12
+                ];
+                $this->sendMobileNotification($user->firebase_token,$dataForNotification,$order->id);
                 return  $this->sendResponse($response,'Payment Successful');
             }
             else{
@@ -1323,6 +1364,44 @@ class OrderController extends BaseController{
             }
         }catch (\Exception $e){
             return $this->sendError('Something Went Wrong', [$e->getMessage()],413);
+        }
+    }
+
+    public function tempFunction(Request $request){
+        $messaging = app('firebase.messaging');
+        $token = "fJw9RPYpTwqx2Sck5JPSGD:APA91bEChWdl8knJ29nqZq6hFRf8hOYRoWP8v4I8gVwkKvfOAXs2_CkhgJ3mcwle-IPJ7kq_eq8cZMgCfRdawi6sWUYal2djLp-gHPID9pKpfuhGlTXx4zM05Sl0yYw0OABT6u-HdnZC";
+        $message = CloudMessage::withTarget('token', $token);
+        $dataForNotification = [];
+        $notification = array (
+            'body'  => "Your Order with id ".""." is received",
+            'title' => "Order Received. Waiting For Confirmation",
+            'icon'  => "https://image.flaticon.com/icons/png/512/270/270014.png",//Default Icon
+        );
+        $message = CloudMessage::fromArray([
+            'token' => $token,
+            'notification' => $notification,
+            'data'=> $dataForNotification
+        ]);
+        $messaging->send($message);
+    }
+
+    public function sendMobileNotification($token,$dataForNotification,$order_id){
+        if($token!=null && $token!='') {
+
+            $messaging = app('firebase.messaging');
+            $message = CloudMessage::withTarget('token', $token);
+
+            $notification = array(
+                'body' => "Your Order with id " . $order_id . " is received",
+                'title' => "Order Received. Waiting For Confirmation",
+                'icon' => "https://image.flaticon.com/icons/png/512/270/270014.png",//Default Icon
+            );
+            $message = CloudMessage::fromArray([
+                'token' => $token,
+                'notification' => $notification,
+                'data' => $dataForNotification
+            ]);
+            $messaging->send($message);
         }
     }
 }

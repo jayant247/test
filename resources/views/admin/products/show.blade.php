@@ -20,47 +20,47 @@
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Product Details</h4>
-                <div class="row"> 
+                <div class="row">
                 <div class="col-md-6">
                     <div class=table-responsive>
                         <table class="table table-striped table-bordered zero-configuration">
                             <thead>
                                 <tr>
                                     <th>Property Name</th>
-                                    <th>Property Value</th>                                   
+                                    <th>Property Value</th>
                                 </tr>
                             </thead>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Product Name :</td>
                                     <td>{{$product->product_name}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Product Price :</td>
                                     <td>{{$product->price}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Available Sizes :</td>
                                     <td>{{$product->available_sizes}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Is On Sale :</td>
                                     <td>{{$product->is_on_sale}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Sale Percentage :</td>
                                     <td>{{$product->sale_percentage}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Product Description :</td>
                                     <td>{{$product->description}}</td>
@@ -76,52 +76,66 @@
                                 <tr>
                                     <th>Property Name</th>
                                     <th>Property Value</th>
-                                    
+
                                 </tr>
                             </thead>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Product MRP :</td>
                                     <td>{{$product->mrp}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Product Ratings :</td>
                                     <td>{{$product->avg_rating}}/5.00</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Available Colors :</td>
                                     <td>{{$product->available_colors}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Sale Price :</td>
                                     <td>{{$product->sale_price}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Units Sold :</td>
                                     <td>{{$product->sellCount}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Is New? :</td>
                                     <td>{{$product->is_new}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tbody>
                                 <tr>
                                     <td>Is Live? :</td>
                                     <td>{{$product->is_live}}</td>
                                 </tr>
                             </tbody>
-                            <tbody>                                   
+                            <tr>
+                                <td>Product Categories :</td>
+                                <td>@foreach($product->categories as $key)
+                                        {{$key->category_name.' ,'}}
+                                    @endforeach
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Product Sub-Categories :</td>
+                                <td>@foreach($product->subCategories as $key)
+                                        {{$key->category_name.' ,'}}
+                                    @endforeach
+                                </td>
+                            </tr>
+                            <tbody>
                                 <tr>
                                     <td>Product Image :</td>
                                     <td>
@@ -133,7 +147,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>                                       
+                </div>
             </div>
         </div>
 
@@ -200,7 +214,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
-                                                
+
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </form>
@@ -239,7 +253,7 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
-                                                
+
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </form>
@@ -251,7 +265,7 @@
                             </table>
                         </div>
                     </div>
-                </div>                    
+                </div>
                 @else
                     <div class="text-center">
                         <h5>Desciption Not Available</h5>
@@ -284,7 +298,7 @@
                                                    <tr>
                                                        <td>{{$productDescription->property_name}}</td>
                                                        <td>{{$productDescription->property_value}}</td>
-                                                   </tr>                                           
+                                                   </tr>
                                                 </tbody>
                                            </table>
                                        </div>
@@ -314,7 +328,7 @@
 
                 </div>
                 @if(count($productVariables)>0)
-                
+
                 <div class="table-responsive">
 
                     <table id="productVariable-table" class="table table-striped table-bordered zero-configuration">
@@ -340,7 +354,7 @@
                                         <img loading="lazy" style="width: 100px;max-height: 100px;" src="{{env('APP_URL').$productVariable->primary_image}}">
                                     </a>
                                 </td>
-                                <td>{{$productVariable->size}}</td>             
+                                <td>{{$productVariable->size}}</td>
                                 <td>{{$productVariable->price}}</td>
                                 <td>{{$productVariable->is_on_sale}}</td>
                                 <td>{{$productVariable->sale_price}}</td>
@@ -357,7 +371,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" onclick="return confirm(' you want to delete?');" class="btn btn-sm btn-outline-dark">
-                                        
+
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </form>

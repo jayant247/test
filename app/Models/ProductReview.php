@@ -11,7 +11,7 @@ class ProductReview extends Model
     use HasFactory, SoftDeletes;
 
     public function userInfo(){
-        return $this->belongsTo(User::class,'user_id','id')->select('name','id');
+        return $this->belongsTo(User::class,'user_id','id')->select('name','id','mobile_no');
     }
 
     public function review_images(){

@@ -6,9 +6,11 @@ namespace App\Http\Controllers\CRM;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
+use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Kreait\Firebase\Messaging\CloudMessage;
 
 
 class TicketsController extends Controller{
@@ -72,11 +74,39 @@ class TicketsController extends Controller{
         $ticketMessage->message_by = 'admin';
         $ticketMessage->admin_id=Auth::user()->id;
         $ticketMessageSaveStatus = $ticketMessage->save();
+
         $ticket = Ticket::with(['customer', 'admin', 'ticketStatus'])->where('id', $request->ticket_id)->first();
+        $user = User::find($ticket->customer_id);
+        $notification = array (
+            'title'  => "Reply from support team",
+            'body' => $request->message,
+        );
+        $dataForNotification = [
+            'channel'=>'ticket_channel',
+            'api_paramerter'=>$ticket->id,
+            'intent'=>'TicketActivity',
+            'intent_value'=>11
+        ];
+        $this->sendMobileNotification($user->firebase_token,$dataForNotification,$notification);
         $ticketMessages = TicketMessage::with(['supportAgent'])->where('ticket_id', $request->ticket_id)->get();
 
         return redirect()->route('tickets.getMessage',$ticket->id);
 //        return view('admin.tickets.details', compact(['ticket', 'ticketMessages']));
+    }
+
+    public function sendMobileNotification($token,$dataForNotification,$notification){
+         if($token!=null && $token!='') {
+             $messaging = app('firebase.messaging');
+             $message = CloudMessage::withTarget('token', $token);
+
+
+             $message = CloudMessage::fromArray([
+                 'token' => $token,
+                 'notification' => $notification,
+                 'data' => $dataForNotification
+             ]);
+             $messaging->send($message);
+         }
     }
 
 }

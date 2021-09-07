@@ -2,6 +2,7 @@
 
 @section('css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap4.min.css" integrity="sha512-NDWv4n2v59EOoj+dDvXfD4uGGTCOXkLAnm+DhQtyYxpZL4lMSymTX5HD8i5NEcF+1YLBkgvByardYsJaA1W6MA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 
 @section('content')
@@ -24,11 +25,52 @@
 
                         <div id="filtersOption">
                             <div class="row">
-                                <div>Coming Soon</div>
+                                <div class="col-md-4">
+                                    <label>Product Id</label>
+                                    <input id="product_id" name="product_id" class="form-control input-default" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Colors</label>
+                                    <select class="input-default form-control" name="colors" id="colors" multiple>
+
+                                        @foreach($filterDataOptions['colorData'] as $color)
+                                            <option value="{{$color}}">{{$color}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Sizes</label>
+                                    <select  class="input-default form-control" name="sizes" id="sizes" multiple>
+
+                                        @foreach($filterDataOptions['sizeData'] as $size)
+                                            <option value="{{$size}}">{{$size}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Categories</label>
+                                    <select  class="input-default form-control" name="categories" id="categories" multiple>
+
+                                        @foreach($filterDataOptions['categories'] as $size)
+                                            <option value="{{$size->id}}">{{$size->category_name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+{{--                                <div class="col-md-4">--}}
+{{--                                    <label>Category</label>--}}
+{{--                                    <select  class="input-default form-control" name="categories" id="categories" multiple>--}}
+
+{{--                                        @foreach($filterDataOptions['categories'] as $size)--}}
+{{--                                            <option value="{{$size->id}}">{{$size->category_name}}</option>--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
+
                             </div>
                             <div class="row d-flex justify-content-end">
                                 <button class="btn btn-primary m-2" onclick="showHideFilter()">Hide</button>
-                                <button class="btn btn-primary m-2" onclick="clearFiltes()">Clear Filter</button>
+                                <button class="btn btn-primary m-2" onclick="applyFilter()">Apply</button>
+                                <button class="btn btn-secondary m-2" onclick="clearFiltes()">Clear Filter</button>
                             </div>
 
                         </div>
@@ -91,7 +133,26 @@
 @section('js')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha512-yCkOYsxpzPSpcbHspsH6A28Z0cgsfjJhlR78nPAfLLZSSV40tVN4VQ6ES/miqI/1z8a5FWVYwCF145+eyJx9Tw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap4.min.js" integrity="sha512-2wDq7VuYclJFDG5YbUbmOEWYtTEs/DwpKa9maNvC8gIhEHyR/rgh1BuyUrPZy00H8/DGlLAwbYwSpzCRV0dQJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('#colors').select2({
+
+                placeholder: "Select a Color",
+                allowClear: true
+            }).val("");
+            $('#sizes').select2({
+
+                placeholder: "Select a Size",
+                allowClear: true
+            }).val("");
+            $('#categories').select2({
+
+                placeholder: "Select a Size",
+                allowClear: true
+            }).val("");
+        });
+
         var products = [];
         var query = '';
         var pageLimit = 10;
@@ -180,16 +241,59 @@
                 $('#'+currentPageNo).removeClass('d-none')
             }
         }
+
         function getData() {
             let dataToSend = {}
-            dataToSend['url']= "{!! route('getProductList') !!}"+"?pageNo="+currentPageNo+"&limit="+pageLimit;
+            dataToSend['url']= "{!! route('getProductList') !!}"+"?pageNo="+currentPageNo+"&limit="+pageLimit+query;
             dataToSend['requestType']='GET';
             dataToSend['data']={
 
             };
-            console.log("getData")
+
             dataToSend['successCallbackFunction'] = onGetDataSuccess;
             ajaxCall(dataToSend)
+        }
+
+        function applyFilter(){
+            query='';
+            if($('#product_id').val()){
+                query =query+'&'+'product_id='+$('#product_id').val();
+            }
+
+            if($('#sizes').select2('data').length>0){
+                let sizeArray = []
+                $('#sizes').select2('data').forEach((item)=>{
+                    if(item.id!=""){
+                        sizeArray.push(item.id)
+                    }
+
+                });
+                if(sizeArray.length>0)
+                    query =query+'&'+'sizes='+sizeArray.join();
+            }
+            if($('#colors').select2('data').length>0){
+                let colorArray = []
+                $('#colors').select2('data').forEach((item)=>{
+                    if(item.id!="")
+                        colorArray.push(item.id)
+                })
+                if(colorArray.length>0)
+                    query =query+'&'+'colors='+colorArray.join();
+            }
+            if($('#categories').select2('data').length>0){
+                let categoriesArray = []
+                $('#categories').select2('data').forEach((item)=>{
+                    if(item.id!="")
+                        categoriesArray.push(item.id)
+                })
+                if(categoriesArray.length>0)
+                    query =query+'&'+'category_id='+categoriesArray.join();
+            }
+            if($('#created_at').val()){
+                query =query+'&'+'startDate='+$('#created_at').val().split('-')[0].trim();
+                query =query+'&'+'endDate='+$('#created_at').val().split('-')[1].trim();
+            }
+            getData();
         }
 
         function onGetDataSuccess(data) {
@@ -227,13 +331,13 @@
                         '<a class="btn btn-sm btn-outline-dark" href="'+editurl+'">'+
                             '<i class="fa fa-pencil"></i>'+
                         '</a>'+
-                        '<a class="btn btn-sm btn-outline-dark" href="'+deleteurl+'">'+
+                        '<a class="btn btn-sm btn-outline-dark" onclick="return confirm(\'Are you sure?\')" href="'+deleteurl+'">'+
                             '<i class="fa fa-trash"></i>'+
                         '</a>'
                     +'</td></tr>';
             }
             $('#tbody').empty();
-            console.log(tableBody)
+
             $('#tbody').append(tableBody);
 
         }
@@ -243,7 +347,7 @@
 
             $(document).on('click','.page-no',function () {
                 currentPageNo = +(this.id)
-                console.log(currentPageNo)
+
                 getData();
             })
             $(document).on('click','#next',function () {

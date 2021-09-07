@@ -19,7 +19,22 @@ class ProductController extends Controller{
 
     public function index(Request $request){
         $products = Products::all();
-        return view('admin.products.index',compact(['products']));
+        $colorData = ProductVariables::select('color')->distinct()->pluck('color');
+        $sizeData = ProductVariables::select('size')->distinct()->pluck('size');
+        $typeData = ProductVariables::select('type')->distinct()->pluck('type');
+        $maxPriceVariable = ProductVariables::where('quantity','>',0)->orderBy('price','DESC')->first();
+        $filterDataOptions['maxPrice'] =  $maxPriceVariable['price'];
+        $lowPriceVariable = ProductVariables::where('quantity','>',0)->orderBy('price','ASC')->first();
+        $filterDataOptions['minPrice'] =  $lowPriceVariable['price'];
+        $maxPriceVariable = ProductVariables::where('quantity','>',0)->where('is_on_sale',true)->orderBy('sale_percentage','DESC')->first();
+        $filterDataOptions['maxSalePercentage'] =  $maxPriceVariable['sale_percentage'];
+        $lowPriceVariable = ProductVariables::where('quantity','>',0)->where('is_on_sale',true)->orderBy('sale_percentage','ASC')->first();
+        $filterDataOptions['minSalePercentage'] =  $lowPriceVariable['sale_percentage'];
+        $filterDataOptions['colorData'] =  $colorData;
+        $filterDataOptions['sizeData'] =  $sizeData;
+        $filterDataOptions['typeData'] =  $typeData;
+        $filterDataOptions['categories']=Category::whereNull('parent_id')->get();
+        return view('admin.products.index',compact(['products','filterDataOptions']));
     }
 
     public function show(Request $request, $id){
@@ -216,7 +231,8 @@ class ProductController extends Controller{
                 'priceRangeHigh'=>'numeric',
                 'priceRangeLow'=>'numeric',
                 'salePercentageRangeHigh'=>'numeric',
-                'salePercentageRangeLow'=>'numeric'
+                'salePercentageRangeLow'=>'numeric',
+                'product_id'=>'numeric'
             ]);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors());
@@ -228,6 +244,10 @@ class ProductController extends Controller{
                 $query->whereHas('categories', function ($query) use($categoryId){
                     $query->whereIn('category_id', $categoryId);
                 });
+            }
+            if($request->has('product_id')){
+
+                $query->where('id', $request->product_id);
             }
 
             if($request->has('sub_category_id')){

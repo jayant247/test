@@ -5,8 +5,10 @@ namespace App\Http\Controllers\CRM;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Permission;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Kreait\Firebase\Messaging\CloudMessage;
 use Lcobucci\JWT\Exception;
 use Validator;
 use Redirect;
@@ -106,7 +108,33 @@ class OrderController extends Controller{
         $order->length=$request->length;
         $order->weight=$request->weight;
         $order->save();
+        $dataForNotification = [
+            'channel'=>'order_channel',
+            'api_paramerter'=>$order->id,
+            'intent'=>'SingleOrderActivity',
+            'intent_value'=>12
+        ];
+        $user = User::find($order->user_id);
+        $notification = array (
+            'title'  => "Your Order with id ".$order->id." is Confirmed",
+            'body' => "Your Order is ready to ship.",
+        );
+        $this->sendMobileNotification($user->firebase_token,$dataForNotification,$notification);
         return Redirect::back();
     }
 
+    public function sendMobileNotification($token,$dataForNotification,$notification){
+        if($token!=null && $token!='') {
+            $messaging = app('firebase.messaging');
+            $message = CloudMessage::withTarget('token', $token);
+
+
+            $message = CloudMessage::fromArray([
+                'token' => $token,
+                'notification' => $notification,
+                'data' => $dataForNotification
+            ]);
+            $messaging->send($message);
+        }
+    }
 }

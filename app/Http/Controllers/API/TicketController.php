@@ -203,7 +203,7 @@ class TicketController extends BaseController{
                     $ticketMessage->message_by='customer';
                     $ticketMessageSaveStatus=$ticketMessage->save();
                     if($ticketMessageSaveStatus){
-                        $customer=User::find($request->customer_id);
+                        $customer=Auth::user();
 
                         if ($customer==null) {
                             return $this->sendResponse([],'No User Found', false);

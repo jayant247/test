@@ -6,6 +6,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\DeliveryPincodeController;
 use App\Http\Controllers\API\GiftCardController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\PromoCodeController;
 use App\Http\Controllers\API\UserDetailsController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\TicketController;
@@ -139,7 +140,8 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
     Route::post('cart',[OrderController::class,'cart']);
     Route::post('checkout',[OrderController::class,'checkout']);
     Route::post('placeOrder',[OrderController::class,'placeOrder']);
-    Route::get('getAvailablePromocodes',[OrderController::class,'getAvailablePromocodes']);
+    Route::get('getAvailablePromocodes',[PromocodeController::class,'getAvailablePromocodes']);
+    Route::get('getUsedPromocodes',[PromocodeController::class,'getUsedPromocodes']);
     Route::get('getMyOrders',[OrderController::class,'getMyOrders']);
     Route::post('addToBag',[OrderController::class,'addToCart']);
     Route::get('getBagItems',[OrderController::class,'getBagItems']);
@@ -181,6 +183,9 @@ Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'order'
 });
 Route::group(['middleware' => ['jwt.verify','throttle:60,1'],'prefix' => 'user','as' => 'user.'], function () {
     Route::get('getReferralDetails',[AuthController::class,'getReferralDetails']);
+    Route::post('refreshToken',[AuthController::class,'refreshToken']);
 });
 
 Route::get('login',[\App\Http\Controllers\Helper\ShiprocketController::class,'placeOrder']);
+
+Route::get('tempFunction',[OrderController::class,'tempFunction']);

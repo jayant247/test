@@ -143,7 +143,7 @@ class ProductController extends BaseController{
             }
             $query->whereHas('productVariables', function ($query) {
                 $query->where('quantity','>',0);
-            })->with(['bestReviews','bestReviews.userInfo']);
+            })->with(['bestReviews','bestReviews.userInfo','bestReviews.review_images']);
             $limit = $request->limit;
             $pageNo = $request->pageNo;
             $skip = $limit*$pageNo;
@@ -848,7 +848,7 @@ class ProductController extends BaseController{
                 $skip = $limit*$pageNo;
                 $query= $query->skip($skip)->limit($limit);
             }
-            $data = $query->with('userInfo')->get();
+            $data = $query->with('userInfo','review_images')->get();
             if(count($data)>0){
                 $response =  $data;
                 return $this->sendResponse($response,'Data Fetched Successfully', true);
@@ -866,7 +866,7 @@ class ProductController extends BaseController{
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'product_id' => 'required|numeric',
-                'image.*' => 'max:2048|mimes:jpeg,bmp,png,jpg',
+                'image.*' => 'max:2048|mimes:jpeg,bmp,png,jpg,JPG,JPEG,PNG',
                 'comment'=>'string|required',
                 'rating'=>'numeric|max:5',
                 'feedback_option'=>'numeric|max:3'
