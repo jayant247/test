@@ -20,7 +20,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          composer install --optimize-autoloader --prefer-dist --no-progress --no-suggest
+          composer update --optimize-autoloader --prefer-dist --no-progress --no-suggest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
