@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    apt-utils    
 
 #install image magic lib
 RUN apt-get update && apt-get install -y \
