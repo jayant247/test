@@ -5,6 +5,7 @@ ARG user
 ARG uid
 
 # Install system dependencies
+
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -12,7 +13,8 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    --no-install-recommends apt-utils    
 
 #install image magic lib
 RUN apt-get update && apt-get install -y \
