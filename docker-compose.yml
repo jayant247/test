@@ -4,8 +4,8 @@ services:
   app:
     build:
       args:
-        user: sammy
-        uid: 1000
+        user: summy
+        uid: 1001
       context: ./
       dockerfile: Dockerfile
     image: eccomerce
